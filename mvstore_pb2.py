@@ -3,13 +3,20 @@
 from google.protobuf import descriptor
 from google.protobuf import message
 from google.protobuf import reflection
-from google.protobuf import service
-from google.protobuf import service_reflection
 #from google.protobuf import descriptor_pb2
+# @@protoc_insertion_point(imports)
+
+
+DESCRIPTOR = descriptor.FileDescriptor(
+  name='mvstore.proto',
+  package='MVStorePB',
+  serialized_pb='\n\rmvstore.proto\x12\tMVStorePB\" \n\x03PID\x12\n\n\x02id\x18\x01 \x01(\x04\x12\r\n\x05ident\x18\x02 \x01(\r\"M\n\x03Ref\x12\x1a\n\x02id\x18\x01 \x02(\x0b\x32\x0e.MVStorePB.PID\x12\x10\n\x08property\x18\x02 \x02(\r\x12\x0b\n\x03\x65id\x18\x03 \x01(\r\x12\x0b\n\x03vid\x18\x04 \x01(\r\"\xba\x0b\n\x05Value\x12(\n\x04type\x18\x01 \x01(\x0e\x32\x1a.MVStorePB.Value.ValueType\x12\x10\n\x08property\x18\x02 \x01(\r\x12\x0b\n\x03str\x18\x03 \x01(\t\x12\x0c\n\x04\x62str\x18\x04 \x01(\x0c\x12\t\n\x01i\x18\x05 \x01(\x11\x12\n\n\x02ui\x18\x06 \x01(\r\x12\x0b\n\x03i64\x18\x07 \x01(\x12\x12\x0c\n\x04ui64\x18\x08 \x01(\x04\x12\t\n\x01\x66\x18\t \x01(\x02\x12\t\n\x01\x64\x18\n \x01(\x01\x12\x10\n\x08\x64\x61tetime\x18\x0b \x01(\x06\x12\x10\n\x08interval\x18\x0c \x01(\x10\x12\x1a\n\x02id\x18\r \x01(\x0b\x32\x0e.MVStorePB.PID\x12\'\n\x06varray\x18\x0e \x01(\x0b\x32\x17.MVStorePB.Value.VArray\x12\x1b\n\x03ref\x18\x0f \x01(\x0b\x32\x0e.MVStorePB.Ref\x12\t\n\x01\x62\x18\x10 \x01(\x08\x12*\n\x02op\x18\x11 \x01(\x0e\x32\x16.MVStorePB.Value.ModOp:\x06OP_SET\x12\x17\n\x03\x65id\x18\x12 \x01(\r:\n4294967295\x12\x0c\n\x04meta\x18\x13 \x01(\r\x12&\n\x04\x65\x64it\x18\x14 \x01(\x0b\x32\x18.MVStorePB.Value.StrEdit\x12\r\n\x05units\x18\x15 \x01(\r\x12\x0c\n\x03\x63id\x18\x80\x01 \x01(\x04\x1a\x44\n\x07StrEdit\x12\x0b\n\x03str\x18\x01 \x01(\t\x12\x0c\n\x04\x62str\x18\x02 \x01(\x0c\x12\x0e\n\x06length\x18\x03 \x02(\r\x12\x0e\n\x06offset\x18\x04 \x01(\x04\x1a\x30\n\x06VArray\x12\t\n\x01l\x18\x01 \x01(\r\x12\x1b\n\x01v\x18\x02 \x03(\x0b\x32\x10.MVStorePB.Value\"\x93\x03\n\tValueType\x12\n\n\x06VT_ANY\x10\x00\x12\r\n\tVT_STRING\x10\x01\x12\x0b\n\x07VT_BSTR\x10\x02\x12\n\n\x06VT_URL\x10\x03\x12\x0b\n\x07VT_ENUM\x10\x04\x12\n\n\x06VT_INT\x10\x05\x12\x0b\n\x07VT_UINT\x10\x06\x12\x0c\n\x08VT_INT64\x10\x07\x12\r\n\tVT_UINT64\x10\x08\x12\x0e\n\nVT_DECIMAL\x10\t\x12\x0c\n\x08VT_FLOAT\x10\n\x12\r\n\tVT_DOUBLE\x10\x0b\x12\x0b\n\x07VT_BOOL\x10\x0c\x12\x0f\n\x0bVT_DATETIME\x10\r\x12\x0f\n\x0bVT_INTERVAL\x10\x0e\x12\x0c\n\x08VT_URIID\x10\x0f\x12\x0f\n\x0bVT_IDENTITY\x10\x10\x12\x0c\n\x08VT_REFID\x10\x12\x12\x10\n\x0cVT_REFIDPROP\x10\x14\x12\x0f\n\x0bVT_REFIDELT\x10\x16\x12\x0b\n\x07VT_EXPR\x10\x17\x12\x0c\n\x08VT_QUERY\x10\x18\x12\x0c\n\x08VT_ARRAY\x10\x19\x12\r\n\tVT_STRUCT\x10\x1b\x12\x0c\n\x08VT_RANGE\x10\x1c\x12\x0e\n\nVT_CURRENT\x10\x1e\x12\r\n\tVT_REFCID\x10\x1f\"\xda\x03\n\x05ModOp\x12\n\n\x06OP_SET\x10\x00\x12\n\n\x06OP_ADD\x10\x01\x12\x11\n\rOP_ADD_BEFORE\x10\x02\x12\x0b\n\x07OP_MOVE\x10\x03\x12\x12\n\x0eOP_MOVE_BEFORE\x10\x04\x12\r\n\tOP_DELETE\x10\x05\x12\x0b\n\x07OP_EDIT\x10\x06\x12\r\n\tOP_RENAME\x10\x07\x12\x0b\n\x07OP_PLUS\x10\x08\x12\x0c\n\x08OP_MINUS\x10\t\x12\n\n\x06OP_MUL\x10\n\x12\n\n\x06OP_DIV\x10\x0b\x12\n\n\x06OP_MOD\x10\x0c\x12\n\n\x06OP_NEG\x10\r\x12\n\n\x06OP_NOT\x10\x0e\x12\n\n\x06OP_AND\x10\x0f\x12\t\n\x05OP_OR\x10\x10\x12\n\n\x06OP_XOR\x10\x11\x12\r\n\tOP_LSHIFT\x10\x12\x12\r\n\tOP_RSHIFT\x10\x13\x12\n\n\x06OP_MIN\x10\x14\x12\n\n\x06OP_MAX\x10\x15\x12\n\n\x06OP_ABS\x10\x16\x12\t\n\x05OP_LN\x10\x17\x12\n\n\x06OP_EXP\x10\x18\x12\n\n\x06OP_POW\x10\x19\x12\x0b\n\x07OP_SQRT\x10\x1a\x12\x0c\n\x08OP_FLOOR\x10\x1b\x12\x0b\n\x07OP_CEIL\x10\x1c\x12\r\n\tOP_CONCAT\x10\x1d\x12\x0c\n\x08OP_LOWER\x10\x1e\x12\x0c\n\x08OP_UPPER\x10\x1f\x12\x0c\n\x08OP_TONUM\x10 \x12\r\n\tOP_TOINUM\x10!\x12\x0b\n\x07OP_CAST\x10\"\"\xac\x0b\n\x08MVStream\x12,\n\x05owner\x18\x01 \x01(\x0b\x32\x1d.MVStorePB.MVStream.StringMap\x12\x0f\n\x07storeID\x18\x02 \x01(\r\x12%\n\x04pins\x18\x03 \x03(\x0b\x32\x17.MVStorePB.MVStream.PIN\x12\x31\n\nproperties\x18\x04 \x03(\x0b\x32\x1d.MVStorePB.MVStream.StringMap\x12\x31\n\nidentities\x18\x05 \x03(\x0b\x32\x1d.MVStorePB.MVStream.StringMap\x12\'\n\x04stmt\x18\x06 \x03(\x0b\x32\x19.MVStorePB.MVStream.MVSQL\x12&\n\x04txop\x18\x07 \x03(\x0e\x32\x18.MVStorePB.MVStream.TXOP\x12*\n\x06result\x18\x08 \x03(\x0b\x32\x1a.MVStorePB.MVStream.Result\x12.\n\x08\x63ompound\x18\t \x03(\x0b\x32\x1c.MVStorePB.MVStream.Compound\x12*\n\x06status\x18\n \x03(\x0b\x32\x1a.MVStorePB.MVStream.Status\x12\r\n\x05\x66lush\x18\x0b \x03(\r\x12\x33\n\x08resPages\x18\x0c \x03(\x0b\x32!.MVStorePB.MVStream.ReservedPages\x12 \n\x06values\x18\r \x03(\x0b\x32\x10.MVStorePB.Value\x1a$\n\tStringMap\x12\x0b\n\x03str\x18\x01 \x02(\t\x12\n\n\x02id\x18\x02 \x02(\r\x1ap\n\x06Result\x12\x0b\n\x03\x63id\x18\x01 \x01(\x04\x12#\n\x05\x65rror\x18\x02 \x01(\x0e\x32\x14.MVStorePB.ErrorCode\x12\r\n\x05\x63ount\x18\x03 \x01(\x04\x12%\n\x02op\x18\x04 \x01(\x0e\x32\x19.MVStorePB.MVStream.MODOP\x1a\xb7\x01\n\x05MVSQL\x12\n\n\x02sq\x18\x01 \x02(\t\x12\x0b\n\x03\x63id\x18\x02 \x01(\x04\x12\"\n\x03rtt\x18\x03 \x01(\x0e\x32\x15.MVStorePB.ReturnType\x12\x0c\n\x04uids\x18\x04 \x03(\r\x12 \n\x06params\x18\x05 \x03(\x0b\x32\x10.MVStorePB.Value\x12\r\n\x05limit\x18\x06 \x01(\r\x12\x0e\n\x06offset\x18\x07 \x01(\r\x12\x0c\n\x04mode\x18\x08 \x01(\r\x12\x14\n\x0c\x61\x62ortOnError\x18\t \x01(\x08\x1a\xc9\x01\n\x03PIN\x12%\n\x02op\x18\x01 \x01(\x0e\x32\x19.MVStorePB.MVStream.MODOP\x12\x1a\n\x02id\x18\x02 \x01(\x0b\x32\x0e.MVStorePB.PID\x12\x0c\n\x04mode\x18\x03 \x01(\r\x12\r\n\x05stamp\x18\x04 \x01(\r\x12\x0f\n\x07nValues\x18\x05 \x01(\r\x12 \n\x06values\x18\x06 \x03(\x0b\x32\x10.MVStorePB.Value\x12\x0b\n\x03\x63id\x18\x07 \x01(\x04\x12\"\n\x03rtt\x18\x08 \x01(\x0e\x32\x15.MVStorePB.ReturnType\x1aM\n\x08\x43ompound\x12\r\n\x05nPINs\x18\x01 \x01(\r\x12%\n\x04pins\x18\x02 \x03(\x0b\x32\x17.MVStorePB.MVStream.PIN\x12\x0b\n\x03\x63id\x18\x03 \x01(\x04\x1a#\n\x06Status\x12\x0c\n\x04\x63ode\x18\x01 \x01(\r\x12\x0b\n\x03\x63id\x18\x02 \x01(\x04\x1a\x1f\n\rReservedPages\x12\x0e\n\x06pageID\x18\x01 \x03(\r\"R\n\x05MODOP\x12\r\n\tOP_INSERT\x10\x00\x12\r\n\tOP_UPDATE\x10\x01\x12\r\n\tOP_DELETE\x10\x02\x12\x0b\n\x07OP_COPY\x10\x03\x12\x0f\n\x0bOP_UNDELETE\x10\x04\"\x8d\x01\n\x04TXOP\x12\x0c\n\x08TX_START\x10\x01\x12\r\n\tTX_COMMIT\x10\x02\x12\x11\n\rTX_COMMIT_ALL\x10\x03\x12\x0f\n\x0bTX_ROLLBACK\x10\x04\x12\x13\n\x0fTX_ROLLBACK_ALL\x10\x05\x12\x15\n\x11TX_START_READONLY\x10\x06\x12\x18\n\x14TX_START_CLASSMODIFY\x10\x07*\xe9\x03\n\tErrorCode\x12\x0f\n\x0bRC_NOTFOUND\x10\x01\x12\x14\n\x10RC_ALREADYEXISTS\x10\x02\x12\x0f\n\x0bRC_INTERNAL\x10\x03\x12\x0f\n\x0bRC_NOACCESS\x10\x04\x12\x12\n\x0eRC_NORESOURCES\x10\x05\x12\x0b\n\x07RC_FULL\x10\x06\x12\x10\n\x0cRC_DEVICEERR\x10\x07\x12\x10\n\x0cRC_DATAERROR\x10\x08\x12\n\n\x06RC_EOF\x10\t\x12\x0e\n\nRC_TIMEOUT\x10\n\x12\r\n\tRC_REPEAT\x10\x0b\x12\x10\n\x0cRC_CORRUPTED\x10\x0c\x12\x0f\n\x0bRC_CANCELED\x10\r\x12\x0e\n\nRC_VERSION\x10\x0e\x12\x0b\n\x07RC_TRUE\x10\x0f\x12\x0c\n\x08RC_FALSE\x10\x10\x12\x0b\n\x07RC_TYPE\x10\x11\x12\x0b\n\x07RC_DIV0\x10\x12\x12\x0f\n\x0bRC_INVPARAM\x10\x13\x12\r\n\tRC_READTX\x10\x14\x12\x0c\n\x08RC_OTHER\x10\x15\x12\x0f\n\x0bRC_DEADLOCK\x10\x16\x12\x0c\n\x08RC_QUOTA\x10\x17\x12\x0f\n\x0bRC_SHUTDOWN\x10\x18\x12\x0e\n\nRC_DELETED\x10\x19\x12\r\n\tRC_CLOSED\x10\x1a\x12\x0f\n\x0bRC_READONLY\x10\x1b\x12\x10\n\x0cRC_NOSESSION\x10\x1c\x12\x0c\n\x08RC_INVOP\x10\x1d\x12\r\n\tRC_SYNTAX\x10\x1e*\x83\x04\n\x08SpecProp\x12\x0c\n\x08SP_PINID\x10\x01\x12\x0f\n\x0bSP_DOCUMENT\x10\x02\x12\r\n\tSP_PARENT\x10\x03\x12\x0c\n\x08SP_VALUE\x10\x04\x12\x0e\n\nSP_CREATED\x10\x05\x12\x10\n\x0cSP_CREATEDBY\x10\x06\x12\x0e\n\nSP_UPDATED\x10\x07\x12\x10\n\x0cSP_UPDATEDBY\x10\x08\x12\n\n\x06SP_ACL\x10\t\x12\n\n\x06SP_URI\x10\n\x12\x0c\n\x08SP_STAMP\x10\x0b\x12\x0e\n\nSP_CLASSID\x10\x0c\x12\x10\n\x0cSP_PREDICATE\x10\r\x12\x11\n\rSP_NINSTANCES\x10\x0e\x12\x12\n\x0eSP_NDINSTANCES\x10\x0f\x12\x11\n\rSP_SUBCLASSES\x10\x10\x12\x13\n\x0fSP_SUPERCLASSES\x10\x11\x12\x11\n\rSP_CLASS_INFO\x10\x12\x12\x11\n\rSP_INDEX_INFO\x10\x13\x12\x11\n\rSP_PROPERTIES\x10\x14\x12\x13\n\x0fSP_JOIN_TRIGGER\x10\x15\x12\x15\n\x11SP_UPDATE_TRIGGER\x10\x16\x12\x14\n\x10SP_LEAVE_TRIGGER\x10\x17\x12\x0c\n\x08SP_REFID\x10\x18\x12\n\n\x06SP_KEY\x10\x19\x12\x0e\n\nSP_VERSION\x10\x1a\x12\r\n\tSP_WEIGHT\x10\x1b\x12\x10\n\x0cSP_PROTOTYPE\x10\x1c\x12\r\n\tSP_WINDOW\x10\x1d\x12\x0b\n\x06SP_MAX\x10\xff\x01*e\n\x07SpecEID\x12\x1b\n\x0e\x45ID_COLLECTION\x10\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01\x12\x1d\n\x10\x45ID_LAST_ELEMENT\x10\xfe\xff\xff\xff\xff\xff\xff\xff\xff\x01\x12\x1e\n\x11\x45ID_FIRST_ELEMENT\x10\xfd\xff\xff\xff\xff\xff\xff\xff\xff\x01*\x81\x01\n\x06OpMode\x12\x0e\n\x08OM_PURGE\x10\x80\x80\x10\x12\x15\n\x0eOM_CHECK_STAMP\x10\x80\x80\x80\x01\x12\x12\n\x0cOM_PURGE_IDS\x10\x80\x80@\x12\x13\n\x0cOM_ALL_WORDS\x10\x80\x80\x80\x02\x12\x11\n\nOM_DELETED\x10\x80\x80\x80\x08\x12\x14\n\rOM_FOR_UPDATE\x10\x80\x80\x80\x10*\xd9\x01\n\x08PINFlags\x12\x19\n\x11PF_NO_REPLICATION\x10\x80\x80\x80\x80\x04\x12\x13\n\x0bPF_NO_INDEX\x10\x80\x80\x80\x80\x02\x12\x11\n\tPF_NOTIFY\x10\x80\x80\x80\x80\x01\x12\x14\n\rPF_REPLICATED\x10\x80\x80\x80@\x12\x10\n\tPF_HIDDEN\x10\x80\x80\x80 \x12\x12\n\x0bPF_READONLY\x10\x80\x80\x80\x10\x12\x11\n\nPF_DELETED\x10\x80\x80\x80\x08\x12\x0f\n\x08PF_CLASS\x10\x80\x80\x80\x04\x12\x15\n\x0ePF_TRANSFORMED\x10\x80\x80\x80\x02\x12\x13\n\x0cPF_PROJECTED\x10\x80\x80\x80\x01*\xeb\x01\n\tMetaProps\x12\x0e\n\tMETA_PART\x10\x80\x01\x12\x15\n\x11META_FIXEDVERSION\x10@\x12\x11\n\rMETA_SSTORAGE\x10@\x12\x17\n\x13META_NONOTIFICATION\x10 \x12\x12\n\x0eMETA_NOFTINDEX\x10\x10\x12\x18\n\x14META_NONSERIALIZABLE\x10\x08\x12\x10\n\x0cMETA_IFEXIST\x10\x08\x12\x13\n\x0fMETA_IFNOTEXIST\x10\x04\x12\x10\n\x0cMETA_DERIVED\x10\x04\x12\x10\n\x0cMETA_RACCESS\x10\x02\x12\x12\n\x0eMETA_STOPWORDS\x10\x01*/\n\x0e\x41\x43LPermissions\x12\r\n\tACLP_READ\x10\x01\x12\x0e\n\nACLP_WRITE\x10\x02*Z\n\nClassFlags\x12\x0e\n\nCF_SDELETE\x10\x01\x12\x0b\n\x07\x43\x46_VIEW\x10\x02\x12\x10\n\x0c\x43\x46_CLUSTERED\x10\x04\x12\x0e\n\nCF_INDEXED\x10\x08\x12\r\n\tCF_UNIQUE\x10\x10*S\n\nReturnType\x12\x0b\n\x07RT_PINS\x10\x00\x12\x0c\n\x08RT_COUNT\x10\x01\x12\x0b\n\x07RT_PIDS\x10\x02\x12\x0e\n\nRT_SRCPINS\x10\x03\x12\r\n\tRT_VALUES\x10\x04\x42\x15\n\x0b\x63om.mvstoreB\x06stream')
+
 _ERRORCODE = descriptor.EnumDescriptor(
   name='ErrorCode',
   full_name='MVStorePB.ErrorCode',
-  filename='ErrorCode',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='RC_NOTFOUND', index=0, number=1,
@@ -132,14 +139,18 @@ _ERRORCODE = descriptor.EnumDescriptor(
       options=None,
       type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=3066,
+  serialized_end=3555,
 )
 
 
 _SPECPROP = descriptor.EnumDescriptor(
   name='SpecProp',
   full_name='MVStorePB.SpecProp',
-  filename='SpecProp',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='SP_PINID', index=0, number=1,
@@ -262,14 +273,18 @@ _SPECPROP = descriptor.EnumDescriptor(
       options=None,
       type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=3558,
+  serialized_end=4073,
 )
 
 
 _SPECEID = descriptor.EnumDescriptor(
   name='SpecEID',
   full_name='MVStorePB.SpecEID',
-  filename='SpecEID',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='EID_COLLECTION', index=0, number=-1,
@@ -284,14 +299,18 @@ _SPECEID = descriptor.EnumDescriptor(
       options=None,
       type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=4075,
+  serialized_end=4176,
 )
 
 
 _OPMODE = descriptor.EnumDescriptor(
   name='OpMode',
   full_name='MVStorePB.OpMode',
-  filename='OpMode',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='OM_PURGE', index=0, number=262144,
@@ -318,14 +337,18 @@ _OPMODE = descriptor.EnumDescriptor(
       options=None,
       type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=4179,
+  serialized_end=4308,
 )
 
 
 _PINFLAGS = descriptor.EnumDescriptor(
   name='PINFlags',
   full_name='MVStorePB.PINFlags',
-  filename='PINFlags',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='PF_NO_REPLICATION', index=0, number=1073741824,
@@ -368,14 +391,18 @@ _PINFLAGS = descriptor.EnumDescriptor(
       options=None,
       type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=4311,
+  serialized_end=4528,
 )
 
 
 _METAPROPS = descriptor.EnumDescriptor(
   name='MetaProps',
   full_name='MVStorePB.MetaProps',
-  filename='MetaProps',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='META_PART', index=0, number=128,
@@ -422,14 +449,18 @@ _METAPROPS = descriptor.EnumDescriptor(
       options=None,
       type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=4531,
+  serialized_end=4766,
 )
 
 
 _ACLPERMISSIONS = descriptor.EnumDescriptor(
   name='ACLPermissions',
   full_name='MVStorePB.ACLPermissions',
-  filename='ACLPermissions',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='ACLP_READ', index=0, number=1,
@@ -440,14 +471,18 @@ _ACLPERMISSIONS = descriptor.EnumDescriptor(
       options=None,
       type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=4768,
+  serialized_end=4815,
 )
 
 
 _CLASSFLAGS = descriptor.EnumDescriptor(
   name='ClassFlags',
   full_name='MVStorePB.ClassFlags',
-  filename='ClassFlags',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='CF_SDELETE', index=0, number=1,
@@ -470,14 +505,18 @@ _CLASSFLAGS = descriptor.EnumDescriptor(
       options=None,
       type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=4817,
+  serialized_end=4907,
 )
 
 
 _RETURNTYPE = descriptor.EnumDescriptor(
   name='ReturnType',
   full_name='MVStorePB.ReturnType',
-  filename='ReturnType',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='RT_PINS', index=0, number=0,
@@ -500,7 +539,10 @@ _RETURNTYPE = descriptor.EnumDescriptor(
       options=None,
       type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=4909,
+  serialized_end=4992,
 )
 
 
@@ -611,74 +653,75 @@ RT_VALUES = 4
 _VALUE_VALUETYPE = descriptor.EnumDescriptor(
   name='ValueType',
   full_name='MVStorePB.Value.ValueType',
-  filename='ValueType',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='VT_ANY', index=0, number=0,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_INT', index=1, number=1,
+      name='VT_STRING', index=1, number=1,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_UINT', index=2, number=2,
+      name='VT_BSTR', index=2, number=2,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_INT64', index=3, number=3,
+      name='VT_URL', index=3, number=3,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_UINT64', index=4, number=4,
+      name='VT_ENUM', index=4, number=4,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_DECIMAL', index=5, number=5,
+      name='VT_INT', index=5, number=5,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_FLOAT', index=6, number=6,
+      name='VT_UINT', index=6, number=6,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_DOUBLE', index=7, number=7,
+      name='VT_INT64', index=7, number=7,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_BOOL', index=8, number=8,
+      name='VT_UINT64', index=8, number=8,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_DATETIME', index=9, number=9,
+      name='VT_DECIMAL', index=9, number=9,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_INTERVAL', index=10, number=10,
+      name='VT_FLOAT', index=10, number=10,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_URIID', index=11, number=11,
+      name='VT_DOUBLE', index=11, number=11,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_IDENTITY', index=12, number=12,
+      name='VT_BOOL', index=12, number=12,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_STRING', index=13, number=13,
+      name='VT_DATETIME', index=13, number=13,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_BSTR', index=14, number=14,
+      name='VT_INTERVAL', index=14, number=14,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_URL', index=15, number=15,
+      name='VT_URIID', index=15, number=15,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='VT_ENUM', index=16, number=16,
+      name='VT_IDENTITY', index=16, number=16,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
@@ -717,14 +760,22 @@ _VALUE_VALUETYPE = descriptor.EnumDescriptor(
       name='VT_CURRENT', index=25, number=30,
       options=None,
       type=None),
+    descriptor.EnumValueDescriptor(
+      name='VT_REFCID', index=26, number=31,
+      options=None,
+      type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=728,
+  serialized_end=1131,
 )
 
 _VALUE_MODOP = descriptor.EnumDescriptor(
   name='ModOp',
   full_name='MVStorePB.Value.ModOp',
-  filename='ModOp',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='OP_SET', index=0, number=0,
@@ -867,13 +918,17 @@ _VALUE_MODOP = descriptor.EnumDescriptor(
       options=None,
       type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=1134,
+  serialized_end=1608,
 )
 
 _MVSTREAM_MODOP = descriptor.EnumDescriptor(
   name='MODOP',
   full_name='MVStorePB.MVStream.MODOP',
-  filename='MODOP',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='OP_INSERT', index=0, number=0,
@@ -896,13 +951,17 @@ _MVSTREAM_MODOP = descriptor.EnumDescriptor(
       options=None,
       type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=2837,
+  serialized_end=2919,
 )
 
 _MVSTREAM_TXOP = descriptor.EnumDescriptor(
   name='TXOP',
   full_name='MVStorePB.MVStream.TXOP',
-  filename='TXOP',
+  filename=None,
+  file=DESCRIPTOR,
   values=[
     descriptor.EnumValueDescriptor(
       name='TX_START', index=0, number=1,
@@ -933,749 +992,841 @@ _MVSTREAM_TXOP = descriptor.EnumDescriptor(
       options=None,
       type=None),
   ],
+  containing_type=None,
   options=None,
+  serialized_start=2922,
+  serialized_end=3063,
 )
 
 
 _PID = descriptor.Descriptor(
   name='PID',
   full_name='MVStorePB.PID',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='id', full_name='MVStorePB.PID.id', index=0,
       number=1, type=4, cpp_type=4, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='ident', full_name='MVStorePB.PID.ident', index=1,
       number=2, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[],
   enum_types=[
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=28,
+  serialized_end=60,
+)
 
 
 _REF = descriptor.Descriptor(
   name='Ref',
   full_name='MVStorePB.Ref',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='id', full_name='MVStorePB.Ref.id', index=0,
       number=1, type=11, cpp_type=10, label=2,
-      default_value=None,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='property', full_name='MVStorePB.Ref.property', index=1,
       number=2, type=13, cpp_type=3, label=2,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='eid', full_name='MVStorePB.Ref.eid', index=2,
       number=3, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='vid', full_name='MVStorePB.Ref.vid', index=3,
       number=4, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[],
   enum_types=[
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=62,
+  serialized_end=139,
+)
 
 
 _VALUE_STREDIT = descriptor.Descriptor(
   name='StrEdit',
   full_name='MVStorePB.Value.StrEdit',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='str', full_name='MVStorePB.Value.StrEdit.str', index=0,
       number=1, type=9, cpp_type=9, label=1,
-      default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='bstr', full_name='MVStorePB.Value.StrEdit.bstr', index=1,
       number=2, type=12, cpp_type=9, label=1,
-      default_value="",
+      has_default_value=False, default_value="",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='length', full_name='MVStorePB.Value.StrEdit.length', index=2,
       number=3, type=13, cpp_type=3, label=2,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='offset', full_name='MVStorePB.Value.StrEdit.offset', index=3,
       number=4, type=4, cpp_type=4, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[],
   enum_types=[
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=607,
+  serialized_end=675,
+)
 
 _VALUE_VARRAY = descriptor.Descriptor(
   name='VArray',
   full_name='MVStorePB.Value.VArray',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='l', full_name='MVStorePB.Value.VArray.l', index=0,
       number=1, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='v', full_name='MVStorePB.Value.VArray.v', index=1,
       number=2, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[],
   enum_types=[
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=677,
+  serialized_end=725,
+)
 
 _VALUE = descriptor.Descriptor(
   name='Value',
   full_name='MVStorePB.Value',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='type', full_name='MVStorePB.Value.type', index=0,
       number=1, type=14, cpp_type=8, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='property', full_name='MVStorePB.Value.property', index=1,
       number=2, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='str', full_name='MVStorePB.Value.str', index=2,
       number=3, type=9, cpp_type=9, label=1,
-      default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='bstr', full_name='MVStorePB.Value.bstr', index=3,
       number=4, type=12, cpp_type=9, label=1,
-      default_value="",
+      has_default_value=False, default_value="",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='i', full_name='MVStorePB.Value.i', index=4,
       number=5, type=17, cpp_type=1, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='ui', full_name='MVStorePB.Value.ui', index=5,
       number=6, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='i64', full_name='MVStorePB.Value.i64', index=6,
       number=7, type=18, cpp_type=2, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='ui64', full_name='MVStorePB.Value.ui64', index=7,
       number=8, type=4, cpp_type=4, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='f', full_name='MVStorePB.Value.f', index=8,
       number=9, type=2, cpp_type=6, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='d', full_name='MVStorePB.Value.d', index=9,
       number=10, type=1, cpp_type=5, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='datetime', full_name='MVStorePB.Value.datetime', index=10,
       number=11, type=6, cpp_type=4, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='interval', full_name='MVStorePB.Value.interval', index=11,
       number=12, type=16, cpp_type=2, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='id', full_name='MVStorePB.Value.id', index=12,
       number=13, type=11, cpp_type=10, label=1,
-      default_value=None,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='varray', full_name='MVStorePB.Value.varray', index=13,
       number=14, type=11, cpp_type=10, label=1,
-      default_value=None,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='ref', full_name='MVStorePB.Value.ref', index=14,
       number=15, type=11, cpp_type=10, label=1,
-      default_value=None,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='b', full_name='MVStorePB.Value.b', index=15,
       number=16, type=8, cpp_type=7, label=1,
-      default_value=False,
+      has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='op', full_name='MVStorePB.Value.op', index=16,
       number=17, type=14, cpp_type=8, label=1,
-      default_value=0,
+      has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='eid', full_name='MVStorePB.Value.eid', index=17,
       number=18, type=13, cpp_type=3, label=1,
-      default_value=4294967295,
+      has_default_value=True, default_value=4294967295,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='meta', full_name='MVStorePB.Value.meta', index=18,
       number=19, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='edit', full_name='MVStorePB.Value.edit', index=19,
       number=20, type=11, cpp_type=10, label=1,
-      default_value=None,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='units', full_name='MVStorePB.Value.units', index=20,
       number=21, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='cid', full_name='MVStorePB.Value.cid', index=21,
       number=128, type=4, cpp_type=4, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[_VALUE_STREDIT, _VALUE_VARRAY, ],
   enum_types=[
     _VALUE_VALUETYPE,
     _VALUE_MODOP,
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=142,
+  serialized_end=1608,
+)
 
 
 _MVSTREAM_STRINGMAP = descriptor.Descriptor(
   name='StringMap',
   full_name='MVStorePB.MVStream.StringMap',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='str', full_name='MVStorePB.MVStream.StringMap.str', index=0,
       number=1, type=9, cpp_type=9, label=2,
-      default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='id', full_name='MVStorePB.MVStream.StringMap.id', index=1,
       number=2, type=13, cpp_type=3, label=2,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[],
   enum_types=[
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=2146,
+  serialized_end=2182,
+)
 
 _MVSTREAM_RESULT = descriptor.Descriptor(
   name='Result',
   full_name='MVStorePB.MVStream.Result',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='cid', full_name='MVStorePB.MVStream.Result.cid', index=0,
       number=1, type=4, cpp_type=4, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='error', full_name='MVStorePB.MVStream.Result.error', index=1,
       number=2, type=14, cpp_type=8, label=1,
-      default_value=1,
+      has_default_value=False, default_value=1,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='count', full_name='MVStorePB.MVStream.Result.count', index=2,
       number=3, type=4, cpp_type=4, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='op', full_name='MVStorePB.MVStream.Result.op', index=3,
       number=4, type=14, cpp_type=8, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[],
   enum_types=[
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=2184,
+  serialized_end=2296,
+)
 
 _MVSTREAM_MVSQL = descriptor.Descriptor(
   name='MVSQL',
   full_name='MVStorePB.MVStream.MVSQL',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='sq', full_name='MVStorePB.MVStream.MVSQL.sq', index=0,
       number=1, type=9, cpp_type=9, label=2,
-      default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='cid', full_name='MVStorePB.MVStream.MVSQL.cid', index=1,
       number=2, type=4, cpp_type=4, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='rtt', full_name='MVStorePB.MVStream.MVSQL.rtt', index=2,
       number=3, type=14, cpp_type=8, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='uids', full_name='MVStorePB.MVStream.MVSQL.uids', index=3,
       number=4, type=13, cpp_type=3, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='params', full_name='MVStorePB.MVStream.MVSQL.params', index=4,
       number=5, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='limit', full_name='MVStorePB.MVStream.MVSQL.limit', index=5,
       number=6, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='offset', full_name='MVStorePB.MVStream.MVSQL.offset', index=6,
       number=7, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='mode', full_name='MVStorePB.MVStream.MVSQL.mode', index=7,
       number=8, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='abortOnError', full_name='MVStorePB.MVStream.MVSQL.abortOnError', index=8,
       number=9, type=8, cpp_type=7, label=1,
-      default_value=False,
+      has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[],
   enum_types=[
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=2299,
+  serialized_end=2482,
+)
 
 _MVSTREAM_PIN = descriptor.Descriptor(
   name='PIN',
   full_name='MVStorePB.MVStream.PIN',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='op', full_name='MVStorePB.MVStream.PIN.op', index=0,
       number=1, type=14, cpp_type=8, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='id', full_name='MVStorePB.MVStream.PIN.id', index=1,
       number=2, type=11, cpp_type=10, label=1,
-      default_value=None,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='mode', full_name='MVStorePB.MVStream.PIN.mode', index=2,
       number=3, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='stamp', full_name='MVStorePB.MVStream.PIN.stamp', index=3,
       number=4, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='nValues', full_name='MVStorePB.MVStream.PIN.nValues', index=4,
       number=5, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='values', full_name='MVStorePB.MVStream.PIN.values', index=5,
       number=6, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='cid', full_name='MVStorePB.MVStream.PIN.cid', index=6,
       number=7, type=4, cpp_type=4, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='rtt', full_name='MVStorePB.MVStream.PIN.rtt', index=7,
       number=8, type=14, cpp_type=8, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[],
   enum_types=[
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=2485,
+  serialized_end=2686,
+)
 
 _MVSTREAM_COMPOUND = descriptor.Descriptor(
   name='Compound',
   full_name='MVStorePB.MVStream.Compound',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='nPINs', full_name='MVStorePB.MVStream.Compound.nPINs', index=0,
       number=1, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='pins', full_name='MVStorePB.MVStream.Compound.pins', index=1,
       number=2, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='cid', full_name='MVStorePB.MVStream.Compound.cid', index=2,
       number=3, type=4, cpp_type=4, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[],
   enum_types=[
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=2688,
+  serialized_end=2765,
+)
 
 _MVSTREAM_STATUS = descriptor.Descriptor(
   name='Status',
   full_name='MVStorePB.MVStream.Status',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='code', full_name='MVStorePB.MVStream.Status.code', index=0,
       number=1, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='cid', full_name='MVStorePB.MVStream.Status.cid', index=1,
       number=2, type=4, cpp_type=4, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[],
   enum_types=[
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=2767,
+  serialized_end=2802,
+)
 
 _MVSTREAM_RESERVEDPAGES = descriptor.Descriptor(
   name='ReservedPages',
   full_name='MVStorePB.MVStream.ReservedPages',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='pageID', full_name='MVStorePB.MVStream.ReservedPages.pageID', index=0,
       number=1, type=13, cpp_type=3, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[],
   enum_types=[
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=2804,
+  serialized_end=2835,
+)
 
 _MVSTREAM = descriptor.Descriptor(
   name='MVStream',
   full_name='MVStorePB.MVStream',
-  filename='mvstore.proto',
+  filename=None,
+  file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
       name='owner', full_name='MVStorePB.MVStream.owner', index=0,
       number=1, type=11, cpp_type=10, label=1,
-      default_value=None,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='storeID', full_name='MVStorePB.MVStream.storeID', index=1,
       number=2, type=13, cpp_type=3, label=1,
-      default_value=0,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='pins', full_name='MVStorePB.MVStream.pins', index=2,
       number=3, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='properties', full_name='MVStorePB.MVStream.properties', index=3,
       number=4, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='identities', full_name='MVStorePB.MVStream.identities', index=4,
       number=5, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='stmt', full_name='MVStorePB.MVStream.stmt', index=5,
       number=6, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='txop', full_name='MVStorePB.MVStream.txop', index=6,
       number=7, type=14, cpp_type=8, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='result', full_name='MVStorePB.MVStream.result', index=7,
       number=8, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='compound', full_name='MVStorePB.MVStream.compound', index=8,
       number=9, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='status', full_name='MVStorePB.MVStream.status', index=9,
       number=10, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='flush', full_name='MVStorePB.MVStream.flush', index=10,
       number=11, type=13, cpp_type=3, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='resPages', full_name='MVStorePB.MVStream.resPages', index=11,
       number=12, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='values', full_name='MVStorePB.MVStream.values', index=12,
       number=13, type=11, cpp_type=10, label=3,
-      default_value=[],
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[],  # TODO(robinson): Implement.
+  nested_types=[_MVSTREAM_STRINGMAP, _MVSTREAM_RESULT, _MVSTREAM_MVSQL, _MVSTREAM_PIN, _MVSTREAM_COMPOUND, _MVSTREAM_STATUS, _MVSTREAM_RESERVEDPAGES, ],
   enum_types=[
     _MVSTREAM_MODOP,
     _MVSTREAM_TXOP,
   ],
-  options=None)
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=1611,
+  serialized_end=3063,
+)
 
 
 _REF.fields_by_name['id'].message_type = _PID
+_VALUE_STREDIT.containing_type = _VALUE;
 _VALUE_VARRAY.fields_by_name['v'].message_type = _VALUE
+_VALUE_VARRAY.containing_type = _VALUE;
 _VALUE.fields_by_name['type'].enum_type = _VALUE_VALUETYPE
 _VALUE.fields_by_name['id'].message_type = _PID
 _VALUE.fields_by_name['varray'].message_type = _VALUE_VARRAY
 _VALUE.fields_by_name['ref'].message_type = _REF
 _VALUE.fields_by_name['op'].enum_type = _VALUE_MODOP
 _VALUE.fields_by_name['edit'].message_type = _VALUE_STREDIT
+_VALUE_VALUETYPE.containing_type = _VALUE;
+_VALUE_MODOP.containing_type = _VALUE;
+_MVSTREAM_STRINGMAP.containing_type = _MVSTREAM;
 _MVSTREAM_RESULT.fields_by_name['error'].enum_type = _ERRORCODE
 _MVSTREAM_RESULT.fields_by_name['op'].enum_type = _MVSTREAM_MODOP
+_MVSTREAM_RESULT.containing_type = _MVSTREAM;
 _MVSTREAM_MVSQL.fields_by_name['rtt'].enum_type = _RETURNTYPE
 _MVSTREAM_MVSQL.fields_by_name['params'].message_type = _VALUE
+_MVSTREAM_MVSQL.containing_type = _MVSTREAM;
 _MVSTREAM_PIN.fields_by_name['op'].enum_type = _MVSTREAM_MODOP
 _MVSTREAM_PIN.fields_by_name['id'].message_type = _PID
 _MVSTREAM_PIN.fields_by_name['values'].message_type = _VALUE
 _MVSTREAM_PIN.fields_by_name['rtt'].enum_type = _RETURNTYPE
+_MVSTREAM_PIN.containing_type = _MVSTREAM;
 _MVSTREAM_COMPOUND.fields_by_name['pins'].message_type = _MVSTREAM_PIN
+_MVSTREAM_COMPOUND.containing_type = _MVSTREAM;
+_MVSTREAM_STATUS.containing_type = _MVSTREAM;
+_MVSTREAM_RESERVEDPAGES.containing_type = _MVSTREAM;
 _MVSTREAM.fields_by_name['owner'].message_type = _MVSTREAM_STRINGMAP
 _MVSTREAM.fields_by_name['pins'].message_type = _MVSTREAM_PIN
 _MVSTREAM.fields_by_name['properties'].message_type = _MVSTREAM_STRINGMAP
@@ -1687,14 +1838,20 @@ _MVSTREAM.fields_by_name['compound'].message_type = _MVSTREAM_COMPOUND
 _MVSTREAM.fields_by_name['status'].message_type = _MVSTREAM_STATUS
 _MVSTREAM.fields_by_name['resPages'].message_type = _MVSTREAM_RESERVEDPAGES
 _MVSTREAM.fields_by_name['values'].message_type = _VALUE
+_MVSTREAM_MODOP.containing_type = _MVSTREAM;
+_MVSTREAM_TXOP.containing_type = _MVSTREAM;
 
 class PID(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _PID
+  
+  # @@protoc_insertion_point(class_scope:MVStorePB.PID)
 
 class Ref(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _REF
+  
+  # @@protoc_insertion_point(class_scope:MVStorePB.Ref)
 
 class Value(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
@@ -1702,11 +1859,17 @@ class Value(message.Message):
   class StrEdit(message.Message):
     __metaclass__ = reflection.GeneratedProtocolMessageType
     DESCRIPTOR = _VALUE_STREDIT
+    
+    # @@protoc_insertion_point(class_scope:MVStorePB.Value.StrEdit)
   
   class VArray(message.Message):
     __metaclass__ = reflection.GeneratedProtocolMessageType
     DESCRIPTOR = _VALUE_VARRAY
+    
+    # @@protoc_insertion_point(class_scope:MVStorePB.Value.VArray)
   DESCRIPTOR = _VALUE
+  
+  # @@protoc_insertion_point(class_scope:MVStorePB.Value)
 
 class MVStream(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
@@ -1714,29 +1877,46 @@ class MVStream(message.Message):
   class StringMap(message.Message):
     __metaclass__ = reflection.GeneratedProtocolMessageType
     DESCRIPTOR = _MVSTREAM_STRINGMAP
+    
+    # @@protoc_insertion_point(class_scope:MVStorePB.MVStream.StringMap)
   
   class Result(message.Message):
     __metaclass__ = reflection.GeneratedProtocolMessageType
     DESCRIPTOR = _MVSTREAM_RESULT
+    
+    # @@protoc_insertion_point(class_scope:MVStorePB.MVStream.Result)
   
   class MVSQL(message.Message):
     __metaclass__ = reflection.GeneratedProtocolMessageType
     DESCRIPTOR = _MVSTREAM_MVSQL
+    
+    # @@protoc_insertion_point(class_scope:MVStorePB.MVStream.MVSQL)
   
   class PIN(message.Message):
     __metaclass__ = reflection.GeneratedProtocolMessageType
     DESCRIPTOR = _MVSTREAM_PIN
+    
+    # @@protoc_insertion_point(class_scope:MVStorePB.MVStream.PIN)
   
   class Compound(message.Message):
     __metaclass__ = reflection.GeneratedProtocolMessageType
     DESCRIPTOR = _MVSTREAM_COMPOUND
+    
+    # @@protoc_insertion_point(class_scope:MVStorePB.MVStream.Compound)
   
   class Status(message.Message):
     __metaclass__ = reflection.GeneratedProtocolMessageType
     DESCRIPTOR = _MVSTREAM_STATUS
+    
+    # @@protoc_insertion_point(class_scope:MVStorePB.MVStream.Status)
   
   class ReservedPages(message.Message):
     __metaclass__ = reflection.GeneratedProtocolMessageType
     DESCRIPTOR = _MVSTREAM_RESERVEDPAGES
+    
+    # @@protoc_insertion_point(class_scope:MVStorePB.MVStream.ReservedPages)
   DESCRIPTOR = _MVSTREAM
+  
+  # @@protoc_insertion_point(class_scope:MVStorePB.MVStream)
 
+# @@protoc_insertion_point(module_scope)
