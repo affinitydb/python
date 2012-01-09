@@ -114,7 +114,7 @@ def _entryPoint():
     # Review: timezone handling seems strange...
     lValue = datetime.datetime.utcnow()
     lValue2 = lValue.replace(tzinfo=None) - datetime.timedelta(seconds=time.timezone)
-    lValueStr = lValue.strftime("%4Y-%2m-%2d %2H:%2M:%2S.%f")
+    lValueStr = MVStoreTest.strftime(lValue, "%4Y-%2m-%2d %2H:%2M:%2S.%f")
     lPin = PIN.loadPINs(lMvStore.mvsqlProto("INSERT (\"http://localhost/mv/property/testtypes1/value1\") VALUES (TIMESTAMP'%s');" % lValueStr))[0]
     lPin['http://localhost/mv/property/testtypes1/value2'] = lValue2
     lPin.refreshPIN()
@@ -128,7 +128,7 @@ def _entryPoint():
 
     # VT_INTERVAL
     lValue = datetime.timedelta(seconds=123.5)
-    lValueStr = (datetime.datetime(year=1970, month=1, day=1) + lValue).strftime("%2H:%2M:%2S.%f")
+    lValueStr = MVStoreTest.strftime((datetime.datetime(year=1970, month=1, day=1) + lValue), "%2H:%2M:%2S.%f")
     lPin = PIN.loadPINs(lMvStore.mvsqlProto("INSERT (\"http://localhost/mv/property/testtypes1/value1\") VALUES (INTERVAL'%s');" % lValueStr))[0]
     lPin['http://localhost/mv/property/testtypes1/value2'] = lValue
     lPin.refreshPIN()

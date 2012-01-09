@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 """Base module to orchestrate the automatic execution and validation of all tests."""
 
+import datetime
 import os
+import re
 import sys
 
 MVSTORE_ALL_TESTS = {}
+
+STRFTIME_IS_LIMITED = (datetime.datetime.utcnow().strftime("%4Y") == "4Y")
+STRFTIME_RE_SIMPLIFY = re.compile(r'[0-9]*')
 
 class MVStoreTest(object):
     "Base class for all test scripts in this test fwk."
@@ -20,6 +25,11 @@ class MVStoreTest(object):
     def execute(self):
         "This is the test's primary entry point, invoked by the fwk."
         return True
+    @staticmethod
+    def strftime(pDT, pFormat):
+        if STRFTIME_IS_LIMITED:
+            return pDT.strftime(STRFTIME_RE_SIMPLIFY.sub("", pFormat))
+        return pDT.strftime(pFormat)
 
 if __name__ == '__main__':
     def _onWalk(_pArg, _pDir, _pFileNames):

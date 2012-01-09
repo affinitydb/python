@@ -362,6 +362,7 @@ class MVStoreConnection(object):
         # Query via protobuf (various flavors).
         def _queryPB1(self, pQstr, pRtt=mvstore_pb2.RT_PINS):
             "This version really participates to the current protobuf stream and its current transaction (i.e. protobuf in&out)."
+            logging.info("mvSQL in protobuf: %s" % pQstr)
             lStmt = self.getPBStream().stmt.add()
             lStmt.sq = pQstr
             lStmt.cid = MVStoreConnection.PBTransactionCtx.NEXT_CID; MVStoreConnection.PBTransactionCtx.NEXT_CID += 1
@@ -373,6 +374,7 @@ class MVStoreConnection(object):
         @staticmethod
         def _queryPBOut(pQstr):
             "This version borrows the current connection to request directly from the server a protobuf response (i.e. mvsql in & protobuf out; for debugging etc.)."
+            logging.info("mvSQL (in protobuf): %s" % pQstr)
             lRaw = MVStoreConnection.getCurrentDbConnection().mvsql(pQstr)
             if lRaw == None:
                 return None
@@ -408,6 +410,7 @@ class MVStoreConnection(object):
             self.mSegments = []
             self.mSegmentsExpectOutput = False
             self.mRC = None
+            self.mPBOutput = None
             if 0 == len(lMessage):
                 logging.debug("no message to send")
                 return
@@ -451,7 +454,7 @@ class MVStoreConnection(object):
         return self.mImpl.close()
     def host(self): return "%s:%s" % (self.mHost, self.mPort)
     def basicauth(self): return base64.b64encode("%s:%s" % (self.mOwner, ("", self.mPassword)[None != self.mPassword]))
-    def mvsql(self, pMsg, pFlags=0, pSession=None): return self.mImpl.get(pMsg, pFlags, self._s(pSession))
+    def mvsql(self, pMsg, pFlags=0, pSession=None): logging.info("mvSQL: %s" % pMsg); return self.mImpl.get(pMsg, pFlags, self._s(pSession))
     def mvsqlProto(self, pQstr): return self._txCtx().queryPB(pQstr)
     def check(self, pMsg, pSession=None): return self.mImpl.check(pMsg, self._s(pSession))
     def startTx(self): self._txCtx().startTx()
@@ -479,9 +482,9 @@ class MVStoreConnection(object):
                 self.mImpl.attachSession(self.mSessionStack[-1])
         return lRet
     # ---
-    def _post(self, pMsg, pSession=None): return self.mImpl.post(pMsg, self._s(pSession))
+    def _post(self, pMsg, pSession=None): logging.info("sending protobuf message"); return self.mImpl.post(pMsg, self._s(pSession))
     def _beginlongpost(self, pSession=None): return self.mImpl.beginlongpost(self._s(pSession))
-    def _continuelongpost(self, pLPToken, pMsg, pExpectOutput, pSession=None): return self.mImpl.continuelongpost(pLPToken, pMsg, pExpectOutput, self._s(pSession))
+    def _continuelongpost(self, pLPToken, pMsg, pExpectOutput, pSession=None): logging.info("sending protobuf message"); return self.mImpl.continuelongpost(pLPToken, pMsg, pExpectOutput, self._s(pSession))
     def _endlongpost(self, pLPToken, pSession=None): self.mImpl.endlongpost(pLPToken, self._s(pSession))
     def _s(self, pSession): return (pSession, len(self.mSessionStack) > 0 and self.mSessionStack[-1])[pSession == None]
     def _txCtx(self):
@@ -982,7 +985,7 @@ class PIN(dict):
                     lExtra[0].mEid = iV.eid
                     logging.debug("obtained eid=%s (%s)" % (iV.eid, lPN))
                 else:
-                    logging.info("didn't obtain eid (%s): %s" % (lPN, iV))
+                    logging.debug("didn't obtain eid (%s): %s" % (lPN, iV))
         lTxCtx.mPBOutput = None
         return pPINs
     def savePIN(self, pTxCtx=None):

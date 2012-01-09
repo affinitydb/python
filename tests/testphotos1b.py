@@ -47,7 +47,7 @@ def _createPhoto(_pDir, _pFileName):
     _lFullPath = "%s/%s" % (_pDir, _pFileName)
     _lDate = datetime.datetime.fromtimestamp(os.path.getctime(_lFullPath))
     lMvStore.mvsql("INSERT (semanticdesktop:\"nfo#hasHash\", \"http://www.w3.org/2001/XMLSchema#date\", \"http://www.w3.org/2001/XMLSchema#time\", semanticdesktop:\"nfo#fileUrl\", semanticdesktop:\"nfo#fileName\") VALUES ('%s', TIMESTAMP'%s', INTERVAL'%s', '%s', '%s');" % \
-        (uuid.uuid4().hex, _lDate.strftime("%4Y-%2m-%2d"), _lDate.strftime("%2H:%2M:%2S"), _pDir, _pFileName))
+        (uuid.uuid4().hex, MVStoreTest.strftime(_lDate, "%4Y-%2m-%2d"), MVStoreTest.strftime(_lDate, "%2H:%2M:%2S"), _pDir, _pFileName))
 def _randomTag(_pTagName, _pRatio=0.10):
     "Assign pTagName to a random selection of 'photos'."
     # Make sure the tag is registered in the 'tags' table.
@@ -140,7 +140,7 @@ def _entryPoint():
     # lMvStore.mvsql("DELETE FROM \"http://localhost/mv/class/testphotos1b/privilege\";") # TODO: review why this fails after running testphotos1...
     # Create a few photos.
     lMvStore.mvsql("START TRANSACTION;")
-    POPULATE_WALK_THIS_DIRECTORY="/media/truecrypt1/src/tests"
+    POPULATE_WALK_THIS_DIRECTORY="../tests"
     POPULATE_USE_THIS_EXTENSION="cpp"
     lCreateWalkArgs = [POPULATE_USE_THIS_EXTENSION, _createPhoto, None, 0]
     os.path.walk(POPULATE_WALK_THIS_DIRECTORY, _onWalk, lCreateWalkArgs)

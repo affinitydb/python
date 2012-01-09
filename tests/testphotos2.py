@@ -63,7 +63,7 @@ def _createPhoto(_pDir, _pFileName):
     _lFullPath = "%s/%s" % (_pDir, _pFileName)
     _lDate = datetime.datetime.fromtimestamp(os.path.getctime(_lFullPath))
     lMvStore.mvsql("INSERT (testphotos2_id, testphotos2_date, testphotos2_time, testphotos2_path, testphotos2_name, testphotos2_fullname) VALUES ('%s', TIMESTAMP'%s', INTERVAL'%s', '%s', '%s', '%s');" % \
-        (uuid.uuid4().hex, _lDate.strftime("%4Y-%2m-%2d"), _lDate.strftime("%2H:%2M:%2S"), _pDir, _pFileName, _lFullPath))
+        (uuid.uuid4().hex, MVStoreTest.strftime(_lDate, "%4Y-%2m-%2d"), MVStoreTest.strftime(_lDate, "%2H:%2M:%2S"), _pDir, _pFileName, _lFullPath))
 def _randomTag(_pTagName, _pRatio=0.10):
     "Assign pTagName to a random selection of 'photos'."
     # Make sure the tag is registered in the 'tags' table.
@@ -128,7 +128,7 @@ def _entryPoint():
     lMvStore.mvsql("DELETE FROM testphotos2_class_users;")
     # Create a few photos.
     lMvStore.mvsql("START TRANSACTION;")
-    POPULATE_WALK_THIS_DIRECTORY="/media/truecrypt1/src/tests"
+    POPULATE_WALK_THIS_DIRECTORY="../tests"
     POPULATE_USE_THIS_EXTENSION="cpp"
     lCreateWalkArgs = [POPULATE_USE_THIS_EXTENSION, _createPhoto, None, 0]
     os.path.walk(POPULATE_WALK_THIS_DIRECTORY, _onWalk, lCreateWalkArgs)
@@ -155,7 +155,7 @@ def _entryPoint():
             lMvStore.mvsql("INSERT (testphotos2_id, testphotos2_users) VALUES ('%s', %s);" % (lGroup, lNewUserPin[0].mPID))
         else:
             lMvStore.mvsql("UPDATE %s ADD testphotos2_users=%s;" % (lGroupPin[0].mPID, lNewUserPin[0].mPID))
-            lCntUsersInGroup = lMvStore.mvsql("SELECT * FROM %s.users;" % repr(lGroupPin[0].mPID), pFlags=1)
+            lCntUsersInGroup = lMvStore.mvsql("SELECT * FROM %s.testphotos2_users;" % repr(lGroupPin[0].mPID), pFlags=1)
             print ("group %s contains %d users" % (lGroup, lCntUsersInGroup))
     lMvStore.mvsql("COMMIT;")
     lCntUserGroups = lMvStore.mvsql("SELECT * FROM testphotos2_class_groups;", pFlags=1)
@@ -201,7 +201,7 @@ def _entryPoint():
             print ("non-unique: %s unique: %s" % (len(_lPhotos), len(_lUniquePhotos)))
         return len(_lUniquePhotos)
     for iU in lUsersOfInterest:
-        lGroupName = _getpins("SELECT * FROM testphotos2_class_groups WHERE (%s IN testphotos2_users);" % iU.mPID)[0]["testphotos2_id"]
+        lGroupName = _getpins("SELECT * FROM testphotos2_class_groups WHERE (%s = testphotos2_users);" % iU.mPID)[0]["testphotos2_id"]
         lCntPhotos = _countUserPhotos(iU["testphotos2_id"], lGroupName)
         _chkCount("photos that can be viewed by %s" % iU["testphotos2_id"], _pExpected=lInMemoryChk.countPhotos(iU["testphotos2_id"]), _pActual=lCntPhotos)
     if False:
