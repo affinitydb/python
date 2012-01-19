@@ -31,18 +31,18 @@ def _entryPoint():
     lPin = PIN(lPinDef).savePIN()
     lMvStore.commitTx()
 
-    print ("\nBasic examples of mvSQL commands.")
-    lMvStore.mvsql("insert (\"http://localhost/mv/property/testbasics1/potato_color\") values (10);") # Note: sent directly to the server, as a string.
-    lMvStore.mvsqlProto("insert (\"http://localhost/mv/property/testbasics1/potato_color\") values (11);") # Note: sent to the server as a query embedded inside a protobuf.
-    lPins = PIN.loadPINs(lMvStore.mvsqlProto("SELECT * WHERE EXISTS(\"http://localhost/mv/property/testbasics1/myprop1\");"))
+    print ("\nBasic examples of pathSQL commands.")
+    lMvStore.q("insert (\"http://localhost/mv/property/testbasics1/potato_color\") values (10);") # Note: sent directly to the server, as a string.
+    lMvStore.qProto("insert (\"http://localhost/mv/property/testbasics1/potato_color\") values (11);") # Note: sent to the server as a query embedded inside a protobuf.
+    lPins = PIN.loadPINs(lMvStore.qProto("SELECT * WHERE EXISTS(\"http://localhost/mv/property/testbasics1/myprop1\");"))
     print ("result of SELECT * WHERE EXISTS(\"http://localhost/mv/property/testbasics1/myprop1\"): %s" % lPins)
     try:
-        lMvStore.mvsqlProto("CREATE CLASS \"http://localhost/mv/class/testbasics1/c1\" AS SELECT * WHERE EXISTS(\"http://localhost/mv/property/testbasics1/myprop1\");") # TODO: check if this really worked (when embedded in protobuf like this)...
+        lMvStore.qProto("CREATE CLASS \"http://localhost/mv/class/testbasics1/c1\" AS SELECT * WHERE EXISTS(\"http://localhost/mv/property/testbasics1/myprop1\");") # TODO: check if this really worked (when embedded in protobuf like this)...
     except:
         pass
 
     print ("\nGet resulting pins.")
-    lRaw = lMvStore.mvsql("SELECT * FROM \"http://localhost/mv/class/testbasics1/c1\";")
+    lRaw = lMvStore.q("SELECT * FROM \"http://localhost/mv/class/testbasics1/c1\";")
     lPBStream = mvstore_pb2.MVStream()
     lPBStream.ParseFromString(lRaw)
     if False:

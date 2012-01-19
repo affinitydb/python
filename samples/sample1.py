@@ -8,19 +8,19 @@ if __name__ == '__main__':
     lMvStore = MVSTORE()
     lMvStore.open()
 
-    print ("\n1. Create a simple PIN via a direct mvSQL request to mvserver.")
-    lMvStore.mvsql("INSERT (name, functions) VALUES ('Peter', 'dentist');")
+    print ("\n1. Create a simple PIN via a direct pathSQL request to mvserver.")
+    lMvStore.q("INSERT (name, functions) VALUES ('Peter', 'dentist');")
 
-    print ("\n2. Create a simple PIN via a mvSQL request embedded inside a protobuf message sent to mvserver.")
-    lMvStore.mvsqlProto("INSERT (name, functions) VALUES ('Fred', 'engineer');")
+    print ("\n2. Create a simple PIN via a pathSQL request embedded inside a protobuf message sent to mvserver.")
+    lMvStore.qProto("INSERT (name, functions) VALUES ('Fred', 'engineer');")
 
     print ("\n3. Same as 2, but grabbing the resulting PIN for further manipulation.")
-    lPinAnn = PIN.loadPINs(lMvStore.mvsqlProto("INSERT (name, functions) VALUES ('Ann', 'scientist');"))[0]
+    lPinAnn = PIN.loadPINs(lMvStore.qProto("INSERT (name, functions) VALUES ('Ann', 'scientist');"))[0]
     print ("is %s really Ann?" % lPinAnn["name"])
     print ("is %s really a %s?" % (lPinAnn["name"], lPinAnn["functions"]))
 
-    print ("\n4. Add another function to Ann, via mvSQL: mother.")
-    lMvStore.mvsqlProto("UPDATE %s ADD functions='mother';" % lPinAnn.mPID)
+    print ("\n4. Add another function to Ann, via pathSQL: mother.")
+    lMvStore.qProto("UPDATE %s ADD functions='mother';" % lPinAnn.mPID)
     lPinAnn.refreshPIN()
 
     print ("\n5. Add a few other functions to Ann, via a protobuf message; insert them between 'scientist' and 'mother'.")
@@ -60,18 +60,18 @@ if __name__ == '__main__':
         # Note:
         #   Checking for class existence is not mandatory, provided that class creation is done within try-except;
         #   here, for documentation sake, both approaches are demonstrated in combination.  
-        if 0 == lMvStore.mvsql("SELECT * FROM mv:ClassOfClasses WHERE mv:classID='sample1_knownage';", pFlags=1):
-            lMvStore.mvsqlProto("CREATE CLASS sample1_knownage AS SELECT * WHERE age IN :0 and EXISTS(name);")
+        if 0 == lMvStore.q("SELECT * FROM mv:ClassOfClasses WHERE mv:classID='sample1_knownage';", pFlags=1):
+            lMvStore.qProto("CREATE CLASS sample1_knownage AS SELECT * WHERE age IN :0 and EXISTS(name);")
         else:
             print ("family already existed.")
     except:
         pass
-    print (''.join("%s=%s " % (i.get("name"), i.get("age")) for i in PIN.loadPINs(lMvStore.mvsqlProto("SELECT * FROM sample1_knownage ORDER BY age;"))))
+    print (''.join("%s=%s " % (i.get("name"), i.get("age")) for i in PIN.loadPINs(lMvStore.qProto("SELECT * FROM sample1_knownage ORDER BY age;"))))
 
-    # TODO: show more kinds of modifs (mvsql and direct)
+    # TODO: show more kinds of modifs (pathSQL and direct)
     # TODO: show more queries
     # TODO: really show transactions
 
     print ("\nFINAL. Print the resulting PINs.")
-    print (PIN.loadPINs(lMvStore.mvsqlProto("SELECT * WHERE EXISTS(name);")))
+    print (PIN.loadPINs(lMvStore.qProto("SELECT * WHERE EXISTS(name);")))
     lMvStore.close()

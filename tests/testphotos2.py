@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-"""This module is a small photo sharing application, written exclusively with 'mvSQL in' (no 'protobuf in').
+"""This module is a small photo sharing application, written exclusively with 'pathSQL in' (no 'protobuf in').
 The present version uses collections of references and path expressions to model the principal relationships
 between objects, whereas 'testphotos1.py', its counterpart, implements the same application with
 a relational model with joins."""
@@ -41,7 +41,7 @@ def _describeModel():
     modeling.describeAttribute("testphotos2_name", {modeling.MVURI_PROP_DOCSTRING:"The file name of the photo."}, pClassURI="testphotos2_class_photos")
 def _getpins(_pQuery):
     "Query and return array of pins."
-    return PIN.loadPINs(lMvStore.mvsqlProto(_pQuery))
+    return PIN.loadPINs(lMvStore.qProto(_pQuery))
 def _chkCount(_pName, _pExpected, _pActual):
     "Print expected vs actual counts; pause for a second if the result is not correct."
     print ("%s: expected %s %s, found %s." % (("WARNING", "YEAH")[_pExpected == _pActual], _pExpected, _pName, _pActual))
@@ -62,22 +62,22 @@ def _createPhoto(_pDir, _pFileName):
     print ("adding file %s/%s" % (_pDir, _pFileName))
     _lFullPath = "%s/%s" % (_pDir, _pFileName)
     _lDate = datetime.datetime.fromtimestamp(os.path.getctime(_lFullPath))
-    lMvStore.mvsql("INSERT (testphotos2_id, testphotos2_date, testphotos2_time, testphotos2_path, testphotos2_name, testphotos2_fullname) VALUES ('%s', TIMESTAMP'%s', INTERVAL'%s', '%s', '%s', '%s');" % \
+    lMvStore.q("INSERT (testphotos2_id, testphotos2_date, testphotos2_time, testphotos2_path, testphotos2_name, testphotos2_fullname) VALUES ('%s', TIMESTAMP'%s', INTERVAL'%s', '%s', '%s', '%s');" % \
         (uuid.uuid4().hex, MVStoreTest.strftime(_lDate, "%4Y-%2m-%2d"), MVStoreTest.strftime(_lDate, "%2H:%2M:%2S"), _pDir, _pFileName, _lFullPath))
 def _randomTag(_pTagName, _pRatio=0.10):
     "Assign pTagName to a random selection of 'photos'."
     # Make sure the tag is registered in the 'tags' table.
-    lMvStore.mvsql("START TRANSACTION;")
+    lMvStore.q("START TRANSACTION;")
     _lTags = _getpins("SELECT * FROM testphotos2_class_tags('%s');" % _pTagName)
     if 0 == len(_lTags):
         print ("adding tag %s" % _pTagName)
-        _lTags = PIN.loadPINs(lMvStore.mvsqlProto("INSERT (testphotos2_tag) VALUES ('%s');" % _pTagName))
+        _lTags = PIN.loadPINs(lMvStore.qProto("INSERT (testphotos2_tag) VALUES ('%s');" % _pTagName))
     # Select an arbitrary number of 'photos', and tag them.
     for _iP in _getpins("SELECT * FROM testphotos2_class_photos;"):
         if random.random() <= _pRatio:
-            lMvStore.mvsql("UPDATE %s ADD testphotos2_tags=%s;" % (_iP.mPID, _lTags[0].mPID))
+            lMvStore.q("UPDATE %s ADD testphotos2_tags=%s;" % (_iP.mPID, _lTags[0].mPID))
             lInMemoryChk.tagPhoto(_iP["testphotos2_id"], _pTagName)
-    lMvStore.mvsql("COMMIT;")
+    lMvStore.q("COMMIT;")
 def _randomGroupPrivileges():
     "Assign a random selection of tags to each existing group."
     # Get the existing groups.
@@ -90,7 +90,7 @@ def _randomGroupPrivileges():
     for _iG in _lGroups:
         _lRights = random.sample(_lTags, random.randrange(len(_lTags) / 2))
         for _iR in _lRights:
-            lMvStore.mvsql("UPDATE %s ADD testphotos2_tags=%s;" % (repr(_iG.mPID), repr(_iR.mPID)))
+            lMvStore.q("UPDATE %s ADD testphotos2_tags=%s;" % (repr(_iG.mPID), repr(_iR.mPID)))
             lInMemoryChk.addGroupPrivilege(_iG["testphotos2_id"], _iR["testphotos2_tag"])
 def _randomUserPrivileges():
     "Assign a random selection of tags to each existing user."
@@ -104,7 +104,7 @@ def _randomUserPrivileges():
     for _iU in _lUsers:
         _lRights = random.sample(_lTags, random.randrange(len(_lTags)))
         for _iR in _lRights:
-            lMvStore.mvsql("UPDATE %s ADD testphotos2_tags=%s;" % (repr(_iU.mPID), repr(_iR.mPID)))
+            lMvStore.q("UPDATE %s ADD testphotos2_tags=%s;" % (repr(_iU.mPID), repr(_iR.mPID)))
             lInMemoryChk.addUserPrivilege(_iU["testphotos2_id"], _iR["testphotos2_tag"])
 def _entryPoint():
     # Start.
@@ -114,35 +114,35 @@ def _entryPoint():
     # Create a few classes.
     print ("Creating classes.")
     try:
-        lMvStore.mvsql("CREATE CLASS testphotos2_class_photos AS SELECT * WHERE testphotos2_id IN :0 AND EXISTS(testphotos2_date) AND EXISTS(testphotos2_time) AND EXISTS(testphotos2_path) AND EXISTS (testphotos2_name) AND EXISTS(testphotos2_fullname);") # Note: The pins that conform with this also have a 'tags' field (a collection of references to tags on the photo).
-        lMvStore.mvsql("CREATE CLASS testphotos2_class_tags AS SELECT * WHERE testphotos2_tag in :0 AND NOT EXISTS(testphotos2_id);") # Interesting... without "AND NOT EXISTS...", it indexes everything... which could be cool, if only I could listValues to retrieve my distinct tags...
-        lMvStore.mvsql("CREATE CLASS testphotos2_class_groups AS SELECT * WHERE testphotos2_id in :0 AND EXISTS(testphotos2_users);") # Note: The pins that conform with this also have a 'tags' field (a collection of references to tags to which the group was granted access).
-        lMvStore.mvsql("CREATE CLASS testphotos2_class_users AS SELECT * WHERE testphotos2_id in :0 AND EXISTS(testphotos2_pw);") # Note: The pins that conform with this also have a 'tags' field (a collection of references to tags to which the user was granted access).
+        lMvStore.q("CREATE CLASS testphotos2_class_photos AS SELECT * WHERE testphotos2_id IN :0 AND EXISTS(testphotos2_date) AND EXISTS(testphotos2_time) AND EXISTS(testphotos2_path) AND EXISTS (testphotos2_name) AND EXISTS(testphotos2_fullname);") # Note: The pins that conform with this also have a 'tags' field (a collection of references to tags on the photo).
+        lMvStore.q("CREATE CLASS testphotos2_class_tags AS SELECT * WHERE testphotos2_tag in :0 AND NOT EXISTS(testphotos2_id);") # Interesting... without "AND NOT EXISTS...", it indexes everything... which could be cool, if only I could listValues to retrieve my distinct tags...
+        lMvStore.q("CREATE CLASS testphotos2_class_groups AS SELECT * WHERE testphotos2_id in :0 AND EXISTS(testphotos2_users);") # Note: The pins that conform with this also have a 'tags' field (a collection of references to tags to which the group was granted access).
+        lMvStore.q("CREATE CLASS testphotos2_class_users AS SELECT * WHERE testphotos2_id in :0 AND EXISTS(testphotos2_pw);") # Note: The pins that conform with this also have a 'tags' field (a collection of references to tags to which the user was granted access).
     except:
         pass
     # Delete old instances, if any.
     print ("Deleting old data.")
-    lMvStore.mvsql("DELETE FROM testphotos2_class_photos;")
-    lMvStore.mvsql("DELETE FROM testphotos2_class_tags;")
-    lMvStore.mvsql("DELETE FROM testphotos2_class_groups;")
-    lMvStore.mvsql("DELETE FROM testphotos2_class_users;")
+    lMvStore.q("DELETE FROM testphotos2_class_photos;")
+    lMvStore.q("DELETE FROM testphotos2_class_tags;")
+    lMvStore.q("DELETE FROM testphotos2_class_groups;")
+    lMvStore.q("DELETE FROM testphotos2_class_users;")
     # Create a few photos.
-    lMvStore.mvsql("START TRANSACTION;")
-    POPULATE_WALK_THIS_DIRECTORY="../tests"
+    lMvStore.q("START TRANSACTION;")
+    POPULATE_WALK_THIS_DIRECTORY="../tests_kernel"
     POPULATE_USE_THIS_EXTENSION="cpp"
     lCreateWalkArgs = [POPULATE_USE_THIS_EXTENSION, _createPhoto, None, 0]
     os.path.walk(POPULATE_WALK_THIS_DIRECTORY, _onWalk, lCreateWalkArgs)
-    lMvStore.mvsql("COMMIT;")
-    lCntPhotos = lMvStore.mvsql("SELECT * FROM testphotos2_class_photos;", pFlags=1)
+    lMvStore.q("COMMIT;")
+    lCntPhotos = lMvStore.q("SELECT * FROM testphotos2_class_photos;", pFlags=1)
     _chkCount("photos", _pExpected=lCreateWalkArgs[3], _pActual=lCntPhotos)
     # Create a few tags and tag some photos.
-    lMvStore.mvsql("START TRANSACTION;")
+    lMvStore.q("START TRANSACTION;")
     lSomeTags = ("cousin_vinny", "uncle_buck", "sister_suffragette", "country", "city", "zoo", "mountain_2010", "ocean_2004", "Beijing_1999", "Montreal_2003", "LasVegas_2007", "Fred", "Alice", "sceneries", "artwork")
     for iT in lSomeTags:
         _randomTag(iT)
-    lMvStore.mvsql("COMMIT;")
+    lMvStore.q("COMMIT;")
     # Create a few users and groups.
-    lMvStore.mvsql("START TRANSACTION;")
+    lMvStore.q("START TRANSACTION;")
     lGroups = ("friends", "family", "public")
     lUsers = ("ralph@peanut.com", "stephen@banana.com", "wilhelm@orchestra.com", "sita@marvel.com", "anna@karenina.com", "leo@tolstoy.com", "peter@pan.com", "jack@jill.com", "little@big.com", \
         "john@hurray.com", "claire@obscure.com", "stanley@puck.com", "grey@ball.com", "john@wimbledon.com", "mark@up.com", "sabrina@cool.com")
@@ -152,14 +152,14 @@ def _entryPoint():
         lGroupPin = _getpins("SELECT * FROM testphotos2_class_groups('%s');" % lGroup) # Convenient elision: pass x, it evaluates [x, x].
         lInMemoryChk.setUserGroup(iU, lGroup)
         if 0 == len(lGroupPin):
-            lMvStore.mvsql("INSERT (testphotos2_id, testphotos2_users) VALUES ('%s', %s);" % (lGroup, lNewUserPin[0].mPID))
+            lMvStore.q("INSERT (testphotos2_id, testphotos2_users) VALUES ('%s', %s);" % (lGroup, lNewUserPin[0].mPID))
         else:
-            lMvStore.mvsql("UPDATE %s ADD testphotos2_users=%s;" % (lGroupPin[0].mPID, lNewUserPin[0].mPID))
-            lCntUsersInGroup = lMvStore.mvsql("SELECT * FROM %s.testphotos2_users;" % repr(lGroupPin[0].mPID), pFlags=1)
+            lMvStore.q("UPDATE %s ADD testphotos2_users=%s;" % (lGroupPin[0].mPID, lNewUserPin[0].mPID))
+            lCntUsersInGroup = lMvStore.q("SELECT * FROM %s.testphotos2_users;" % repr(lGroupPin[0].mPID), pFlags=1)
             print ("group %s contains %d users" % (lGroup, lCntUsersInGroup))
-    lMvStore.mvsql("COMMIT;")
-    lCntUserGroups = lMvStore.mvsql("SELECT * FROM testphotos2_class_groups;", pFlags=1)
-    lCntUsers = lMvStore.mvsql("SELECT * FROM testphotos2_class_users;", pFlags=1)
+    lMvStore.q("COMMIT;")
+    lCntUserGroups = lMvStore.q("SELECT * FROM testphotos2_class_groups;", pFlags=1)
+    lCntUsers = lMvStore.q("SELECT * FROM testphotos2_class_users;", pFlags=1)
     _chkCount("groups", _pExpected=len(lGroups), _pActual=lCntUserGroups)
     _chkCount("users", _pExpected=len(lUsers), _pActual=lCntUsers)
     # Assign group/user privileges, and query on those.
@@ -211,7 +211,7 @@ def _entryPoint():
     lMvStore.close()
 
 class TestPhotos2(MVStoreTest):
-    "A simple application talking to the store through mvSQL only, and using a model with collections of references."
+    "A simple application talking to the store through pathSQL only, and using a model with collections of references."
     def execute(self):
         _entryPoint()
 MVStoreTest.declare(TestPhotos2)

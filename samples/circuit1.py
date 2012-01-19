@@ -46,7 +46,7 @@ class Circuit(object):
     def __init__(self, pName):
         # Either retrieve the circuit pin by query, if it already exists...
         self.mMvStore = MVSTORE()
-        lPins = PIN.loadPINs(self.mMvStore.mvsqlProto("SELECT * FROM \"http://localhost/mv/class/1.0/Circuit\"('%s');" % pName))
+        lPins = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM \"http://localhost/mv/class/1.0/Circuit\"('%s');" % pName))
         self.mComponentsCache = {} # Review: for multi-user, may want to refine/remove this.
         if lPins != None and len(lPins) > 0:
             self.mPin = lPins[0]
@@ -109,7 +109,7 @@ class Circuit(object):
                     lCondition = " WHERE ((cp.mv:pinID NOT IN (%s)) AND (cp.\"http://localhost/mv/property/1.0/circuit/component/x\" IN [%s, %s]) AND (cp.\"http://localhost/mv/property/1.0/circuit/component/y\" IN [%s, %s]))" % (lExcludedStr, lMinX, lMaxX, lMinY, lMaxY)
                     # TODO: enable when bug 108 is fixed.
                     #lCondition = " WHERE (cp.mv:pinID NOT IN (%s))" % lExcludedStr
-                    lCandidates = PIN.loadPINs(self.mMvStore.mvsqlProto( \
+                    lCandidates = PIN.loadPINs(self.mMvStore.qProto( \
                         "SELECT * FROM \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c ON (cp.mv:pinID = c.\"http://localhost/mv/property/1.0/circuit/components\")%s;" % \
                         (self.mPin["http://localhost/mv/property/1.0/circuit/name"], lCondition)))
                         # TODO: enable when bug 108 is fixed.
@@ -174,8 +174,8 @@ class Circuit(object):
     def declareMvClasses(cls):
         "Declare the mvstore classes used by the implementation."
         try:
-            MVSTORE().mvsqlProto("CREATE CLASS \"http://localhost/mv/class/1.0/Circuit\" AS SELECT * WHERE \"http://localhost/mv/property/1.0/circuit/name\" IN :0 AND EXISTS(\"http://localhost/mv/property/1.0/circuit/components\");")
-            MVSTORE().mvsqlProto("CREATE CLASS \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS SELECT * WHERE \"http://localhost/mv/property/1.0/circuit/component/x\" IN :0(int) AND \"http://localhost/mv/property/1.0/circuit/component/y\" IN :1(int);")
+            MVSTORE().qProto("CREATE CLASS \"http://localhost/mv/class/1.0/Circuit\" AS SELECT * WHERE \"http://localhost/mv/property/1.0/circuit/name\" IN :0 AND EXISTS(\"http://localhost/mv/property/1.0/circuit/components\");")
+            MVSTORE().qProto("CREATE CLASS \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS SELECT * WHERE \"http://localhost/mv/property/1.0/circuit/component/x\" IN :0(int) AND \"http://localhost/mv/property/1.0/circuit/component/y\" IN :1(int);")
         except:
             pass
     @classmethod

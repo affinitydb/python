@@ -23,18 +23,18 @@ if __name__ == '__main__':
     lMvStore.commitTx()
     print ("bootstrap: %s s" % (time.time() - lT1))
 
-    # mvsql.
+    # pathSQL.
     lT1 = time.time()
     if KEEP_ALIVE:
-        lMvStore.mvsql("SET PREFIX perf01p: 'http://localhost/mv/property/perf01/';")
-        lMvStore.mvsql("START TRANSACTION;")
+        lMvStore.q("SET PREFIX perf01p: 'http://localhost/mv/property/perf01/';")
+        lMvStore.q("START TRANSACTION;")
         for iP in xrange(NUM_PINS):
-            lMvStore.mvsql("INSERT (perf01p:name, perf01p:code, perf01p:type) VALUES ('" + randomString(10) + "', '" + randomString(15) + "', 'mvsql');")
-        lMvStore.mvsql("COMMIT;")
+            lMvStore.q("INSERT (perf01p:name, perf01p:code, perf01p:type) VALUES ('" + randomString(10) + "', '" + randomString(15) + "', 'pathsql');")
+        lMvStore.q("COMMIT;")
     else:
         for iP in xrange(NUM_PINS):
-            lMvStore.mvsql("INSERT (\"http://localhost/mv/property/perf01/name\", \"http://localhost/mv/property/perf01/code\", \"http://localhost/mv/property/perf01/type\") VALUES ('" + randomString(10) + "', '" + randomString(15) + "', 'mvsql');")
-    print ("mvsql: %s s" % (time.time() - lT1))
+            lMvStore.q("INSERT (\"http://localhost/mv/property/perf01/name\", \"http://localhost/mv/property/perf01/code\", \"http://localhost/mv/property/perf01/type\") VALUES ('" + randomString(10) + "', '" + randomString(15) + "', 'pathsql');")
+    print ("pathsql: %s s" % (time.time() - lT1))
 
     # protobuf.
     lT1 = time.time()

@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-"""This module is a small photo sharing application, written exclusively with 'mvSQL in' (no 'protobuf in').
+"""This module is a small photo sharing application, written exclusively with 'pathSQL in' (no 'protobuf in').
 The present version uses a relational model with joins, whereas 'testphotos2.py', its counterpart,
 implements the same application with collections of references and path expressions to model the
 principal relationships between objects."""
@@ -17,7 +17,7 @@ lMvStore = MVSTORE()
 lInMemoryChk = InMemoryChk()
 def _getpins(_pQuery):
     "Query and return array of pins."
-    return PIN.loadPINs(lMvStore.mvsqlProto(_pQuery))
+    return PIN.loadPINs(lMvStore.qProto(_pQuery))
 def _chkCount(_pName, _pExpected, _pActual):
     "Print expected vs actual counts; pause for a second if the result is not correct."
     print ("%s: expected %s %s, found %s." % (("WARNING", "YEAH")[_pExpected == _pActual], _pExpected, _pName, _pActual))
@@ -45,24 +45,24 @@ def _createPhoto(_pDir, _pFileName):
     print ("adding file %s/%s" % (_pDir, _pFileName))
     _lFullPath = "%s/%s" % (_pDir, _pFileName)
     _lDate = datetime.datetime.fromtimestamp(os.path.getctime(_lFullPath))
-    lMvStore.mvsql("INSERT (\"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash\", \"http://www.w3.org/2001/XMLSchema#date\", \"http://www.w3.org/2001/XMLSchema#time\", \"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileUrl\", \"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName\") VALUES ('%s', TIMESTAMP'%s', INTERVAL'%s', '%s', '%s');" % \
+    lMvStore.q("INSERT (\"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash\", \"http://www.w3.org/2001/XMLSchema#date\", \"http://www.w3.org/2001/XMLSchema#time\", \"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileUrl\", \"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName\") VALUES ('%s', TIMESTAMP'%s', INTERVAL'%s', '%s', '%s');" % \
         (uuid.uuid4().hex, MVStoreTest.strftime(_lDate, "%4Y-%2m-%2d"), MVStoreTest.strftime(_lDate, "%2H:%2M:%2S"), _pDir, _pFileName))
 def _randomTag(_pTagName, _pRatio=0.10):
     "Assign pTagName to a random selection of 'photos'."
     # Make sure the tag is registered in the 'tags' table.
     # Note: Using UNIQUE to handle duplicates (e.g. http://www.tutorialspoint.com/mysql/mysql-handling-duplicates.htm)
-    #       is not an option with mvsql...
-    lMvStore.mvsql("START TRANSACTION;")
-    _lCount = lMvStore.mvsql("SELECT * FROM \"http://localhost/mv/class/testphotos1/tag\" WHERE \"http://code.google.com/p/tagont/hasTagLabel\"='%s';" % _pTagName, pFlags=1) # review: index by tag
+    #       is not an option with pathSQL...
+    lMvStore.q("START TRANSACTION;")
+    _lCount = lMvStore.q("SELECT * FROM \"http://localhost/mv/class/testphotos1/tag\" WHERE \"http://code.google.com/p/tagont/hasTagLabel\"='%s';" % _pTagName, pFlags=1) # review: index by tag
     if 0 == _lCount:
         print ("adding tag %s" % _pTagName)
-        lMvStore.mvsql("INSERT (\"http://code.google.com/p/tagont/hasTagLabel\") VALUES ('%s');" % _pTagName)
+        lMvStore.q("INSERT (\"http://code.google.com/p/tagont/hasTagLabel\") VALUES ('%s');" % _pTagName)
     # Select an arbitrary number of 'photos', and tag them.
     for _iP in _getpins("SELECT * FROM \"http://localhost/mv/class/testphotos1/photo\";"):
         if random.random() <= _pRatio:
-            lMvStore.mvsql("INSERT (\"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash\", \"http://code.google.com/p/tagont/hasTagLabel\") VALUES ('%s', '%s');" % (_iP["http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash"], _pTagName))
+            lMvStore.q("INSERT (\"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash\", \"http://code.google.com/p/tagont/hasTagLabel\") VALUES ('%s', '%s');" % (_iP["http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash"], _pTagName))
             lInMemoryChk.tagPhoto(_iP["http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash"], _pTagName)
-    lMvStore.mvsql("COMMIT;")
+    lMvStore.q("COMMIT;")
 def _randomGroupPrivileges():
     "Assign a random selection of tags to each existing group."
     # Get the existing groups.
@@ -75,7 +75,7 @@ def _randomGroupPrivileges():
     for _iG in _lGroupIds:
         _lRights = random.sample(_lTags, random.randrange(len(_lTags) / 2))
         for _iR in _lRights:
-            lMvStore.mvsql("INSERT (\"http://code.google.com/p/tagont/hasTagLabel\", \"http://code.google.com/p/tagont/hasVisibility\") VALUES ('%s', '%s');" % (_iR["http://code.google.com/p/tagont/hasTagLabel"], _iG))
+            lMvStore.q("INSERT (\"http://code.google.com/p/tagont/hasTagLabel\", \"http://code.google.com/p/tagont/hasVisibility\") VALUES ('%s', '%s');" % (_iR["http://code.google.com/p/tagont/hasTagLabel"], _iG))
             lInMemoryChk.addGroupPrivilege(_iG, _iR["http://code.google.com/p/tagont/hasTagLabel"])
 def _randomUserPrivileges():
     "Assign a random selection of tags to each existing user."
@@ -89,7 +89,7 @@ def _randomUserPrivileges():
     for _iU in _lUsers:
         _lRights = random.sample(_lTags, random.randrange(len(_lTags)))
         for _iR in _lRights:
-            lMvStore.mvsql("INSERT (\"http://code.google.com/p/tagont/hasTagLabel\", \"http://code.google.com/p/tagont/hasVisibility\") VALUES ('%s', '%s');" % (_iR["http://code.google.com/p/tagont/hasTagLabel"], _iU["http://xmlns.com/foaf/0.1/mbox"]))
+            lMvStore.q("INSERT (\"http://code.google.com/p/tagont/hasTagLabel\", \"http://code.google.com/p/tagont/hasVisibility\") VALUES ('%s', '%s');" % (_iR["http://code.google.com/p/tagont/hasTagLabel"], _iU["http://xmlns.com/foaf/0.1/mbox"]))
             lInMemoryChk.addUserPrivilege(_iU["http://xmlns.com/foaf/0.1/mbox"], _iR["http://code.google.com/p/tagont/hasTagLabel"])
 def _entryPoint():
     # Start.
@@ -117,37 +117,37 @@ def _entryPoint():
     #   assigns a different meaning to "rdfs:domain"... "rdfs:range" is closer to our "adomain".
     print ("Creating classes.")
     try:
-        lMvStore.mvsql("CREATE CLASS \"http://localhost/mv/class/testphotos1/photo\" AS SELECT * WHERE \"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash\" IN :0 AND EXISTS(\"http://www.w3.org/2001/XMLSchema#date\") AND EXISTS(\"http://www.w3.org/2001/XMLSchema#time\") AND EXISTS(\"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileUrl\") AND EXISTS (\"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName\");")
-        lMvStore.mvsql("CREATE CLASS \"http://localhost/mv/class/testphotos1/tag\" AS SELECT * WHERE \"http://code.google.com/p/tagont/hasTagLabel\" in :0 AND NOT EXISTS(\"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash\") AND NOT EXISTS(\"http://code.google.com/p/tagont/hasVisibility\");") # Interesting... without "AND NOT EXISTS(id)", it indexes also my tagging table and my privilege table... which would be cool, if only I could listValues to retrieve my distinct tags...
-        lMvStore.mvsql("CREATE CLASS \"http://localhost/mv/class/testphotos1/tagging\" AS SELECT * WHERE EXISTS(\"http://code.google.com/p/tagont/hasTagLabel\") AND \"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash\" in :0;")
-        lMvStore.mvsql("CREATE CLASS \"http://localhost/mv/class/testphotos1/user\" AS SELECT * WHERE \"http://xmlns.com/foaf/0.1/mbox\" in :0 AND EXISTS(\"http://www.w3.org/2002/01/p3prdfv1#user.login.password\") AND EXISTS(\"http://xmlns.com/foaf/0.1/member/adomain:Group\");")
-        lMvStore.mvsql("CREATE CLASS \"http://localhost/mv/class/testphotos1/privilege\" AS SELECT * WHERE \"http://code.google.com/p/tagont/hasTagLabel\" in :0 and EXISTS(\"http://code.google.com/p/tagont/hasVisibility\");")
+        lMvStore.q("CREATE CLASS \"http://localhost/mv/class/testphotos1/photo\" AS SELECT * WHERE \"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash\" IN :0 AND EXISTS(\"http://www.w3.org/2001/XMLSchema#date\") AND EXISTS(\"http://www.w3.org/2001/XMLSchema#time\") AND EXISTS(\"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileUrl\") AND EXISTS (\"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName\");")
+        lMvStore.q("CREATE CLASS \"http://localhost/mv/class/testphotos1/tag\" AS SELECT * WHERE \"http://code.google.com/p/tagont/hasTagLabel\" in :0 AND NOT EXISTS(\"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash\") AND NOT EXISTS(\"http://code.google.com/p/tagont/hasVisibility\");") # Interesting... without "AND NOT EXISTS(id)", it indexes also my tagging table and my privilege table... which would be cool, if only I could listValues to retrieve my distinct tags...
+        lMvStore.q("CREATE CLASS \"http://localhost/mv/class/testphotos1/tagging\" AS SELECT * WHERE EXISTS(\"http://code.google.com/p/tagont/hasTagLabel\") AND \"http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash\" in :0;")
+        lMvStore.q("CREATE CLASS \"http://localhost/mv/class/testphotos1/user\" AS SELECT * WHERE \"http://xmlns.com/foaf/0.1/mbox\" in :0 AND EXISTS(\"http://www.w3.org/2002/01/p3prdfv1#user.login.password\") AND EXISTS(\"http://xmlns.com/foaf/0.1/member/adomain:Group\");")
+        lMvStore.q("CREATE CLASS \"http://localhost/mv/class/testphotos1/privilege\" AS SELECT * WHERE \"http://code.google.com/p/tagont/hasTagLabel\" in :0 and EXISTS(\"http://code.google.com/p/tagont/hasVisibility\");")
     except:
         pass
     # Delete old instances, if any.
     print ("Deleting old data.")
-    lMvStore.mvsql("DELETE FROM \"http://localhost/mv/class/testphotos1/photo\";")
-    lMvStore.mvsql("DELETE FROM \"http://localhost/mv/class/testphotos1/tag\";")
-    lMvStore.mvsql("DELETE FROM \"http://localhost/mv/class/testphotos1/tagging\";")
-    lMvStore.mvsql("DELETE FROM \"http://localhost/mv/class/testphotos1/user\";")
-    lMvStore.mvsql("DELETE FROM \"http://localhost/mv/class/testphotos1/privilege\";")
+    lMvStore.q("DELETE FROM \"http://localhost/mv/class/testphotos1/photo\";")
+    lMvStore.q("DELETE FROM \"http://localhost/mv/class/testphotos1/tag\";")
+    lMvStore.q("DELETE FROM \"http://localhost/mv/class/testphotos1/tagging\";")
+    lMvStore.q("DELETE FROM \"http://localhost/mv/class/testphotos1/user\";")
+    lMvStore.q("DELETE FROM \"http://localhost/mv/class/testphotos1/privilege\";")
     # Create a few photos.
-    lMvStore.mvsql("START TRANSACTION;")
-    POPULATE_WALK_THIS_DIRECTORY="../tests"
+    lMvStore.q("START TRANSACTION;")
+    POPULATE_WALK_THIS_DIRECTORY="../tests_kernel"
     POPULATE_USE_THIS_EXTENSION="cpp"
     lCreateWalkArgs = [POPULATE_USE_THIS_EXTENSION, _createPhoto, None, 0]
     os.path.walk(POPULATE_WALK_THIS_DIRECTORY, _onWalk, lCreateWalkArgs)
-    lMvStore.mvsql("COMMIT;")
-    lCntPhotos = lMvStore.mvsql("SELECT * FROM \"http://localhost/mv/class/testphotos1/photo\";", pFlags=1)
+    lMvStore.q("COMMIT;")
+    lCntPhotos = lMvStore.q("SELECT * FROM \"http://localhost/mv/class/testphotos1/photo\";", pFlags=1)
     _chkCount("photos", _pExpected=lCreateWalkArgs[3], _pActual=lCntPhotos)
     # Create a few tags and tag some photos.
-    lMvStore.mvsql("START TRANSACTION;")
+    lMvStore.q("START TRANSACTION;")
     lSomeTags = ("cousin_vinny", "uncle_buck", "sister_suffragette", "country", "city", "zoo", "mountain_2010", "ocean_2004", "Beijing_1999", "Montreal_2003", "LasVegas_2007", "Fred", "Alice", "sceneries", "artwork")
     for iT in lSomeTags:
         _randomTag(iT)
-    lMvStore.mvsql("COMMIT;")
+    lMvStore.q("COMMIT;")
     # Create a few users and groups.
-    lMvStore.mvsql("START TRANSACTION;")
+    lMvStore.q("START TRANSACTION;")
     lGroups = ("friends", "family", "public")
     lUsers = ("ralph@peanut.com", "stephen@banana.com", "wilhelm@orchestra.com", "sita@marvel.com", "anna@karenina.com", "leo@tolstoy.com", "peter@pan.com", "jack@jill.com", "little@big.com", \
         "john@hurray.com", "claire@obscure.com", "stanley@puck.com", "grey@ball.com", "john@wimbledon.com", "mark@up.com", "sabrina@cool.com")
@@ -155,17 +155,17 @@ def _entryPoint():
         lGroup = random.choice(lGroups)
         lNewUserPin = _getpins("INSERT (\"http://xmlns.com/foaf/0.1/mbox\", \"http://www.w3.org/2002/01/p3prdfv1#user.login.password\", \"http://xmlns.com/foaf/0.1/member/adomain:Group\") VALUES ('%s', '%s', '%s');" % (iU, ''.join(random.choice(string.letters) for i in xrange(20)), lGroup))
         lInMemoryChk.setUserGroup(iU, lGroup)
-        lCntUsersInGroup = lMvStore.mvsql("SELECT * FROM \"http://localhost/mv/class/testphotos1/user\" WHERE \"http://xmlns.com/foaf/0.1/member/adomain:Group\"='%s';" % lGroup, pFlags=1)
+        lCntUsersInGroup = lMvStore.q("SELECT * FROM \"http://localhost/mv/class/testphotos1/user\" WHERE \"http://xmlns.com/foaf/0.1/member/adomain:Group\"='%s';" % lGroup, pFlags=1)
         print ("group %s contains %d users" % (lGroup, lCntUsersInGroup))
-    lMvStore.mvsql("COMMIT;")
+    lMvStore.q("COMMIT;")
     lCntUserGroups = len(_selectDistinctGroups())
-    lCntUsers = lMvStore.mvsql("SELECT * FROM \"http://localhost/mv/class/testphotos1/user\";", pFlags=1)
+    lCntUsers = lMvStore.q("SELECT * FROM \"http://localhost/mv/class/testphotos1/user\";", pFlags=1)
     _chkCount("groups", _pExpected=len(lGroups), _pActual=lCntUserGroups)
     _chkCount("users", _pExpected=len(lUsers), _pActual=lCntUsers)
     # Assign group/user privileges, and query on those.
     _randomGroupPrivileges()
     _randomUserPrivileges()
-    lCntPrivileges = lMvStore.mvsql("SELECT * FROM \"http://localhost/mv/class/testphotos1/privilege\";", pFlags=1)
+    lCntPrivileges = lMvStore.q("SELECT * FROM \"http://localhost/mv/class/testphotos1/privilege\";", pFlags=1)
     print ("%d privileges assigned." % lCntPrivileges)
     # Find a user who can view any of the first 5 tags, and count how many photos he can view.
     lTags = _getpins("SELECT * FROM \"http://localhost/mv/class/testphotos1/tag\";")
@@ -212,7 +212,7 @@ def _entryPoint():
     lMvStore.close()
 
 class TestPhotos1(MVStoreTest):
-    "A simple application talking to the store through mvSQL only, and using a relational model with joins."
+    "A simple application talking to the store through pathSQL only, and using a relational model with joins."
     def execute(self):
         _entryPoint()
 MVStoreTest.declare(TestPhotos1)

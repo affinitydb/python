@@ -33,11 +33,11 @@ def initialize():
         # Review: Use a qname and namespace, as soon as it becomes possible.
         # Note: the attribute/relation must exist, but the class may be NULL (in which case this PIN describes the global attribute/relation).
         # Review: remove those 'NOT EXISTS' when DISTINCT is available...
-        MVSTORE().mvsqlProto("CREATE CLASS \"%s\" AS SELECT * WHERE \"%s\" IN :0;" % \
+        MVSTORE().qProto("CREATE CLASS \"%s\" AS SELECT * WHERE \"%s\" IN :0;" % \
           (MVURI_CLASS_OF_ATTRIBUTE_DESCR, MVURI_PROP_URI_OF_ATTRIBUTE))
-        MVSTORE().mvsqlProto("CREATE CLASS \"%s\" AS SELECT * WHERE \"%s\" IN :0;" % \
+        MVSTORE().qProto("CREATE CLASS \"%s\" AS SELECT * WHERE \"%s\" IN :0;" % \
           (MVURI_CLASS_OF_RELATION_DESCR, MVURI_PROP_URI_OF_RELATION))
-        MVSTORE().mvsqlProto("CREATE CLASS \"%s\" AS SELECT * WHERE \"%s\" IN :0 AND NOT EXISTS(\"%s\") AND NOT EXISTS(\"%s\");" % \
+        MVSTORE().qProto("CREATE CLASS \"%s\" AS SELECT * WHERE \"%s\" IN :0 AND NOT EXISTS(\"%s\") AND NOT EXISTS(\"%s\");" % \
           (MVURI_CLASS_OF_CLASS_DESCR, MVURI_PROP_URI_OF_CLASS, MVURI_PROP_URI_OF_ATTRIBUTE, MVURI_PROP_URI_OF_RELATION))
     except:
         pass
@@ -46,10 +46,10 @@ def _describeProperty(pURI, pDict, pIsRelation, pClassURI=None):
     "[internal] Describe the property designated by pURI, using the properties and values of pDict; pClassURI determines if the description is in the scope of a class."
     lClassType = (MVURI_CLASS_OF_ATTRIBUTE_DESCR, MVURI_CLASS_OF_RELATION_DESCR)[pIsRelation]
     if pClassURI:
-        lCheck = MVSTORE().mvsql("SELECT * FROM \"%s\"('%s') WHERE (\"%s\" = '%s');" % \
+        lCheck = MVSTORE().q("SELECT * FROM \"%s\"('%s') WHERE (\"%s\" = '%s');" % \
             (lClassType, pURI, MVURI_PROP_URI_OF_CLASS, pClassURI), pFlags=1)
     else:
-        lCheck = MVSTORE().mvsql("SELECT * FROM \"%s\"('%s') WHERE NOT EXISTS(\"%s\");" % \
+        lCheck = MVSTORE().q("SELECT * FROM \"%s\"('%s') WHERE NOT EXISTS(\"%s\");" % \
             (lClassType, pURI, MVURI_PROP_URI_OF_CLASS), pFlags=1)
     if lCheck > 0:
         # TODO: validations.
@@ -74,7 +74,7 @@ def describeRelation(pURI, pDict, pClassURI=None):
 def describeClass(pURI, pDict):
     # Note: For the moment, I use a separate PIN (than the actual class PIN), to store the description; this also provides independence in terms of when these functions are called.
     # Note: We don't expect an enumeration of properties or of related classes in pDict, since this is already automated in the kernel.
-    lCheck = MVSTORE().mvsql("SELECT * FROM \"%s\"('%s');" % (MVURI_CLASS_OF_CLASS_DESCR, pURI), pFlags=1)
+    lCheck = MVSTORE().q("SELECT * FROM \"%s\"('%s');" % (MVURI_CLASS_OF_CLASS_DESCR, pURI), pFlags=1)
     if lCheck > 0:
         # TODO: validations.
         return
@@ -127,10 +127,12 @@ class ERSchema(object):
         self.mMvStore = MVSTORE()
         self.mQNames = pQNames
         self.mPaths2QNames = {}
-        self.mClasses = PIN.loadPINs(self.mMvStore.mvsqlProto("SELECT * FROM mv:ClassOfClasses;"))
+        self.mClasses = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM mv:ClassOfClasses;"))
         self.mEntities = {}
         # Create the 'Entity' objects.
         for iC in self.mClasses:
+            if 0 == iC[SP_PROPERTY_NAMES[mvstore_pb2.SP_CLASSID]]:
+                continue
             lClassURI = self._withQName(iC[SP_PROPERTY_NAMES[mvstore_pb2.SP_CLASSID]])
             self.mEntities[lClassURI] = ERSchema.Entity(lClassURI, iC)
         # Create the 'Attribute' and 'Relation' objects, for each 'Entity'.
@@ -143,15 +145,15 @@ class ERSchema(object):
             # Deal with the relations.
             if True:
                 #lPropertiesStr = ','.join(["'%s'" % iEP for iEP in lProperties])
-                #lRelations = PIN.loadPINs(self.mMvStore.mvsqlProto("SELECT * FROM %s AS r1 JOIN mv:ClassOfClasses AS e1 ON (r1.%s = e1.mv:properties) WHERE (e1.mv:classID='%s');" % \
-                #lRelations = PIN.loadPINs(self.mMvStore.mvsqlProto("SELECT * FROM %s WHERE %s IN (%s);" % \
+                #lRelations = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM %s AS r1 JOIN mv:ClassOfClasses AS e1 ON (r1.%s = e1.mv:properties) WHERE (e1.mv:classID='%s');" % \
+                #lRelations = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM %s WHERE %s IN (%s);" % \
                 #    (MVURI_CLASS_OF_RELATION_DESCR, MVURI_PROP_URI_OF_RELATION, lPropertiesStr)))
-                lRelations = PIN.loadPINs(self.mMvStore.mvsqlProto("SELECT * FROM \"%s\" WHERE \"%s\"='%s';" % \
+                lRelations = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM \"%s\" WHERE \"%s\"='%s';" % \
                     (MVURI_CLASS_OF_RELATION_DESCR, MVURI_PROP_URI_OF_CLASS, self._withoutQName(iE.mClassURI))))
                 logging.info("relations for entity %s: %s" % (iE.mClassURI, ','.join(['%s' % self._withQName(iR[MVURI_PROP_URI_OF_RELATION]) for iR in lRelations])))
                 for iR in lRelations:
                     lRelationURI = iR[MVURI_PROP_URI_OF_RELATION]
-                    lBase = PIN.loadPINs(self.mMvStore.mvsqlProto("SELECT * FROM \"%s\"('%s') WHERE NOT EXISTS(\"%s\");" % \
+                    lBase = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM \"%s\"('%s') WHERE NOT EXISTS(\"%s\");" % \
                         (MVURI_CLASS_OF_RELATION_DESCR, lRelationURI, MVURI_PROP_URI_OF_CLASS)))
                     lTo = []
                     for iB in lBase:
@@ -169,7 +171,7 @@ class ERSchema(object):
                     lProperties.discard(lRelationURI)
             # Deal with the attributes.
             if True:
-                lAttributes = PIN.loadPINs(self.mMvStore.mvsqlProto("SELECT * FROM \"%s\" WHERE \"%s\"='%s';" % \
+                lAttributes = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM \"%s\" WHERE \"%s\"='%s';" % \
                     (MVURI_CLASS_OF_ATTRIBUTE_DESCR, MVURI_PROP_URI_OF_CLASS, self._withoutQName(iE.mClassURI))))
                 logging.info("declared attributes for entity %s: %s" % (iE.mClassURI, ','.join(['%s' % iA[MVURI_PROP_URI_OF_ATTRIBUTE] for iA in lAttributes])))
                 for iA in lAttributes:

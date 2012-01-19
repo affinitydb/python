@@ -24,8 +24,8 @@ def _testLogic():
 
     print ("1a. create a few classes")
     try:
-        MVStoreConnection.getCurrentDbConnection().mvsql("CREATE CLASS \"http://localhost/mv/class/testnotifications1/Named\" AS SELECT * WHERE \"http://localhost/mv/property/testnotifications1/name\" IN :0;")
-        MVStoreConnection.getCurrentDbConnection().mvsql("CREATE CLASS \"http://localhost/mv/class/testnotifications1/Aged\" AS SELECT * WHERE \"http://localhost/mv/property/testnotifications1/age\" IN :0;")
+        MVStoreConnection.getCurrentDbConnection().q("CREATE CLASS \"http://localhost/mv/class/testnotifications1/Named\" AS SELECT * WHERE \"http://localhost/mv/property/testnotifications1/name\" IN :0;")
+        MVStoreConnection.getCurrentDbConnection().q("CREATE CLASS \"http://localhost/mv/class/testnotifications1/Aged\" AS SELECT * WHERE \"http://localhost/mv/property/testnotifications1/age\" IN :0;")
     except:
         pass
 

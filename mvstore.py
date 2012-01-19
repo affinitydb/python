@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.6
 """This module defines the key components of mvStore's low-level client library in python:
 MVStoreConnection and PIN (including PIN.PID and PIN.Collection).
-The library talks to the store via mvSQL and protobuf exclusively.
+The library talks to the store via pathSQL and protobuf exclusively.
 When the mvstoreinproc module is in the path, and MVStoreConnection.DEFAULT_INPROC is True,
 the library talks to an in-proc store. Otherwise, it uses HTTP to reach the mvserver.
 Please read the documentation of each component for more details."""
@@ -257,16 +257,16 @@ class MVStoreConnection(object):
             logging.debug(pMsg)
             lRet = None
             if self.mConnectionHTTP:
-                self.mConnectionHTTP.request("GET", "/db/?q=%s&i=mvsql%s" % (urllib.quote(pMsg), ("&o=proto", "&type=count")[pFlags==MVStoreConnection.FLAG_COUNT_ONLY]), headers={"Authorization":"Basic %s" % self.auth()})
+                self.mConnectionHTTP.request("GET", "/db/?q=%s&i=pathsql%s" % (urllib.quote(pMsg), ("&o=proto", "&type=count")[pFlags==MVStoreConnection.FLAG_COUNT_ONLY]), headers={"Authorization":"Basic %s" % self.auth()})
                 lRet = self.mConnectionHTTP.getresponse().read()
             else:
-                lRet = urllib2.urlopen(urllib2.Request("http://%s/db/?q=%s&i=mvsql%s" % (self.host(), urllib.quote(pMsg), ("&o=proto", "&type=count")[pFlags==MVStoreConnection.FLAG_COUNT_ONLY]), headers={"Authorization":"Basic %s" % self.auth()})).read()
+                lRet = urllib2.urlopen(urllib2.Request("http://%s/db/?q=%s&i=pathsql%s" % (self.host(), urllib.quote(pMsg), ("&o=proto", "&type=count")[pFlags==MVStoreConnection.FLAG_COUNT_ONLY]), headers={"Authorization":"Basic %s" % self.auth()})).read()
             if pFlags==MVStoreConnection.FLAG_COUNT_ONLY:
                 return int(lRet)
             return lRet
         def check(self, pMsg, pSession):
             logging.debug(pMsg)
-            return urllib2.urlopen(urllib2.Request("http://%s/db/?q=%s&i=mvsql&o=json" % (self.host(), urllib.quote(pMsg)), headers={"Authorization":"Basic %s" % self.auth()})).read()
+            return urllib2.urlopen(urllib2.Request("http://%s/db/?q=%s&i=pathsql&o=json" % (self.host(), urllib.quote(pMsg)), headers={"Authorization":"Basic %s" % self.auth()})).read()
         def trueSessions(self): return False
         def host(self): return self.mConnection.host()
         def auth(self): return self.mConnection.basicauth()
@@ -362,7 +362,7 @@ class MVStoreConnection(object):
         # Query via protobuf (various flavors).
         def _queryPB1(self, pQstr, pRtt=mvstore_pb2.RT_PINS):
             "This version really participates to the current protobuf stream and its current transaction (i.e. protobuf in&out)."
-            logging.info("mvSQL in protobuf: %s" % pQstr)
+            logging.info("pathSQL in protobuf: %s" % pQstr)
             lStmt = self.getPBStream().stmt.add()
             lStmt.sq = pQstr
             lStmt.cid = MVStoreConnection.PBTransactionCtx.NEXT_CID; MVStoreConnection.PBTransactionCtx.NEXT_CID += 1
@@ -373,9 +373,9 @@ class MVStoreConnection(object):
             return self.mPBOutput
         @staticmethod
         def _queryPBOut(pQstr):
-            "This version borrows the current connection to request directly from the server a protobuf response (i.e. mvsql in & protobuf out; for debugging etc.)."
-            logging.info("mvSQL (in protobuf): %s" % pQstr)
-            lRaw = MVStoreConnection.getCurrentDbConnection().mvsql(pQstr)
+            "This version borrows the current connection to request directly from the server a protobuf response (i.e. pathSQL in & protobuf out; for debugging etc.)."
+            logging.info("pathSQL (in protobuf): %s" % pQstr)
+            lRaw = MVStoreConnection.getCurrentDbConnection().q(pQstr)
             if lRaw == None:
                 return None
             #displayPBStr(lRaw, pTitle="response obtained from mvstore for _queryPB")
@@ -454,8 +454,8 @@ class MVStoreConnection(object):
         return self.mImpl.close()
     def host(self): return "%s:%s" % (self.mHost, self.mPort)
     def basicauth(self): return base64.b64encode("%s:%s" % (self.mOwner, ("", self.mPassword)[None != self.mPassword]))
-    def mvsql(self, pMsg, pFlags=0, pSession=None): logging.info("mvSQL: %s" % pMsg); return self.mImpl.get(pMsg, pFlags, self._s(pSession))
-    def mvsqlProto(self, pQstr): return self._txCtx().queryPB(pQstr)
+    def q(self, pMsg, pFlags=0, pSession=None): logging.info("pathSQL: %s" % pMsg); return self.mImpl.get(pMsg, pFlags, self._s(pSession))
+    def qProto(self, pQstr): return self._txCtx().queryPB(pQstr)
     def check(self, pMsg, pSession=None): return self.mImpl.check(pMsg, self._s(pSession))
     def startTx(self): self._txCtx().startTx()
     def commitTx(self): self._txCtx().commitTx()
@@ -1046,7 +1046,7 @@ class PIN(dict):
     @classmethod
     def createFromPID(cls, pPID):
         "Load the PIN specified by pPID, and return it as a new PIN object."
-        lPBStream = MVSTORE().mvsqlProto("SELECT * FROM {@%x};" % pPID.mLocalPID)
+        lPBStream = MVSTORE().qProto("SELECT * FROM {@%x};" % pPID.mLocalPID)
         return PIN().loadPIN(PBReadCtx(lPBStream), lPBStream.pins[0])
     def loadPIN(self, pReadCtx, pPBPin):
         "Load the specified PIN in-place."
@@ -1061,7 +1061,7 @@ class PIN(dict):
         "Refresh the contents of self, by rereading the whole PIN from the store."
         if None == self.mPID:
             return self
-        lPBStream = MVSTORE().mvsqlProto("SELECT * FROM {@%x};" % self.mPID.mLocalPID)
+        lPBStream = MVSTORE().qProto("SELECT * FROM {@%x};" % self.mPID.mLocalPID)
         return self.loadPIN(PBReadCtx(lPBStream), lPBStream.pins[0])
     def _clearPIN(self):
         "Clear the contents of self."
@@ -1297,7 +1297,7 @@ class PIN(dict):
 # TODO: document the effect of recordPINUpdate, and correct usage (e.g. since updates are deferred, queries can be affected)
 # TODO: better del support, for the pin itself; better remove for last element of collection
 # TODO: finish testing the more esoteric formats, to make sure their conversion is good
-# TODO: test that units of measurement work ok back and forth between mvSQL and pure protobuf
+# TODO: test that units of measurement work ok back and forth between pathSQL and pure protobuf
 # ---
 # TODO: mark pins that have participated to a rolled-back transaction as dirty, and refresh them if reused
 # TODO: make sure that all paths produce exceptions when necessary (e.g. all MVSTORE().get/post failures); show better in samples/tests
@@ -1313,7 +1313,7 @@ class PIN(dict):
     #from google.protobuf.internal import decoder, encoder
     #def test_streaming(pPinIDs):
         ## write something like InternalParse
-        #lRawRes = gMvStore.mvsql("SELECT * FROM {@%x};" % pPinIDs[0].id)
+        #lRawRes = gMvStore.q("SELECT * FROM {@%x};" % pPinIDs[0].id)
         #lStreamObj = mvstore_pb2.MVStream()
         ##lStreamRes.ParseFromString(lRawRes)
         ## Note:
