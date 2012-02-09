@@ -60,7 +60,7 @@ if __name__ == '__main__':
         # Note:
         #   Checking for class existence is not mandatory, provided that class creation is done within try-except;
         #   here, for documentation sake, both approaches are demonstrated in combination.  
-        if 0 == lMvStore.q("SELECT * FROM mv:ClassOfClasses WHERE mv:classID='sample1_knownage';", pFlags=1):
+        if 0 == lMvStore.q("SELECT * FROM afy:ClassOfClasses WHERE afy:classID='sample1_knownage';", pFlags=1):
             lMvStore.qProto("CREATE CLASS sample1_knownage AS SELECT * WHERE age IN :0 and EXISTS(name);")
         else:
             print ("family already existed.")

@@ -208,17 +208,17 @@ if __name__ == '__main__':
         if lVarType2.get() != lNil:
             # Still not working... need to follow up with Mark (bug #183).
             #lCandidates = PIN.loadPINs(lMvStore.qProto( \
-                #"SELECT * FROM (\"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp1 JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c ON (cp1.mv:pinID = c.\"http://localhost/mv/property/1.0/circuit/components\")) JOIN \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp2 ON (cp2.mv:pinID = cp1.\"http://localhost/mv/property/1.0/circuit/component/outputs\") WHERE (cp1.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s' and cp2.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s');" % \
+                #"SELECT * FROM (\"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp1 JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c ON (cp1.afy:pinID = c.\"http://localhost/mv/property/1.0/circuit/components\")) JOIN \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp2 ON (cp2.afy:pinID = cp1.\"http://localhost/mv/property/1.0/circuit/component/outputs\") WHERE (cp1.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s' and cp2.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s');" % \
                 #(lCircuitUI.mCircuit.name, lVarType1.get(), lVarType2.get())))
             lCandidatesT = PIN.loadPINs(lMvStore.qProto( \
-                "SELECT * FROM \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp1 JOIN \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp2 ON (cp2.mv:pinID = cp1.\"http://localhost/mv/property/1.0/circuit/component/outputs\") WHERE (cp1.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s' and cp2.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s');" % \
+                "SELECT * FROM \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp1 JOIN \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp2 ON (cp2.afy:pinID = cp1.\"http://localhost/mv/property/1.0/circuit/component/outputs\") WHERE (cp1.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s' and cp2.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s');" % \
                 (lVarType1.get(), lVarType2.get())))
             lCandidates = PIN.loadPINs(lMvStore.qProto( \
-                "SELECT * FROM {%s} AS cp1 JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c on (c.\"http://localhost/mv/property/1.0/circuit/components\" = cp1.mv:pinID);" % \
+                "SELECT * FROM {%s} AS cp1 JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c on (c.\"http://localhost/mv/property/1.0/circuit/components\" = cp1.afy:pinID);" % \
                 (','.join([repr(_iCT.mPID) for _iCT in lCandidatesT]), lCircuitUI.mCircuit.name)))
         else:
             lCandidates = PIN.loadPINs(lMvStore.qProto( \
-                "SELECT * FROM \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp1 JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c ON (cp1.mv:pinID = c.\"http://localhost/mv/property/1.0/circuit/components\") WHERE (cp1.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s');" % \
+                "SELECT * FROM \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp1 JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c ON (cp1.afy:pinID = c.\"http://localhost/mv/property/1.0/circuit/components\") WHERE (cp1.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s');" % \
                 (lCircuitUI.mCircuit.name, lVarType1.get())))
         lCircuitUI.unselect(); lCircuitUI.unselect(pSoft=True)
         for iC in lCandidates:

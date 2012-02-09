@@ -106,14 +106,14 @@ class Circuit(object):
                     lMaxX = lComp1.cx + 2 * Circuit.DISPLAY_WIDTH + Circuit.DISPLAY_MARGIN
                     lMinY = lComp1.cy - Circuit.DISPLAY_HEIGHT - Circuit.DISPLAY_MARGIN
                     lMaxY = lComp1.cy + 2 * Circuit.DISPLAY_HEIGHT + Circuit.DISPLAY_MARGIN
-                    lCondition = " WHERE ((cp.mv:pinID NOT IN (%s)) AND (cp.\"http://localhost/mv/property/1.0/circuit/component/x\" IN [%s, %s]) AND (cp.\"http://localhost/mv/property/1.0/circuit/component/y\" IN [%s, %s]))" % (lExcludedStr, lMinX, lMaxX, lMinY, lMaxY)
+                    lCondition = " WHERE ((cp.afy:pinID NOT IN (%s)) AND (cp.\"http://localhost/mv/property/1.0/circuit/component/x\" IN [%s, %s]) AND (cp.\"http://localhost/mv/property/1.0/circuit/component/y\" IN [%s, %s]))" % (lExcludedStr, lMinX, lMaxX, lMinY, lMaxY)
                     # TODO: enable when bug 108 is fixed.
-                    #lCondition = " WHERE (cp.mv:pinID NOT IN (%s))" % lExcludedStr
+                    #lCondition = " WHERE (cp.afy:pinID NOT IN (%s))" % lExcludedStr
                     lCandidates = PIN.loadPINs(self.mMvStore.qProto( \
-                        "SELECT * FROM \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c ON (cp.mv:pinID = c.\"http://localhost/mv/property/1.0/circuit/components\")%s;" % \
+                        "SELECT * FROM \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c ON (cp.afy:pinID = c.\"http://localhost/mv/property/1.0/circuit/components\")%s;" % \
                         (self.mPin["http://localhost/mv/property/1.0/circuit/name"], lCondition)))
                         # TODO: enable when bug 108 is fixed.
-                        #"SELECT * FROM \"http://localhost/mv/class/1.0/Circuit/Component#bypos\"([%s, %s], [%s, %s]) AS cp JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c ON (cp.mv:pinID = c.\"http://localhost/mv/property/1.0/circuit/components\")%s;" % \
+                        #"SELECT * FROM \"http://localhost/mv/class/1.0/Circuit/Component#bypos\"([%s, %s], [%s, %s]) AS cp JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c ON (cp.afy:pinID = c.\"http://localhost/mv/property/1.0/circuit/components\")%s;" % \
                         #(lMinX, lMaxX, lMinY, lMaxY, self.mPin["http://localhost/mv/property/1.0/circuit/name"], lCondition))))
                     if 0 == len(lCandidates):
                         logging.debug("couldn't find a candidate for %s with exclusions %s" % (lComp1.mPin.mPID, lExcludedStr))

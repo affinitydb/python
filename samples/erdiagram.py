@@ -207,11 +207,11 @@ if __name__ == '__main__':
         lCandidates = []
         if lVarType2.get() != lNil:
             lCandidates = PIN.loadPINs(lMvStore.qProto( \
-                "SELECT * FROM (components_bypos AS cp1 JOIN circuits('%s') AS c ON (cp1.mv:pinID = c.components)) INTERSECT SELECT * FROM components_bypos WHERE (cp2.mv:pinID = cp1.component_outputs AND cp1.component_type='%s' AND cp2.component_type='%s');" % \
+                "SELECT * FROM (components_bypos AS cp1 JOIN circuits('%s') AS c ON (cp1.afy:pinID = c.components)) INTERSECT SELECT * FROM components_bypos WHERE (cp2.afy:pinID = cp1.component_outputs AND cp1.component_type='%s' AND cp2.component_type='%s');" % \
                 (lERDiagramUI.mCircuit.name, lVarType1.get(), lVarType2.get())))
         else:
             lCandidates = PIN.loadPINs(lMvStore.qProto( \
-                "SELECT * FROM components_bypos AS cp1 JOIN circuits('%s') AS c ON (cp1.mv:pinID = c.components) WHERE (cp1.component_type='%s');" % \
+                "SELECT * FROM components_bypos AS cp1 JOIN circuits('%s') AS c ON (cp1.afy:pinID = c.components) WHERE (cp1.component_type='%s');" % \
                 (lERDiagramUI.mCircuit.name, lVarType1.get())))
         lERDiagramUI.unselect(); lERDiagramUI.unselect(pSoft=True)
         for iC in lCandidates:

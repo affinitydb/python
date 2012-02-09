@@ -169,11 +169,11 @@ def _entryPoint():
     lTags = _getpins("SELECT * FROM testphotos2_class_tags;")
     lFirstTagsStr = ','.join(["'%s'" % iT["testphotos2_tag"] for iT in lTags[:5]])
     #lUsersOfInterest = _getpins("SELECT * FROM testphotos2_class_users WHERE testphotos2_tags.testphotos2_tag IN (%s);" % lFirstTagsStr)
-    #lUsersOfInterest = _getpins("SELECT u.* FROM testphotos2_class_tags(%s) AS t JOIN testphotos2_class_users AS u ON (t.mv:pinID = u.testphotos2_tags);" % lFirstTagsStr) # doesn't work yet
-    lUsersOfInterest = _getpins("SELECT * FROM testphotos2_class_users AS u JOIN testphotos2_class_tags(%s) AS t ON (t.mv:pinID = u.testphotos2_tags);" % lFirstTagsStr)
+    #lUsersOfInterest = _getpins("SELECT u.* FROM testphotos2_class_tags(%s) AS t JOIN testphotos2_class_users AS u ON (t.afy:pinID = u.testphotos2_tags);" % lFirstTagsStr) # doesn't work yet
+    lUsersOfInterest = _getpins("SELECT * FROM testphotos2_class_users AS u JOIN testphotos2_class_tags(%s) AS t ON (t.afy:pinID = u.testphotos2_tags);" % lFirstTagsStr)
     print ("users that have one of %s: %s" % (lFirstTagsStr, [iU.get("testphotos2_id") for iU in lUsersOfInterest]))
     def _countUserPhotos(_pUserName, _pUserGroup):
-        _lTagsP1 = _getpins("SELECT * FROM testphotos2_class_tags AS t JOIN testphotos2_class_users('%s') AS u ON (t.mv:pinID = u.testphotos2_tags);" % _pUserName)
+        _lTagsP1 = _getpins("SELECT * FROM testphotos2_class_tags AS t JOIN testphotos2_class_users('%s') AS u ON (t.afy:pinID = u.testphotos2_tags);" % _pUserName)
         _lExpected_usPriv = lInMemoryChk.getTags_usPriv(_pUserName)
         _lTags = set() # Note: Here it's not for dedup, just for compatibility with InMemoryChk...
         for _iP in _lTagsP1:
@@ -182,7 +182,7 @@ def _entryPoint():
         if len(_lExpected_usPriv.difference(_lTags)) > 0:
             print ("WARNING: expected user-privilege tags %s" % _lExpected_usPriv.difference(_lTags))
             assert False
-        _lTagsP2 = _getpins("SELECT * FROM testphotos2_class_tags AS t JOIN testphotos2_class_groups('%s') AS g ON (t.mv:pinID = g.testphotos2_tags);" % _pUserGroup)
+        _lTagsP2 = _getpins("SELECT * FROM testphotos2_class_tags AS t JOIN testphotos2_class_groups('%s') AS g ON (t.afy:pinID = g.testphotos2_tags);" % _pUserGroup)
         for _iP in _lTagsP2:
             _lTags.add(_iP["testphotos2_tag"])
         print ("user %s has tags %s" % (_pUserName, _lTags))

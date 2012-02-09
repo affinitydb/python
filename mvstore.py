@@ -45,26 +45,26 @@ EID_FIRST_ELEMENT = 4294967293
 # Names for special properties.
 SP_PROPERTY_NAMES = \
 { \
-    mvstore_pb2.SP_PINID:"mv:pinID", \
-    mvstore_pb2.SP_DOCUMENT:"mv:document", \
-    mvstore_pb2.SP_PARENT:"mv:parent", \
-    mvstore_pb2.SP_VALUE:"mv:value", \
-    mvstore_pb2.SP_CREATED:"mv:created", \
-    mvstore_pb2.SP_CREATEDBY:"mv:createdBy", \
-    mvstore_pb2.SP_UPDATED:"mv:updated", \
-    mvstore_pb2.SP_UPDATEDBY:"mv:updatedBy", \
-    mvstore_pb2.SP_ACL:"mv:ACL", \
-    mvstore_pb2.SP_URI:"mv:URI", \
-    mvstore_pb2.SP_STAMP:"mv:stamp", \
-    mvstore_pb2.SP_CLASSID:"mv:classID", \
-    mvstore_pb2.SP_PREDICATE:"mv:predicate", \
-    mvstore_pb2.SP_NINSTANCES:"mv:nInstances", \
-    mvstore_pb2.SP_NDINSTANCES:"mv:nDelInstances", \
-    mvstore_pb2.SP_SUBCLASSES:"mv:subclasses", \
-    mvstore_pb2.SP_SUPERCLASSES:"mv:superclasses", \
-    mvstore_pb2.SP_CLASS_INFO:"mv:classInfo", \
-    mvstore_pb2.SP_INDEX_INFO:"mv:indexInfo", \
-    mvstore_pb2.SP_PROPERTIES:"mv:properties", \
+    mvstore_pb2.SP_PINID:"afy:pinID", \
+    mvstore_pb2.SP_DOCUMENT:"afy:document", \
+    mvstore_pb2.SP_PARENT:"afy:parent", \
+    mvstore_pb2.SP_VALUE:"afy:value", \
+    mvstore_pb2.SP_CREATED:"afy:created", \
+    mvstore_pb2.SP_CREATEDBY:"afy:createdBy", \
+    mvstore_pb2.SP_UPDATED:"afy:updated", \
+    mvstore_pb2.SP_UPDATEDBY:"afy:updatedBy", \
+    mvstore_pb2.SP_ACL:"afy:ACL", \
+    mvstore_pb2.SP_URI:"afy:URI", \
+    mvstore_pb2.SP_STAMP:"afy:stamp", \
+    mvstore_pb2.SP_CLASSID:"afy:classID", \
+    mvstore_pb2.SP_PREDICATE:"afy:predicate", \
+    mvstore_pb2.SP_NINSTANCES:"afy:nInstances", \
+    mvstore_pb2.SP_NDINSTANCES:"afy:nDelInstances", \
+    mvstore_pb2.SP_SUBCLASSES:"afy:subclasses", \
+    mvstore_pb2.SP_SUPERCLASSES:"afy:superclasses", \
+    mvstore_pb2.SP_CLASS_INFO:"afy:classInfo", \
+    mvstore_pb2.SP_INDEX_INFO:"afy:indexInfo", \
+    mvstore_pb2.SP_PROPERTIES:"afy:properties", \
 }    
 
 # Internal logging.

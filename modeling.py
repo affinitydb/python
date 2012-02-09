@@ -101,7 +101,7 @@ class ERSchema(object):
             self.mFkTarget = pFkTarget # The 'Entity' that 'contains', or is pointed to by 'pFk' (MVURI_PROP_URI_OF_CLASS).
             self.mPin = pPin # Actual pin in the store representing the relation (MVURI_CLASS_OF_RELATION_DESCR).
     class Attribute(object):
-        """'Attribute' refers to the union of properties enumerated by an entity's 'mv:properties',
+        """'Attribute' refers to the union of properties enumerated by an entity's 'afy:properties',
         and other properties declared via 'describeAttribute'."""
         def __init__(self, pURI, pPin=None):
             self.mURI = pURI # Full URI of the mvstore property that holds this attribute.
@@ -127,7 +127,7 @@ class ERSchema(object):
         self.mMvStore = MVSTORE()
         self.mQNames = pQNames
         self.mPaths2QNames = {}
-        self.mClasses = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM mv:ClassOfClasses;"))
+        self.mClasses = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM afy:ClassOfClasses;"))
         self.mEntities = {}
         # Create the 'Entity' objects.
         for iC in self.mClasses:
@@ -145,7 +145,7 @@ class ERSchema(object):
             # Deal with the relations.
             if True:
                 #lPropertiesStr = ','.join(["'%s'" % iEP for iEP in lProperties])
-                #lRelations = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM %s AS r1 JOIN mv:ClassOfClasses AS e1 ON (r1.%s = e1.mv:properties) WHERE (e1.mv:classID='%s');" % \
+                #lRelations = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM %s AS r1 JOIN afy:ClassOfClasses AS e1 ON (r1.%s = e1.afy:properties) WHERE (e1.afy:classID='%s');" % \
                 #lRelations = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM %s WHERE %s IN (%s);" % \
                 #    (MVURI_CLASS_OF_RELATION_DESCR, MVURI_PROP_URI_OF_RELATION, lPropertiesStr)))
                 lRelations = PIN.loadPINs(self.mMvStore.qProto("SELECT * FROM \"%s\" WHERE \"%s\"='%s';" % \
