@@ -6,7 +6,7 @@ try:
     from tkinter import * # For UI.
 except:
     from Tkinter import * # For UI.
-from mvstore import * # For mvstore db access.
+from affinity import * # For Affinity db access.
 from uihelpers import * # For simple tkinter helpers.
 from circuit1 import * # For our circuit model.
 
@@ -113,10 +113,10 @@ class CircuitUI(object):
         
 if __name__ == '__main__':
     # Have a db connection.
-    lMvStore = MVSTORE()
+    lAffinity = AFFINITY()
 
     # Create the root UI.
-    ROOT_TITLE = "MvStore Circuit Sample"
+    ROOT_TITLE = "Affinity Circuit Sample"
     lRootUI = Tk()
     lRootUI.geometry("1000x600")
     lRootUI.resizable(1, 1)
@@ -151,8 +151,8 @@ if __name__ == '__main__':
             lRootUI.title("%s [%s]" % (ROOT_TITLE, lNewName))
     def onMenuLoad():
         # Setup the dlg...
-        lCircuitList = PIN.loadPINs(lMvStore.qProto("SELECT * FROM \"http://localhost/mv/class/1.0/Circuit\";"))
-        lNameList = [iC["http://localhost/mv/property/1.0/circuit/name"] for iC in lCircuitList]
+        lCircuitList = PIN.loadPINs(lAffinity.qProto("SELECT * FROM \"http://localhost/afy/class/1.0/Circuit\";"))
+        lNameList = [iC["http://localhost/afy/property/1.0/circuit/name"] for iC in lCircuitList]
         lDlg = Toplevel(lRootUI)
         lDlg.title("Load Circuit...")
         lList = uiAddList(lDlg)
@@ -207,22 +207,22 @@ if __name__ == '__main__':
         lCandidates = []
         if lVarType2.get() != lNil:
             # Still not working... need to follow up with Mark (bug #183).
-            #lCandidates = PIN.loadPINs(lMvStore.qProto( \
-                #"SELECT * FROM (\"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp1 JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c ON (cp1.afy:pinID = c.\"http://localhost/mv/property/1.0/circuit/components\")) JOIN \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp2 ON (cp2.afy:pinID = cp1.\"http://localhost/mv/property/1.0/circuit/component/outputs\") WHERE (cp1.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s' and cp2.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s');" % \
+            #lCandidates = PIN.loadPINs(lAffinity.qProto( \
+                #"SELECT * FROM (\"http://localhost/afy/class/1.0/Circuit/Component#bypos\" AS cp1 JOIN \"http://localhost/afy/class/1.0/Circuit\"('%s') AS c ON (cp1.afy:pinID = c.\"http://localhost/afy/property/1.0/circuit/components\")) JOIN \"http://localhost/afy/class/1.0/Circuit/Component#bypos\" AS cp2 ON (cp2.afy:pinID = cp1.\"http://localhost/afy/property/1.0/circuit/component/outputs\") WHERE (cp1.\"http://localhost/afy/property/1.0/circuit/component/type\"='%s' and cp2.\"http://localhost/afy/property/1.0/circuit/component/type\"='%s');" % \
                 #(lCircuitUI.mCircuit.name, lVarType1.get(), lVarType2.get())))
-            lCandidatesT = PIN.loadPINs(lMvStore.qProto( \
-                "SELECT * FROM \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp1 JOIN \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp2 ON (cp2.afy:pinID = cp1.\"http://localhost/mv/property/1.0/circuit/component/outputs\") WHERE (cp1.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s' and cp2.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s');" % \
+            lCandidatesT = PIN.loadPINs(lAffinity.qProto( \
+                "SELECT * FROM \"http://localhost/afy/class/1.0/Circuit/Component#bypos\" AS cp1 JOIN \"http://localhost/afy/class/1.0/Circuit/Component#bypos\" AS cp2 ON (cp2.afy:pinID = cp1.\"http://localhost/afy/property/1.0/circuit/component/outputs\") WHERE (cp1.\"http://localhost/afy/property/1.0/circuit/component/type\"='%s' and cp2.\"http://localhost/afy/property/1.0/circuit/component/type\"='%s');" % \
                 (lVarType1.get(), lVarType2.get())))
-            lCandidates = PIN.loadPINs(lMvStore.qProto( \
-                "SELECT * FROM {%s} AS cp1 JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c on (c.\"http://localhost/mv/property/1.0/circuit/components\" = cp1.afy:pinID);" % \
+            lCandidates = PIN.loadPINs(lAffinity.qProto( \
+                "SELECT * FROM {%s} AS cp1 JOIN \"http://localhost/afy/class/1.0/Circuit\"('%s') AS c on (c.\"http://localhost/afy/property/1.0/circuit/components\" = cp1.afy:pinID);" % \
                 (','.join([repr(_iCT.mPID) for _iCT in lCandidatesT]), lCircuitUI.mCircuit.name)))
         else:
-            lCandidates = PIN.loadPINs(lMvStore.qProto( \
-                "SELECT * FROM \"http://localhost/mv/class/1.0/Circuit/Component#bypos\" AS cp1 JOIN \"http://localhost/mv/class/1.0/Circuit\"('%s') AS c ON (cp1.afy:pinID = c.\"http://localhost/mv/property/1.0/circuit/components\") WHERE (cp1.\"http://localhost/mv/property/1.0/circuit/component/type\"='%s');" % \
+            lCandidates = PIN.loadPINs(lAffinity.qProto( \
+                "SELECT * FROM \"http://localhost/afy/class/1.0/Circuit/Component#bypos\" AS cp1 JOIN \"http://localhost/afy/class/1.0/Circuit\"('%s') AS c ON (cp1.afy:pinID = c.\"http://localhost/afy/property/1.0/circuit/components\") WHERE (cp1.\"http://localhost/afy/property/1.0/circuit/component/type\"='%s');" % \
                 (lCircuitUI.mCircuit.name, lVarType1.get())))
         lCircuitUI.unselect(); lCircuitUI.unselect(pSoft=True)
         for iC in lCandidates:
-            lCircuitUI.selectComponent(iC["http://localhost/mv/property/1.0/circuit/component/x"], iC["http://localhost/mv/property/1.0/circuit/component/y"], pCanvasCoords=True, pSoft=True)
+            lCircuitUI.selectComponent(iC["http://localhost/afy/property/1.0/circuit/component/x"], iC["http://localhost/afy/property/1.0/circuit/component/y"], pCanvasCoords=True, pSoft=True)
     def onMenuEditComponent():
         if lCircuitUI.mSelected:
             # Setup the dlg...
@@ -237,7 +237,7 @@ if __name__ == '__main__':
             # Handle the result.
             lNewType = lVarType.get()
             if lNewType and lNewType != lCircuitUI.mSelected[0].ctype:
-                lCircuitUI.mSelected[0].mPin["http://localhost/mv/property/1.0/circuit/component/type"] = lNewType
+                lCircuitUI.mSelected[0].mPin["http://localhost/afy/property/1.0/circuit/component/type"] = lNewType
                 lCircuitUI.refresh()
             else:
                 lCircuitUI.unselect()
@@ -297,9 +297,9 @@ if __name__ == '__main__':
     lMainCanvas.bind("<Shift-Button-1>", softCtrlSelectComponent)
 
     # Run.
-    lMvStore.open()
-    Circuit.declareMvClasses()
+    lAffinity.open()
+    Circuit.declareAfyClasses()
     Circuit.describeModel()
     lRootUI.mainloop()
-    lMvStore.close()
+    lAffinity.close()
     print ("circuit1 exited normally.")

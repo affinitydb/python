@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.6
 """This module implements a UI that leverages the information provided by the 'modeling'
 module, and presents entity-relationship graphs of existing classes in the store. The initial
-intent is to serve as simple demo material, help play with mvstore data modeling, and encourage
+intent is to serve as simple demo material, help play with Affinity data modeling, and encourage
 the use of the 'modeling' module. This might be converted into a more serious tool if it proves
 useful and if time permits (e.g. on-the-fly modeling / class management, stat extraction
 from existing raw data, multi-level modeling, visibility on emergent related classes, etc.)."""
@@ -12,7 +12,7 @@ try:
     from tkinter import * # For UI.
 except:
     from Tkinter import * # For UI.
-from mvstore import * # For mvstore db access.
+from affinity import * # For Affinity db access.
 from uihelpers import * # For simple tkinter helpers.
 import math
 import modeling
@@ -75,7 +75,7 @@ class ERDiagramUI(object):
             for iR in iE.mRelations:
                 if iE == iR.mFk:
                     self._createConnection(iE, iR.mFkTarget, iR.mColor)
-        self.mCanvas.configure(scrollregion=(0, 0, 2 * ERDiagramUI.MARGIN + lMaxX * (ERDiagramUI.ENTITY_WIDTH + ERDiagramUI.MARGIN), 2 * ERDiagramUI.MARGIN + lMaxX * (ERDiagramUI.ENTITY_HEIGHT + ERDiagramUI.MARGIN)))
+        self.mCanvas.configure(scrollregion=(0, 0, 2 * ERDiagramUI.MARGIN + (1 + lMaxX) * (ERDiagramUI.ENTITY_WIDTH + ERDiagramUI.MARGIN), 2 * ERDiagramUI.MARGIN + lMaxX * (ERDiagramUI.ENTITY_HEIGHT + ERDiagramUI.MARGIN)))
     def unselect(self, pSoft=False):
         if pSoft and self.mSoftSelected != None:
             for iS in self.mSoftSelected:
@@ -172,10 +172,10 @@ class ERDiagramUI(object):
         
 if __name__ == '__main__':
     # Have a db connection.
-    lMvStore = MVSTORE()
+    lAffinity = AFFINITY()
 
     # Create the root UI.
-    ROOT_TITLE = "MvStore ER Diagram Sample"
+    ROOT_TITLE = "Affinity ER Diagram Sample"
     lRootUI = Tk()
     lRootUI.geometry("1000x600")
     lRootUI.resizable(1, 1)
@@ -206,11 +206,11 @@ if __name__ == '__main__':
         # Handle the result.
         lCandidates = []
         if lVarType2.get() != lNil:
-            lCandidates = PIN.loadPINs(lMvStore.qProto( \
+            lCandidates = PIN.loadPINs(lAffinity.qProto( \
                 "SELECT * FROM (components_bypos AS cp1 JOIN circuits('%s') AS c ON (cp1.afy:pinID = c.components)) INTERSECT SELECT * FROM components_bypos WHERE (cp2.afy:pinID = cp1.component_outputs AND cp1.component_type='%s' AND cp2.component_type='%s');" % \
                 (lERDiagramUI.mCircuit.name, lVarType1.get(), lVarType2.get())))
         else:
-            lCandidates = PIN.loadPINs(lMvStore.qProto( \
+            lCandidates = PIN.loadPINs(lAffinity.qProto( \
                 "SELECT * FROM components_bypos AS cp1 JOIN circuits('%s') AS c ON (cp1.afy:pinID = c.components) WHERE (cp1.component_type='%s');" % \
                 (lERDiagramUI.mCircuit.name, lVarType1.get())))
         lERDiagramUI.unselect(); lERDiagramUI.unselect(pSoft=True)
@@ -267,9 +267,9 @@ if __name__ == '__main__':
     lMainCanvas.bind("<Shift-Button-1>", softCtrlSelectComponent)
 
     # Run.
-    lMvStore.open()
+    lAffinity.open()
     modeling.initialize()
     lERDiagramUI.setData()
     lRootUI.mainloop()
-    lMvStore.close()
+    lAffinity.close()
     print ("erdiagram exited normally.")

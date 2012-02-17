@@ -2,25 +2,25 @@
 """This module is a another basic test for notifications, more focused on
 quantitative assessment (than testnotifications1)."""
 
-from testfwk import MVStoreTest
-from mvstore import *
-from mvnotifier import *
+from testfwk import AffinityTest
+from affinity import *
+from afynotifier import *
 import random
 import time
 
 def _entryPoint():
-    lMvStore = MVSTORE()
-    lMvStore.open(pKeepAlive=True)
-    #MVNOTIFIER.open(lMvStore)
+    lAffinity = AFFINITY()
+    lAffinity.open(pKeepAlive=True)
+    #AFYNOTIFIER.open(lAffinity)
 
     print ("1. create a few classes")
-    lMvStore.q("SET PREFIX tn2c: 'http://localhost/mv/class/testnotifications2/';")
-    lMvStore.q("SET PREFIX tn2p: 'http://localhost/mv/property/testnotifications2/';")
+    lAffinity.q("SET PREFIX tn2c: 'http://localhost/afy/class/testnotifications2/';")
+    lAffinity.q("SET PREFIX tn2p: 'http://localhost/afy/property/testnotifications2/';")
     try:
-        lMvStore.q("CREATE CLASS tn2c:Person AS SELECT * WHERE tn2p:name IN :0;")
-        lMvStore.q("CREATE CLASS tn2c:Location AS SELECT * WHERE BEGINS(tn2p:postalcode, :0);")
-        lMvStore.q("CREATE CLASS tn2c:Occupation AS SELECT * WHERE BEGINS(tn2p:occupation, :0);")
-        lMvStore.q("CREATE CLASS tn2c:Age AS SELECT * WHERE BEGINS(tn2p:age, :0);")
+        lAffinity.q("CREATE CLASS tn2c:Person AS SELECT * WHERE tn2p:name IN :0;")
+        lAffinity.q("CREATE CLASS tn2c:Location AS SELECT * WHERE BEGINS(tn2p:postalcode, :0);")
+        lAffinity.q("CREATE CLASS tn2c:Occupation AS SELECT * WHERE BEGINS(tn2p:occupation, :0);")
+        lAffinity.q("CREATE CLASS tn2c:Age AS SELECT * WHERE BEGINS(tn2p:age, :0);")
     except:
         pass
 
@@ -59,7 +59,7 @@ def _entryPoint():
         'urologist', 'veterinarian', 'volcanologist', 'wood chemist', 'youth court judge', 'zoologist']
     lPostal1 = [("%s%d%s" % (random.choice(string.letters), random.randrange(1, 9), random.choice(string.letters))).upper() for i in xrange(100)]
     lPostal2 = [("%d%s%d" % (random.randrange(1, 9), random.choice(string.letters), random.randrange(1, 9))).upper() for i in xrange(400)]
-    lMvStore.startTx()
+    lAffinity.startTx()
     print "  progress [  0%%]",; sys.stdout.flush()
     lPINs = []
     def _processPIN(_pPIN):
@@ -70,23 +70,23 @@ def _entryPoint():
     for i in xrange(100):
         for j in xrange(100):
             print "\b\b\b\b\b\b%3d%%]" % int(100.0 * (i * j) / 10000),; sys.stdout.flush()
-            _processPIN(PIN({"http://localhost/mv/property/testnotifications2/name":"%s, %s" % (random.choice(lLastNames), random.choice(lFirstNames)), \
-                "http://localhost/mv/property/testnotifications2/occupation":random.choice(lOccupations), \
-                "http://localhost/mv/property/testnotifications2/postalcode":("%s %s" % (random.choice(lPostal1), random.choice(lPostal2))), \
-                "http://localhost/mv/property/testnotifications2/age":random.randrange(12,100)}))
+            _processPIN(PIN({"http://localhost/afy/property/testnotifications2/name":"%s, %s" % (random.choice(lLastNames), random.choice(lFirstNames)), \
+                "http://localhost/afy/property/testnotifications2/occupation":random.choice(lOccupations), \
+                "http://localhost/afy/property/testnotifications2/postalcode":("%s %s" % (random.choice(lPostal1), random.choice(lPostal2))), \
+                "http://localhost/afy/property/testnotifications2/age":random.randrange(12,100)}))
         if len(lPINs) > 0:
             PIN.savePINs(lPINs)
             del lPINs[:]
-    lMvStore.commitTx()
+    lAffinity.commitTx()
 
     lLocLetter = random.choice(string.letters).upper()
-    lCntLoc = lMvStore.q("SELECT * FROM tn2c:Location('%s');" % lLocLetter, pFlags=1)
+    lCntLoc = lAffinity.qCount("SELECT * FROM tn2c:Location('%s');" % lLocLetter)
     print ("%d instances found with a postal-code starting with '%s'" % (lCntLoc, lLocLetter))
     lAge = random.randrange(12,100)
-    lCntAge = lMvStore.q("SELECT * FROM tn2c:Age(%s);" % lAge, pFlags=1)
+    lCntAge = lAffinity.qCount("SELECT * FROM tn2c:Age(%s);" % lAge)
     print ("%d instances found with age %s" % (lCntAge, lAge))
     lOccLetter = random.choice(string.letters).lower()
-    lCntOcc = lMvStore.q("SELECT * FROM tn2c:Occupation('%s');" % lOccLetter, pFlags=1)
+    lCntOcc = lAffinity.qCount("SELECT * FROM tn2c:Occupation('%s');" % lOccLetter)
     print ("%d instances found with an occupation starting with '%s'" % (lCntOcc, lOccLetter))
 
     def intersectSelect():
@@ -94,14 +94,14 @@ def _entryPoint():
         #return ('&', 'INTERSECT SELECT * FROM')[random.choice([False, True])]
         return '&'
     lIJ = intersectSelect()
-    lCntI1 = lMvStore.q("SELECT * FROM tn2c:Location('%s') %s tn2c:Age(%s) %s tn2c:Occupation('%s');" % (lLocLetter, lIJ, lAge, lIJ, lOccLetter), pFlags=1)
+    lCntI1 = lAffinity.qCount("SELECT * FROM tn2c:Location('%s') %s tn2c:Age(%s) %s tn2c:Occupation('%s');" % (lLocLetter, lIJ, lAge, lIJ, lOccLetter))
     print ("%d instances found corresponding to postal-code(%s) age(%s) occupation(%s)" % (lCntI1, lLocLetter, lAge, lOccLetter))
-    lCntI2 = lMvStore.q("SELECT * FROM tn2c:Location('%s') %s tn2c:Age(%s);" % (lLocLetter, intersectSelect(), lAge), pFlags=1)
+    lCntI2 = lAffinity.qCount("SELECT * FROM tn2c:Location('%s') %s tn2c:Age(%s);" % (lLocLetter, intersectSelect(), lAge))
     print ("%d instances found corresponding to postal-code(%s) age(%s)" % (lCntI2, lLocLetter, lAge))
-    lCntI4 = lMvStore.q("SELECT * FROM tn2c:Age(%s) %s tn2c:Occupation('%s');" % (lAge, intersectSelect(), lOccLetter), pFlags=1)
+    lCntI4 = lAffinity.qCount("SELECT * FROM tn2c:Age(%s) %s tn2c:Occupation('%s');" % (lAge, intersectSelect(), lOccLetter))
     print ("%d instances found corresponding to age(%s) occupation(%s)" % (lCntI4, lAge, lOccLetter))
     
-    MVNOTIFIER.open(lMvStore)
+    AFYNOTIFIER.open(lAffinity)
 
     lNumNotifs = [0]
     def onClassNotif(pData, pCriterion):
@@ -120,47 +120,47 @@ def _entryPoint():
         print ("\nobtained %s notifications, expected %s" % (lNumNotifs[0], pExpectedNotifCount))
         assert lNumNotifs[0] == pExpectedNotifCount
 
-    MVNOTIFIER.registerClass("http://localhost/mv/class/testnotifications2/Location", onClassNotif, pGroupNotifs=True)
-    MVNOTIFIER.registerClass("http://localhost/mv/class/testnotifications2/Age", onClassNotif, pGroupNotifs=True)
-    MVNOTIFIER.registerClass("http://localhost/mv/class/testnotifications2/Occupation", onClassNotif, pGroupNotifs=True)
+    AFYNOTIFIER.registerClass("http://localhost/afy/class/testnotifications2/Location", onClassNotif, pGroupNotifs=True)
+    AFYNOTIFIER.registerClass("http://localhost/afy/class/testnotifications2/Age", onClassNotif, pGroupNotifs=True)
+    AFYNOTIFIER.registerClass("http://localhost/afy/class/testnotifications2/Occupation", onClassNotif, pGroupNotifs=True)
 
     print ("3. Unclassify instances of age(%s) that intersect with postal-code(%s)" % (lAge, lLocLetter))
     lNumNotifs[0] = 0    
-    lCandidates = PIN.loadPINs(lMvStore.qProto("SELECT * FROM \"http://localhost/mv/class/testnotifications2/Location\"('%s') %s \"http://localhost/mv/class/testnotifications2/Age\"(%s);" % (lLocLetter, intersectSelect(), lAge)))
+    lCandidates = PIN.loadPINs(lAffinity.qProto("SELECT * FROM \"http://localhost/afy/class/testnotifications2/Location\"('%s') %s \"http://localhost/afy/class/testnotifications2/Age\"(%s);" % (lLocLetter, intersectSelect(), lAge)))
     for iC in lCandidates:
-        del iC["http://localhost/mv/property/testnotifications2/age"]
+        del iC["http://localhost/afy/property/testnotifications2/age"]
     waitForNotifs(10, 3 * lCntI2)
 
-    lMvStore.q("SET PREFIX tn2c: 'http://localhost/mv/class/testnotifications2/';") # Note: the protobuf request resets the connection...
-    lCntI3 = lMvStore.q("SELECT * FROM tn2c:Location('%s') %s tn2c:Occupation('%s');" % (lLocLetter, intersectSelect(), lOccLetter), pFlags=1)
+    lAffinity.q("SET PREFIX tn2c: 'http://localhost/afy/class/testnotifications2/';") # Note: the protobuf request resets the connection...
+    lCntI3 = lAffinity.qCount("SELECT * FROM tn2c:Location('%s') %s tn2c:Occupation('%s');" % (lLocLetter, intersectSelect(), lOccLetter))
     print ("%d instances found corresponding to postal-code(%s) occupation(%s)" % (lCntI3, lLocLetter, lOccLetter))
 
     print ("4. Unclassify instances of occupation(%s) that intersect with postal-code(%s)" % (lOccLetter, lLocLetter))
     lNumNotifs[0] = 0
-    lCandidates = PIN.loadPINs(lMvStore.qProto("SELECT * FROM \"http://localhost/mv/class/testnotifications2/Location\"('%s') %s \"http://localhost/mv/class/testnotifications2/Occupation\"('%s');" % (lLocLetter, intersectSelect(), lOccLetter)))
+    lCandidates = PIN.loadPINs(lAffinity.qProto("SELECT * FROM \"http://localhost/afy/class/testnotifications2/Location\"('%s') %s \"http://localhost/afy/class/testnotifications2/Occupation\"('%s');" % (lLocLetter, intersectSelect(), lOccLetter)))
     for iC in lCandidates:
-        del iC["http://localhost/mv/property/testnotifications2/occupation"]
+        del iC["http://localhost/afy/property/testnotifications2/occupation"]
     waitForNotifs(10, 3 * lCntI3)
 
     print ("5. Change instances of postal-code(%s)" % lLocLetter)
     lNumNotifs[0] = 0
-    lCandidates = PIN.loadPINs(lMvStore.qProto("SELECT * FROM \"http://localhost/mv/class/testnotifications2/Location\"('%s');" % lLocLetter))
+    lCandidates = PIN.loadPINs(lAffinity.qProto("SELECT * FROM \"http://localhost/afy/class/testnotifications2/Location\"('%s');" % lLocLetter))
     for iC in lCandidates:
-        iC["http://localhost/mv/property/testnotifications2/postalcode"] = "%s" % iC["http://localhost/mv/property/testnotifications2/postalcode"].lower()
+        iC["http://localhost/afy/property/testnotifications2/postalcode"] = "%s" % iC["http://localhost/afy/property/testnotifications2/postalcode"].lower()
     waitForNotifs(10, 3 * lCntLoc - lCntI3 - lCntI2)
 
-    MVNOTIFIER.unregisterClass("http://localhost/mv/class/testnotifications2/Location", onClassNotif)
-    MVNOTIFIER.unregisterClass("http://localhost/mv/class/testnotifications2/Age", onClassNotif)
-    MVNOTIFIER.unregisterClass("http://localhost/mv/class/testnotifications2/Occupation", onClassNotif)
+    AFYNOTIFIER.unregisterClass("http://localhost/afy/class/testnotifications2/Location", onClassNotif)
+    AFYNOTIFIER.unregisterClass("http://localhost/afy/class/testnotifications2/Age", onClassNotif)
+    AFYNOTIFIER.unregisterClass("http://localhost/afy/class/testnotifications2/Occupation", onClassNotif)
 
-    MVNOTIFIER.close()
-    lMvStore.close()
+    AFYNOTIFIER.close()
+    lAffinity.close()
 
-class TestNotifications2(MVStoreTest):
+class TestNotifications2(AffinityTest):
     "A test for notifications emphasizing high number of notifications."
     def execute(self):
         _entryPoint()
-MVStoreTest.declare(TestNotifications2)
+AffinityTest.declare(TestNotifications2)
 
 if __name__ == '__main__':
     lT = TestNotifications2()

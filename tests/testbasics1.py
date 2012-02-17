@@ -1,6 +1,6 @@
 #!/usr/bin/env python2.6
-from testfwk import MVStoreTest
-from mvstore import *
+from testfwk import AffinityTest
+from affinity import *
 import random
 import string
 import uuid
@@ -19,34 +19,34 @@ def comparePins(pP1, pP2):
         assert False
 
 def _entryPoint():
-    lMvStore = MVSTORE()
-    lMvStore.open()
+    lAffinity = AFFINITY()
+    lAffinity.open()
 
     print ("\nA basic transaction, with pin creations (including collections).")
-    lMvStore.startTx()
+    lAffinity.startTx()
     PIN.savePINs([
-        PIN({"http://localhost/mv/property/testbasics1/myprop1":"salut", "http://localhost/mv/property/testbasics1/myprop2":123}), 
-        PIN({"http://localhost/mv/property/testbasics1/myprop1":"bonjour", "http://localhost/mv/property/testbasics1/myprop3":456})])
-    lPinDef = {"http://localhost/mv/property/testbasics1/myprop1":["comment", "allez", "vous", "donc"], "http://localhost/mv/property/testbasics1/myprop2":123.5, "http://localhost/mv/property/testbasics1/myprop3":True, "http://localhost/mv/property/testbasics1/myprop4":"-65"}
+        PIN({"http://localhost/afy/property/testbasics1/myprop1":"salut", "http://localhost/afy/property/testbasics1/myprop2":123}), 
+        PIN({"http://localhost/afy/property/testbasics1/myprop1":"bonjour", "http://localhost/afy/property/testbasics1/myprop3":456})])
+    lPinDef = {"http://localhost/afy/property/testbasics1/myprop1":["comment", "allez", "vous", "donc"], "http://localhost/afy/property/testbasics1/myprop2":123.5, "http://localhost/afy/property/testbasics1/myprop3":True, "http://localhost/afy/property/testbasics1/myprop4":"-65"}
     lPin = PIN(lPinDef).savePIN()
-    lMvStore.commitTx()
+    lAffinity.commitTx()
 
     print ("\nBasic examples of pathSQL commands.")
-    lMvStore.q("insert (\"http://localhost/mv/property/testbasics1/potato_color\") values (10);") # Note: sent directly to the server, as a string.
-    lMvStore.qProto("insert (\"http://localhost/mv/property/testbasics1/potato_color\") values (11);") # Note: sent to the server as a query embedded inside a protobuf.
-    lPins = PIN.loadPINs(lMvStore.qProto("SELECT * WHERE EXISTS(\"http://localhost/mv/property/testbasics1/myprop1\");"))
-    print ("result of SELECT * WHERE EXISTS(\"http://localhost/mv/property/testbasics1/myprop1\"): %s" % lPins)
+    lAffinity.q("insert (\"http://localhost/afy/property/testbasics1/potato_color\") values (10);") # Note: sent directly to the server, as a string.
+    lAffinity.qProto("insert (\"http://localhost/afy/property/testbasics1/potato_color\") values (11);") # Note: sent to the server as a query embedded inside a protobuf.
+    lPins = PIN.loadPINs(lAffinity.qProto("SELECT * WHERE EXISTS(\"http://localhost/afy/property/testbasics1/myprop1\");"))
+    print ("result of SELECT * WHERE EXISTS(\"http://localhost/afy/property/testbasics1/myprop1\"): %s" % lPins)
     try:
-        lMvStore.qProto("CREATE CLASS \"http://localhost/mv/class/testbasics1/c1\" AS SELECT * WHERE EXISTS(\"http://localhost/mv/property/testbasics1/myprop1\");") # TODO: check if this really worked (when embedded in protobuf like this)...
+        lAffinity.qProto("CREATE CLASS \"http://localhost/afy/class/testbasics1/c1\" AS SELECT * WHERE EXISTS(\"http://localhost/afy/property/testbasics1/myprop1\");") # TODO: check if this really worked (when embedded in protobuf like this)...
     except:
         pass
 
     print ("\nGet resulting pins.")
-    lRaw = lMvStore.q("SELECT * FROM \"http://localhost/mv/class/testbasics1/c1\";")
-    lPBStream = mvstore_pb2.MVStream()
+    lRaw = lAffinity.q("SELECT * FROM \"http://localhost/afy/class/testbasics1/c1\";")
+    lPBStream = affinity_pb2.MVStream()
     lPBStream.ParseFromString(lRaw)
     if False:
-        displayPBStr(lRaw, pTitle="raw result of SELECT * FROM \"http://localhost/mv/class/testbasics1/c1\"")
+        displayPBStr(lRaw, pTitle="raw result of SELECT * FROM \"http://localhost/afy/class/testbasics1/c1\"")
         print ("result: %s" % repr(lPBStream.pins))
 
     print ("\nCheck lPinDef.")
@@ -59,61 +59,61 @@ def _entryPoint():
     print ("\nBasic collection modification.")
     print (repr(lPin))
     print ("num values in fetched pin: %d" % len(lPin.keys()))
-    print ("num values in fetched pin's myprop1 collection: %d" % len(lPin["http://localhost/mv/property/testbasics1/myprop1"]))
-    lPin.moveXafterY("http://localhost/mv/property/testbasics1/myprop1", 2, 0)
+    print ("num values in fetched pin's myprop1 collection: %d" % len(lPin["http://localhost/afy/property/testbasics1/myprop1"]))
+    lPin.moveXafterY("http://localhost/afy/property/testbasics1/myprop1", 2, 0)
     print (lPin)
     lPinAfter = PIN.createFromPID(lPin.mPID)
     comparePins(lPin, lPinAfter)
     lPin.refreshPIN()
     
     print ("\nBasic demonstration of in-place modifications (adding myprop5 and modifying myprop2).")
-    lPin["http://localhost/mv/property/testbasics1/myprop5"] = "some newly added value"
-    lPin["http://localhost/mv/property/testbasics1/myprop2"] = lPin["http://localhost/mv/property/testbasics1/myprop2"] + 50.4321
-    del lPin["http://localhost/mv/property/testbasics1/myprop1"][3]
+    lPin["http://localhost/afy/property/testbasics1/myprop5"] = "some newly added value"
+    lPin["http://localhost/afy/property/testbasics1/myprop2"] = lPin["http://localhost/afy/property/testbasics1/myprop2"] + 50.4321
+    del lPin["http://localhost/afy/property/testbasics1/myprop1"][3]
     print (lPin)
     lPinAfter = PIN.createFromPID(lPin.mPID)
     comparePins(lPin, lPinAfter)
     lPin.refreshPIN()
 
     print ("\nBasic demonstration of OP_PLUS (on myprop4 of pin %s)." % repr(lPin.mPID))
-    lValBef = int(lPin["http://localhost/mv/property/testbasics1/myprop4"])
-    PIN({"http://localhost/mv/property/testbasics1/myprop4":(-35, PIN.Extra(pType=mvstore_pb2.Value.VT_INT, pOp=mvstore_pb2.Value.OP_PLUS))}, __PID__=lPin.mPID).savePIN()
+    lValBef = int(lPin["http://localhost/afy/property/testbasics1/myprop4"])
+    PIN({"http://localhost/afy/property/testbasics1/myprop4":(-35, PIN.Extra(pType=affinity_pb2.Value.VT_INT, pOp=affinity_pb2.Value.OP_PLUS))}, __PID__=lPin.mPID).savePIN()
     lPin.refreshPIN()
-    if int(lPin["http://localhost/mv/property/testbasics1/myprop4"]) != lValBef - 35:
-        print ("Unexpected value after OP_PLUS: %d (expected %d)" % (int(lPin["http://localhost/mv/property/testbasics1/myprop4"]), lValBef - 35))
+    if int(lPin["http://localhost/afy/property/testbasics1/myprop4"]) != lValBef - 35:
+        print ("Unexpected value after OP_PLUS: %d (expected %d)" % (int(lPin["http://localhost/afy/property/testbasics1/myprop4"]), lValBef - 35))
         assert False
 
     if False:
         print ("\nA simple test for batch-insert of inter-connected uncommitted pins.")
         PIN.savePINs([
-            PIN({PIN.SK_PID:1, "http://localhost/mv/property/testbasics1/referenced_by":PIN.Ref(2), "http://localhost/mv/property/testbasics1/text":"1 <- 2"}), 
-            PIN({PIN.SK_PID:2, "http://localhost/mv/property/testbasics1/references":PIN.Ref(1), "http://localhost/mv/property/testbasics1/text":"2 -> 1"})])
+            PIN({PIN.SK_PID:1, "http://localhost/afy/property/testbasics1/referenced_by":PIN.Ref(2), "http://localhost/afy/property/testbasics1/text":"1 <- 2"}), 
+            PIN({PIN.SK_PID:2, "http://localhost/afy/property/testbasics1/references":PIN.Ref(1), "http://localhost/afy/property/testbasics1/text":"2 -> 1"})])
 
     if len(lPBStream.pins) > 1:
         print ("\nA basic PIN modification test (ISession::modify style).")
         lPid = lPBStream.pins[1].id
-        print ("before modify: %s" % lMvStore.check("SELECT * FROM {@%x};" % lPid.id))
-        lPin = PIN({PIN.SK_PID:PIN.PID.fromPB(lPid), "http://localhost/mv/property/testbasics1/myprop1":"bien"})
+        print ("before modify: %s" % lAffinity.check("SELECT * FROM {@%x};" % lPid.id))
+        lPin = PIN({PIN.SK_PID:PIN.PID.fromPB(lPid), "http://localhost/afy/property/testbasics1/myprop1":"bien"})
         #lPin = PIN(__PID__=PIN.PID.fromPB(lPid), testbasics1_myprop1="bien")
         lPin.savePIN()
-        print ("after modify: %s" % lMvStore.check("SELECT * FROM {@%x};" % lPid.id))
+        print ("after modify: %s" % lAffinity.check("SELECT * FROM {@%x};" % lPid.id))
 
     if len(lPBStream.pins) > 1:
         print ("\nA basic PIN deletion test.")
         lPid = lPBStream.pins[1].id
-        print ("before delete: %s" % lMvStore.check("SELECT * FROM {@%x};" % lPid.id))
+        print ("before delete: %s" % lAffinity.check("SELECT * FROM {@%x};" % lPid.id))
         PIN.deletePINs([PIN.PID.fromPB(lPid)])
-        #print ("after delete: %s" % lMvStore.check("SELECT * FROM {@%x};" % lPid.id))
+        #print ("after delete: %s" % lAffinity.check("SELECT * FROM {@%x};" % lPid.id))
 
     #print ("\nFinal state check.")
-    #print (lMvStore.check("SELECT *"))
-    lMvStore.close()
+    #print (lAffinity.check("SELECT *"))
+    lAffinity.close()
 
-class TestBasics1(MVStoreTest):
+class TestBasics1(AffinityTest):
     "First basic test (originally written for testgen/python)."
     def execute(self):
         _entryPoint()
-MVStoreTest.declare(TestBasics1)
+AffinityTest.declare(TestBasics1)
 
 if __name__ == '__main__':
     lT = TestBasics1()

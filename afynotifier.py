@@ -1,18 +1,18 @@
 #!/usr/bin/env python2.6
-"""This module provides access to mvStore's notification service. An application can request
+"""This module provides access to Affinity's notification service. An application can request
 notifications when specific PINs change, or when specific classes change (i.e. when PINs are
 classified or un-classified, as well as when already classified PINs change). An application
 can also emit standard queries to retrieve all changes since time x. The current implementation
 uses a 'comet' pattern; in the future, a more efficient networking solution will be
 implemented."""
 from __future__ import with_statement
-from mvstore import *
+from affinity import *
 import copy
 import json
 import logging
 try:
     import multiprocessing # Optional (for more flexible Event object).
-    import mvstoreinproc # Optional (for inproc execution of mvstore; see the 'ext' subdirectory).
+    import affinityinproc # Optional (for inproc execution of Affinity; see the 'ext' subdirectory).
 except:
     pass
 import os
@@ -24,9 +24,9 @@ import uuid
 # TODO: auth
 # TODO: support qnames for class registration
 
-class MVNotifier(object):
+class AfyNotifier(object):
     """Client-side notification manager. Accepts registrations for specific PINs and classes,
-    and invokes the specified handlers (callbacks) upon mvStore notifications."""
+    and invokes the specified handlers (callbacks) upon receiving Affinity notifications."""
     class _ThreadCtx(object):
         """[internal] Thread context for the threads that wait for notifications."""
         def __init__(self, pCriterion, pHandler, pHandlerData, pCreateThread, pNotifier):
@@ -40,7 +40,7 @@ class MVNotifier(object):
                 self.mFinished = threading.Event()
             self.mThread = None # Contexts attached to the "group" context don't have their own thread.
             if pCreateThread:
-                self.mThread = threading.Thread(name="MVNotifier.%s" % pCriterion, target=MVNotifier._staticEntryPoint, args=(pNotifier, self))
+                self.mThread = threading.Thread(name="AfyNotifier.%s" % pCriterion, target=AfyNotifier._staticEntryPoint, args=(pNotifier, self))
                 self.mThread.setDaemon(1) # to allow Ctrl+C
         def start(self, pServerToken):
             self.mServerToken = pServerToken
@@ -56,13 +56,13 @@ class MVNotifier(object):
         self.mLock = threading.Lock() # Synchronization, to allow unregistration from the callbacks.
         self.mPendingCtxs = set() # Threads currently waiting for a http response.
         self.mGroupCtx = None # Thread used for all notifications grouped by clientid.
-        self.mMvstoreInproc = MVStoreConnection.isInproc()
+        self.mAffinityInproc = AffinityConnection.isInproc()
     def open(self, pDbConnection):
         "Initializer for the notifier."
-        if not isinstance(pDbConnection, MVStoreConnection):
-            raise Exception("Invalid pDbConnection passed to MVNotifier.")
+        if not isinstance(pDbConnection, AffinityConnection):
+            raise Exception("Invalid pDbConnection passed to AfyNotifier.")
         self.mDbConnection = pDbConnection
-        self.mGroupCtx = MVNotifier._ThreadCtx(self.mClientID, MVNotifier._groupHandler, self, True, self) # Thread allowing to group together all notifications.
+        self.mGroupCtx = AfyNotifier._ThreadCtx(self.mClientID, AfyNotifier._groupHandler, self, True, self) # Thread allowing to group together all notifications.
         self.mGroupCtx.start(None)
     def close(self):
         "Terminator for the notifier."
@@ -85,9 +85,9 @@ class MVNotifier(object):
     def registerClass(self, pClassName, pHandler, pHandlerData=None, pGroupNotifs=True):
         "Registration of notifications for class-related changes."
         def _regci():
-            if self.mMvstoreInproc: return mvstoreinproc.regnotif(self.mDbConnection._s(None), pClassName, None, self.mClientID)
+            if self.mAffinityInproc: return affinityinproc.regnotif(self.mDbConnection._s(None), pClassName, None, self.mClientID)
             return self._callServer("http://%s/db/?i=regnotif&notifparam=%s&type=class&clientid=%s" % (self.mDbConnection.host(), pClassName, self.mClientID))
-        lThreadCtx = MVNotifier._ThreadCtx(pClassName, pHandler, pHandlerData, not pGroupNotifs, self)
+        lThreadCtx = AfyNotifier._ThreadCtx(pClassName, pHandler, pHandlerData, not pGroupNotifs, self)
         lResult = json.loads(_regci())
         if lResult and len(lResult.keys()) > 0:
             with self.mLock:
@@ -99,7 +99,7 @@ class MVNotifier(object):
                 lThreadCtx.start(lToken)
     def unregisterClass(self, pClassName, pHandler):
         def _unregci(_pServerToken):
-            if self.mMvstoreInproc: mvstoreinproc.unregnotif(self.mDbConnection._s(None), _pServerToken, self.mClientID); return
+            if self.mAffinityInproc: affinityinproc.unregnotif(self.mDbConnection._s(None), _pServerToken, self.mClientID); return
             self._callServer("http://%s/db/?i=unregnotif&notifparam=%s" % (self.mDbConnection.host(), _pServerToken))
         lCtx = None
         with self.mLock:
@@ -117,10 +117,10 @@ class MVNotifier(object):
     def registerPIN(self, pLocalPID, pHandler, pHandlerData=None, pGroupNotifs=True):
         "Registration of notifications for PIN-related changes."
         def _regpi(_pCriterion):
-            if self.mMvstoreInproc: return mvstoreinproc.regnotif(self.mDbConnection._s(None), None, _pCriterion, self.mClientID)
+            if self.mAffinityInproc: return affinityinproc.regnotif(self.mDbConnection._s(None), None, _pCriterion, self.mClientID)
             return self._callServer("http://%s/db/?i=regnotif&notifparam=%s&type=pin&clientid=%s" % (self.mDbConnection.host(), _pCriterion, self.mClientID))
-        lCriterion = MVNotifier.serializeLocalPID(pLocalPID)
-        lThreadCtx = MVNotifier._ThreadCtx(lCriterion, pHandler, pHandlerData, not pGroupNotifs, self)
+        lCriterion = AfyNotifier.serializeLocalPID(pLocalPID)
+        lThreadCtx = AfyNotifier._ThreadCtx(lCriterion, pHandler, pHandlerData, not pGroupNotifs, self)
         lResult = json.loads(_regpi(lCriterion))
         if lResult and len(lResult.keys()) > 0:
             with self.mLock:
@@ -132,11 +132,11 @@ class MVNotifier(object):
                 lThreadCtx.start(lToken)
     def unregisterPIN(self, pLocalPID, pHandler):
         def _unregpi(_pServerToken):
-            if self.mMvstoreInproc: mvstoreinproc.unregnotif(self.mDbConnection._s(None), _pServerToken, self.mClientID); return
+            if self.mAffinityInproc: affinityinproc.unregnotif(self.mDbConnection._s(None), _pServerToken, self.mClientID); return
             self._callServer("http://%s/db/?i=unregnotif&notifparam=%s" % (self.mDbConnection.host(), _pServerToken))
         lCtx = None
         with self.mLock:
-            lCriterion = MVNotifier.serializeLocalPID(pLocalPID)
+            lCriterion = AfyNotifier.serializeLocalPID(pLocalPID)
             if not self.mPIDs.has_key(lCriterion):
                 return
             for iCtx in xrange(len(self.mPIDs[lCriterion])):
@@ -149,7 +149,7 @@ class MVNotifier(object):
             _unregpi(lCtx.mServerToken)
             lCtx.finished = True
     def _callServer(self, pURL, pTimeout=None):
-        assert not self.mMvstoreInproc
+        assert not self.mAffinityInproc
         lT1 = time.time()
         logging.debug(pURL)
         try:
@@ -170,7 +170,7 @@ class MVNotifier(object):
             self.mPendingCtxs.discard(pThreadCtx)
     def _entryPoint(self, pThreadCtx):
         def _waiti(_pArg):
-            if self.mMvstoreInproc: return mvstoreinproc.waitnotif(self.mDbConnection._s(None), _pArg, 5000)
+            if self.mAffinityInproc: return affinityinproc.waitnotif(self.mDbConnection._s(None), _pArg, 5000)
             return self._callServer("http://%s/db/?i=waitnotif&%s&timeout=5000" % (self.mDbConnection.host(), _pArg), pTimeout=10)
         while not pThreadCtx.finished:
             self._addPendingCtx(pThreadCtx)
@@ -219,4 +219,4 @@ class MVNotifier(object):
         if isInteger(pLocalPID):
             return "%x" % pLocalPID
         return pLocalPID    
-MVNOTIFIER = MVNotifier()
+AFYNOTIFIER = AfyNotifier()

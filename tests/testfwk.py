@@ -6,18 +6,18 @@ import os
 import re
 import sys
 
-MVSTORE_ALL_TESTS = {}
+AFFINITY_ALL_TESTS = {}
 
 STRFTIME_IS_LIMITED = (datetime.datetime.utcnow().strftime("%4Y") == "4Y")
 STRFTIME_RE_SIMPLIFY = re.compile(r'[0-9]*')
 
-class MVStoreTest(object):
+class AffinityTest(object):
     "Base class for all test scripts in this test fwk."
     @staticmethod
     def declare(pTestClass):
         "Service to register a test in the fwk."
-        if sys.modules['__main__'].__dict__.has_key('MVSTORE_ALL_TESTS'):
-            lTheTests = sys.modules['__main__'].__dict__['MVSTORE_ALL_TESTS']
+        if sys.modules['__main__'].__dict__.has_key('AFFINITY_ALL_TESTS'):
+            lTheTests = sys.modules['__main__'].__dict__['AFFINITY_ALL_TESTS']
             lTheTests[pTestClass.__name__.lower()] = pTestClass
     def getTags(self):
         "Returns an array of tags to classify the test."
@@ -44,7 +44,7 @@ if __name__ == '__main__':
             elif os.path.isdir(_f):
                 os.path.walk(_f, _onWalk, _pArg)
     def _loadTest(_pDir, _pFN):
-        "Load one python file, to give it a chance to register tests in MVSTORE_ALL_TESTS."
+        "Load one python file, to give it a chance to register tests in AFFINITY_ALL_TESTS."
         _lN = _pFN.split(".")[0]
         if 0 == _lN.find("test") and _lN != "testfwk":
             try:
@@ -52,13 +52,13 @@ if __name__ == '__main__':
             except Exception as ex:
                 pass
     def _loadAllTests():
-        "Load all python files under the current directory, and give them a chance to register tests in MVSTORE_ALL_TESTS."
+        "Load all python files under the current directory, and give them a chance to register tests in AFFINITY_ALL_TESTS."
         _lArgs = ["py", _loadTest, None, None]
         os.path.walk(".", _onWalk, _lArgs)
     def _createTestInstance(_pTestName):
         "Create an instance of the test class whose name is _pTestName, if any."
-        if MVSTORE_ALL_TESTS.has_key(_pTestName.lower()):
-            _lTestClass = MVSTORE_ALL_TESTS[_pTestName.lower()]
+        if AFFINITY_ALL_TESTS.has_key(_pTestName.lower()):
+            _lTestClass = AFFINITY_ALL_TESTS[_pTestName.lower()]
             _lTest = _lTestClass.__new__(_lTestClass)
             if isinstance(_lTest, _lTestClass):
                 type(_lTest).__init__(_lTest)
@@ -75,7 +75,7 @@ if __name__ == '__main__':
             _lTest.execute()
     def _runall(_pBogus):
         "Run all tests."
-        _lTestN = MVSTORE_ALL_TESTS.keys()
+        _lTestN = AFFINITY_ALL_TESTS.keys()
         for _i, _iT in zip(xrange(len(_lTestN)), _lTestN):
             print ("\nRunning test %s [%d/%d]\n" % (_iT, (1 + _i), len(_lTestN)))
             _run(_iT)
@@ -98,5 +98,5 @@ if __name__ == '__main__':
         for iC, iCi in zip(lCmds, lCmdsi):
             print ("  %s:\n    %s" % (iC, iCi.__doc__))
         print ("\nTest names:")
-        for iT in MVSTORE_ALL_TESTS.iteritems():
+        for iT in AFFINITY_ALL_TESTS.iteritems():
             print ("  %s:\n    %s" % (iT[0], iT[1].__doc__))

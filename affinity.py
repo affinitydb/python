@@ -1,9 +1,9 @@
 #!/usr/bin/env python2.6
-"""This module defines the key components of mvStore's low-level client library in python:
-MVStoreConnection and PIN (including PIN.PID and PIN.Collection).
+"""This module defines the key components of Affinity's low-level client library in python:
+AffinityConnection and PIN (including PIN.PID and PIN.Collection).
 The library talks to the store via pathSQL and protobuf exclusively.
-When the mvstoreinproc module is in the path, and MVStoreConnection.DEFAULT_INPROC is True,
-the library talks to an in-proc store. Otherwise, it uses HTTP to reach the mvserver.
+When the affinityinproc module is in the path, and AffinityConnection.DEFAULT_INPROC is True,
+the library talks to an in-proc store. Otherwise, it uses HTTP to reach the Affinity server.
 Please read the documentation of each component for more details."""
 
 from __future__ import with_statement
@@ -16,9 +16,9 @@ try:
 except:    
     import http as httplib # python3
 import logging
-import mvstore_pb2
+import affinity_pb2
 try:
-    import mvstoreinproc # Optional (for inproc execution of mvstore; see the 'ext' subdirectory).
+    import affinityinproc # Optional (for inproc execution of Affinity; see the 'ext' subdirectory).
 except Exception as ex:
     pass
 import os
@@ -31,13 +31,13 @@ import traceback
 import urllib2
 import urllib
 
-# For MVHTTPResponse.
+# For AfyHTTPResponse.
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
 
-# Workaround (these enum values can't be provided by mvstore.proto).
+# Workaround (these enum values can't be provided by affinity.proto).
 EID_COLLECTION = 4294967295
 EID_LAST_ELEMENT = 4294967294
 EID_FIRST_ELEMENT = 4294967293
@@ -45,38 +45,38 @@ EID_FIRST_ELEMENT = 4294967293
 # Names for special properties.
 SP_PROPERTY_NAMES = \
 { \
-    mvstore_pb2.SP_PINID:"afy:pinID", \
-    mvstore_pb2.SP_DOCUMENT:"afy:document", \
-    mvstore_pb2.SP_PARENT:"afy:parent", \
-    mvstore_pb2.SP_VALUE:"afy:value", \
-    mvstore_pb2.SP_CREATED:"afy:created", \
-    mvstore_pb2.SP_CREATEDBY:"afy:createdBy", \
-    mvstore_pb2.SP_UPDATED:"afy:updated", \
-    mvstore_pb2.SP_UPDATEDBY:"afy:updatedBy", \
-    mvstore_pb2.SP_ACL:"afy:ACL", \
-    mvstore_pb2.SP_URI:"afy:URI", \
-    mvstore_pb2.SP_STAMP:"afy:stamp", \
-    mvstore_pb2.SP_CLASSID:"afy:classID", \
-    mvstore_pb2.SP_PREDICATE:"afy:predicate", \
-    mvstore_pb2.SP_NINSTANCES:"afy:nInstances", \
-    mvstore_pb2.SP_NDINSTANCES:"afy:nDelInstances", \
-    mvstore_pb2.SP_SUBCLASSES:"afy:subclasses", \
-    mvstore_pb2.SP_SUPERCLASSES:"afy:superclasses", \
-    mvstore_pb2.SP_CLASS_INFO:"afy:classInfo", \
-    mvstore_pb2.SP_INDEX_INFO:"afy:indexInfo", \
-    mvstore_pb2.SP_PROPERTIES:"afy:properties", \
+    affinity_pb2.SP_PINID:"afy:pinID", \
+    affinity_pb2.SP_DOCUMENT:"afy:document", \
+    affinity_pb2.SP_PARENT:"afy:parent", \
+    affinity_pb2.SP_VALUE:"afy:value", \
+    affinity_pb2.SP_CREATED:"afy:created", \
+    affinity_pb2.SP_CREATEDBY:"afy:createdBy", \
+    affinity_pb2.SP_UPDATED:"afy:updated", \
+    affinity_pb2.SP_UPDATEDBY:"afy:updatedBy", \
+    affinity_pb2.SP_ACL:"afy:ACL", \
+    affinity_pb2.SP_URI:"afy:URI", \
+    affinity_pb2.SP_STAMP:"afy:stamp", \
+    affinity_pb2.SP_CLASSID:"afy:classID", \
+    affinity_pb2.SP_PREDICATE:"afy:predicate", \
+    affinity_pb2.SP_NINSTANCES:"afy:nInstances", \
+    affinity_pb2.SP_NDINSTANCES:"afy:nDelInstances", \
+    affinity_pb2.SP_SUBCLASSES:"afy:subclasses", \
+    affinity_pb2.SP_SUPERCLASSES:"afy:superclasses", \
+    affinity_pb2.SP_CLASS_INFO:"afy:classInfo", \
+    affinity_pb2.SP_INDEX_INFO:"afy:indexInfo", \
+    affinity_pb2.SP_PROPERTIES:"afy:properties", \
 }    
 
 # Internal logging.
-def configureMvLogging():
+def configureAfyLogging():
     "Configure the logging behavior of this module."
     lFormat = '%(asctime)s|%(levelname)s|%(filename)s|%(funcName)s(): %(message)s [tid=%(thread)d]'
-    logging.basicConfig(filename='mvstore_py.log', level=logging.WARN, format=lFormat)
+    logging.basicConfig(filename='affinity.pylog', level=logging.WARN, format=lFormat)
     lConsole = logging.StreamHandler()
     lConsole.setLevel(logging.WARN)
     lConsole.setFormatter(logging.Formatter(lFormat))
     logging.getLogger().addHandler(lConsole)
-configureMvLogging() # Review: May remove this by default (arguably belongs to the app).
+configureAfyLogging() # Review: May remove this by default (arguably belongs to the app).
 
 # Misc. Helpers.
 def displayPBStr(pPBStr, pTitle=None):
@@ -96,27 +96,31 @@ def savePBStr(pPBStr, pOutputFileName):
     lF.close()
 def parsePBStr(pPBStr):
     "[internal] Parse the raw pPBStr and returned the resulting protobuf structure."
-    lPBStream = mvstore_pb2.MVStream()
+    lPBStream = affinity_pb2.MVStream()
     try:
         lPBStream.ParseFromString(pPBStr)
         return lPBStream
     except Exception as ex:
         print ("***")
         print ("*** EXCEPTION CAUGHT in ParseFromString:\n***   %s" % ex)
-        print ("***   waiting for 5 seconds..."); time.sleep(5); savePBStr(pPBStr, "/tmp/mvstore_pb_issue.raw")
+        print ("***   waiting for 5 seconds..."); time.sleep(5); savePBStr(pPBStr, "/tmp/affinity_pb_issue.raw")
         print ("***")
         return None
 def isInteger(p):
     "Return True if p is an integer value."
     return hasattr(p, '__mod__') and 0 == (p % 1)
+def getOpt(pOptions, pWhich, pDefault):
+    if None != pOptions and None != pWhich and pOptions.has_key(pWhich):
+        return pOptions[pWhich]
+    return pDefault
 
 # Exceptions.
 class InvalidParameter(Exception):
     "Invalid or unexpected parameter."
 
-# MVHTTPResponse: HTTPResponse override.
+# AfyHTTPResponse: HTTPResponse override.
 # Note: httplib.HTTPResponse is an old-style class...
-class MVHTTPResponse(httplib.HTTPResponse):
+class AfyHTTPResponse(httplib.HTTPResponse):
     """HTTPResponse override, to enable streaming (i.e. reading response segments, corresponding to
     flushed segments in the input stream)."""
     def begin(self):
@@ -141,65 +145,64 @@ class MVHTTPResponse(httplib.HTTPResponse):
         return httplib.HTTPResponse.read(self, amt)
 
 # Core Objects: store access/connection.
-class MVStoreConnection(object):
-    """Access layer for mvStore (aka db connection). For convenience, it allows
+class AffinityConnection(object):
+    """Access layer for Affinity (aka db connection). For convenience, it allows
     to talk to an inproc store or to the server, interchangeably. The global DEFAULT_CONNECTION instance
     is used by default; otherwise, a 'with' statement can be used to push a different connection
     on the stack. Not designed to be used concurrently (use one connection per thread)."""
-    FLAG_COUNT_ONLY = 1
     DEFAULT_INPROC = True
     DEFAULT_CONNECTION = None
     @staticmethod
     def isInproc():
-        return sys.modules.has_key('mvstoreinproc') and MVStoreConnection.DEFAULT_INPROC
+        return sys.modules.has_key('affinityinproc') and AffinityConnection.DEFAULT_INPROC
     # ---
     TLS = threading.local()
     @staticmethod
     def getCurrentDbConnection():
-        if not MVStoreConnection.TLS.__dict__.has_key("mDbConnectionStack"):
+        if not AffinityConnection.TLS.__dict__.has_key("mDbConnectionStack"):
             logging.debug("initializing tls")
-            MVStoreConnection.TLS.mDbConnectionStack = [MVStoreConnection.DEFAULT_CONNECTION]
-        return MVStoreConnection.TLS.mDbConnectionStack[-1]
+            AffinityConnection.TLS.mDbConnectionStack = [AffinityConnection.DEFAULT_CONNECTION]
+        return AffinityConnection.TLS.mDbConnectionStack[-1]
     @staticmethod
     def pushDbConnection(pDbConnection):
-        if not MVStoreConnection.TLS.__dict__.has_key("mDbConnectionStack"):
+        if not AffinityConnection.TLS.__dict__.has_key("mDbConnectionStack"):
             logging.debug("initializing tls")
-            MVStoreConnection.TLS.mDbConnectionStack = [MVStoreConnection.DEFAULT_CONNECTION]
-        lOld = MVStoreConnection.TLS.mDbConnectionStack[-1]
+            AffinityConnection.TLS.mDbConnectionStack = [AffinityConnection.DEFAULT_CONNECTION]
+        lOld = AffinityConnection.TLS.mDbConnectionStack[-1]
         logging.debug("pushing db connection %s (old=%s)" % (pDbConnection, lOld))
-        MVStoreConnection.TLS.mDbConnectionStack.append(pDbConnection)
+        AffinityConnection.TLS.mDbConnectionStack.append(pDbConnection)
         return lOld
     @staticmethod
     def popDbConnection():
-        if not MVStoreConnection.TLS.__dict__.has_key("mDbConnectionStack"):
+        if not AffinityConnection.TLS.__dict__.has_key("mDbConnectionStack"):
             logging.warn("no connection to pop!")
             return
-        logging.debug("popping db connection %s (new=%s)" % (MVStoreConnection.TLS.mDbConnectionStack[-1], MVStoreConnection.TLS.mDbConnectionStack[-2]))
-        return MVStoreConnection.TLS.mDbConnectionStack.pop()
+        logging.debug("popping db connection %s (new=%s)" % (AffinityConnection.TLS.mDbConnectionStack[-1], AffinityConnection.TLS.mDbConnectionStack[-2]))
+        return AffinityConnection.TLS.mDbConnectionStack.pop()
     def __enter__(self):
-        MVStoreConnection.pushDbConnection(self)
+        AffinityConnection.pushDbConnection(self)
     def __exit__(self, etyp, einst, etb):
-        if MVStoreConnection.popDbConnection() != self:
+        if AffinityConnection.popDbConnection() != self:
             logging.warn("imbalance detected in the db connection stack!")
     # ---
     class Inproc(object):
-        """[internal] Internal implementation, for mvStore running in-process (in python)."""
-        def open(self, pKeepAlive): return 0 == mvstoreinproc.open()
-        def close(self): return 0 == mvstoreinproc.close()
-        def startSession(self): return mvstoreinproc.startSession()
-        def terminateSession(self, pSession): return mvstoreinproc.terminateSession(pSession)
-        def attachSession(self, pSession): return mvstoreinproc.attachSession(pSession)
-        def detachSession(self, pSession): return mvstoreinproc.detachSession(pSession)
-        def post(self, pMsg, pSession): return mvstoreinproc.post(pSession, pMsg)
-        def beginlongpost(self, pSession): return mvstoreinproc.beginlongpost(pSession)
-        def continuelongpost(self, pLPToken, pMsg, pExpectOutput, pSession): logging.debug(pMsg); return mvstoreinproc.continuelongpost(pSession, pLPToken, pMsg)
-        def endlongpost(self, pLPToken, pSession): return mvstoreinproc.endlongpost(pSession, pLPToken)
-        def get(self, pMsg, pFlags, pSession): logging.debug(pMsg); return mvstoreinproc.get(pSession, pMsg, pFlags)
-        def check(self, pMsg, pSession): logging.debug(pMsg); return mvstoreinproc.check(pSession, pMsg)
+        """[internal] Internal implementation, for Affinity running in-process (in python)."""
+        def open(self, pKeepAlive): return 0 == affinityinproc.open()
+        def close(self): return 0 == affinityinproc.close()
+        def startSession(self): return affinityinproc.startSession()
+        def terminateSession(self, pSession): return affinityinproc.terminateSession(pSession)
+        def attachSession(self, pSession): return affinityinproc.attachSession(pSession)
+        def detachSession(self, pSession): return affinityinproc.detachSession(pSession)
+        def post(self, pMsg, pSession): return affinityinproc.post(pSession, pMsg)
+        def beginlongpost(self, pSession): return affinityinproc.beginlongpost(pSession)
+        def continuelongpost(self, pLPToken, pMsg, pExpectOutput, pSession): logging.debug(pMsg); return affinityinproc.continuelongpost(pSession, pLPToken, pMsg)
+        def endlongpost(self, pLPToken, pSession): return affinityinproc.endlongpost(pSession, pLPToken)
+        def get(self, pQstr, pOptions, pSession): logging.debug(pQstr); return affinityinproc.get(pSession, pQstr, pOptions)
+        def check(self, pQstr, pOptions, pSession): logging.debug(pQstr); return affinityinproc.check(pSession, pQstr, pOptions)
         def trueSessions(self): return True
     # ---
-    class MvServer(object):
-        """[internal] Internal implementation, for mvStore running as a server (reached via http)."""
+    class AfyServer(object):
+        """[internal] Internal implementation, for Affinity running as a server (reached via http)."""
         def __init__(self, pConnection):
             self.mConnection = pConnection
             self.mConnectionHTTP = None
@@ -227,9 +230,9 @@ class MVStoreConnection(object):
             logging.debug("received %d bytes" % len(lRes[1]))
             return lRes
         def beginlongpost(self, pSession):
-            # Note: Currently, a mvstore transaction cannot live across more than one http request...
+            # Note: Currently, an Affinity transaction cannot live across more than one http request...
             lLongC = httplib.HTTPConnection(self.host())
-            lLongC.response_class = MVHTTPResponse
+            lLongC.response_class = AfyHTTPResponse
             lLongC.putrequest('POST', '/db/?i=proto&o=proto')
             lLongC.putheader("Authorization", "Basic %s" % self.auth())
             lLongC.putheader("Content-Type", "application/octet-stream")
@@ -253,23 +256,38 @@ class MVStoreConnection(object):
             logging.debug("token=%s" % pLPToken)
             pLPToken.close()
             self.mResponse = None
-        def get(self, pMsg, pFlags, pSession):
-            logging.debug(pMsg)
+        def get(self, pQstr, pOptions, pSession):
+            logging.debug(pQstr)
             lRet = None
+            lCountOnly = getOpt(pOptions, "count", False)
+            lPath = "/db/?q=%s&i=pathsql%s" % (urllib.quote(pQstr), ("&o=proto", "&type=count")[lCountOnly])
+            lPath = AffinityConnection.AfyServer._appendUrlOptions(lPath, pOptions)
             if self.mConnectionHTTP:
-                self.mConnectionHTTP.request("GET", "/db/?q=%s&i=pathsql%s" % (urllib.quote(pMsg), ("&o=proto", "&type=count")[pFlags==MVStoreConnection.FLAG_COUNT_ONLY]), headers={"Authorization":"Basic %s" % self.auth()})
+                self.mConnectionHTTP.request("GET", lPath, headers={"Authorization":"Basic %s" % self.auth()})
                 lRet = self.mConnectionHTTP.getresponse().read()
             else:
-                lRet = urllib2.urlopen(urllib2.Request("http://%s/db/?q=%s&i=pathsql%s" % (self.host(), urllib.quote(pMsg), ("&o=proto", "&type=count")[pFlags==MVStoreConnection.FLAG_COUNT_ONLY]), headers={"Authorization":"Basic %s" % self.auth()})).read()
-            if pFlags==MVStoreConnection.FLAG_COUNT_ONLY:
+                lRet = urllib2.urlopen(urllib2.Request("http://%s%s" % (self.host(), lPath), headers={"Authorization":"Basic %s" % self.auth()})).read()
+            if lCountOnly:
                 return int(lRet)
             return lRet
-        def check(self, pMsg, pSession):
-            logging.debug(pMsg)
-            return urllib2.urlopen(urllib2.Request("http://%s/db/?q=%s&i=pathsql&o=json" % (self.host(), urllib.quote(pMsg)), headers={"Authorization":"Basic %s" % self.auth()})).read()
+        def check(self, pQstr, pOptions, pSession):
+            logging.debug(pQstr)
+            lCountOnly = getOpt(pOptions, "count", False)
+            lPath = "/db/?q=%s&i=pathsql&o=json%s" % (urllib.quote(pQstr), ("", "&type=count")[lCountOnly])
+            lPath = AffinityConnection.AfyServer._appendUrlOptions(lPath, pOptions)
+            return urllib2.urlopen(urllib2.Request("http://%s%s" % (self.host(), lPath), headers={"Authorization":"Basic %s" % self.auth()})).read()
         def trueSessions(self): return False
         def host(self): return self.mConnection.host()
         def auth(self): return self.mConnection.basicauth()
+        @staticmethod
+        def _appendUrlOptions(pUrl, pOptions):
+            if None == pOptions:
+                return pUrl
+            if pOptions.has_key("offset"):
+                pUrl = pUrl + "&offset=%s" % pOptions["offset"]
+            if pOptions.has_key("limit"):
+                pUrl = pUrl + "&limit=%s" % pOptions["limit"]
+            return pUrl
     # ---
     class PBTransactionCtx(object):
         """[internal] Transaction context for protobuf. Allows to run long transactions and fetch intermediate results
@@ -282,12 +300,12 @@ class MVStoreConnection(object):
         def __init__(self, pConnection=None, pMode=0):
             self.mConnection = pConnection
             if not self.mConnection:
-                self.mConnection = MVStoreConnection.getCurrentDbConnection()
-            self.mPBStream = mvstore_pb2.MVStream() # The current stream segment.
+                self.mConnection = AffinityConnection.getCurrentDbConnection()
+            self.mPBStream = affinity_pb2.MVStream() # The current stream segment.
             self.mSegments = [] # The accumulated stream segments.
             self.mSegmentsExpectOutput = False # Maybe just a workaround until commit produces bits in the response stream...
             self.mMode = pMode # The combination of modes in which we operate currently.
-            self.mRC = None # The return code from mvStore.
+            self.mRC = None # The return code from Affinity.
             self.mPBOutput = None # The parsed (MVStream) protobuf output.
             self.mPropDict = {} # Accumulated dictionary of {propname, propid}.
             self.mLPToken = None # For long-running transactions (protobuf).
@@ -296,14 +314,14 @@ class MVStoreConnection(object):
         # ---
         # Control of the PB stream.
         def isOutputIgnored(self):
-            return ((self.mMode & MVStoreConnection.PBTransactionCtx.MODE_IGNORE_OUTPUT) != 0)
+            return ((self.mMode & AffinityConnection.PBTransactionCtx.MODE_IGNORE_OUTPUT) != 0)
         def performImmediateUpdates(self):
-            return ((self.mMode & MVStoreConnection.PBTransactionCtx.MODE_IMMEDIATE_UPDATES) != 0)
+            return ((self.mMode & AffinityConnection.PBTransactionCtx.MODE_IMMEDIATE_UPDATES) != 0)
         def capture(self):
             if len(self.mPBStream.pins) > 0:
                 # Review: The final condition will be different, but for the moment I'm not sure I can do better.
                 for iP in self.mPBStream.pins:
-                    if mvstore_pb2.MVStream.OP_INSERT == iP.op:
+                    if affinity_pb2.MVStream.OP_INSERT == iP.op:
                         self.mSegmentsExpectOutput = True
                         break
                 self.mSegments.append(self.mPBStream.SerializeToString())
@@ -315,7 +333,7 @@ class MVStoreConnection(object):
             else:
                 logging.warn("An empty mPBStream was captured... and ignored.")
             logging.debug("%s segments, %s bytes%s" % (len(self.mSegments), sum([len(iS) for iS in self.mSegments]), ("", ", FLUSH")[len(self.mPBStream.flush) > 0]))
-            self.mPBStream = mvstore_pb2.MVStream()
+            self.mPBStream = affinity_pb2.MVStream()
         def flush(self, pExplicit=True):
             if pExplicit:
                 self.mPBStream.flush.append(0)
@@ -331,19 +349,19 @@ class MVStoreConnection(object):
             logging.debug("")
             if not self.mLPToken:
                 self.mLPToken = self.mConnection._beginlongpost()
-            self.mPBStream.txop.append(mvstore_pb2.MVStream.TX_START)
+            self.mPBStream.txop.append(affinity_pb2.MVStream.TX_START)
             self.capture()
             self.mTxCnt += 1
         def commitTx(self):
             logging.debug("")
-            self.mPBStream.txop.append(mvstore_pb2.MVStream.TX_COMMIT)
+            self.mPBStream.txop.append(affinity_pb2.MVStream.TX_COMMIT)
             self.capture()
             self.mTxCnt -= 1
             if 0 == self.mTxCnt:
                 self._terminate()
         def rollbackTx(self):
             logging.debug("")
-            self.mPBStream.txop.append(mvstore_pb2.MVStream.TX_ROLLBACK)
+            self.mPBStream.txop.append(affinity_pb2.MVStream.TX_ROLLBACK)
             self.capture()
             self.mTxCnt -= 1
             if 0 == self.mTxCnt:
@@ -360,34 +378,34 @@ class MVStoreConnection(object):
             self.mConnection.mTxCtx = None
         # ---
         # Query via protobuf (various flavors).
-        def _queryPB1(self, pQstr, pRtt=mvstore_pb2.RT_PINS):
+        def _queryPB1(self, pQstr, pOptions, pRtt=affinity_pb2.RT_PINS):
             "This version really participates to the current protobuf stream and its current transaction (i.e. protobuf in&out)."
             logging.info("pathSQL in protobuf: %s" % pQstr)
             lStmt = self.getPBStream().stmt.add()
             lStmt.sq = pQstr
-            lStmt.cid = MVStoreConnection.PBTransactionCtx.NEXT_CID; MVStoreConnection.PBTransactionCtx.NEXT_CID += 1
+            lStmt.cid = AffinityConnection.PBTransactionCtx.NEXT_CID; AffinityConnection.PBTransactionCtx.NEXT_CID += 1
             lStmt.rtt = pRtt
-            lStmt.limit = 99999 # otherwise 0 by default right now
-            lStmt.offset = 0
+            lStmt.limit = getOpt(pOptions, "limit", 999999)
+            lStmt.offset = getOpt(pOptions, "offset", 0)
             self.flush()
             return self.mPBOutput
         @staticmethod
-        def _queryPBOut(pQstr):
+        def _queryPBOut(pQstr, pOptions):
             "This version borrows the current connection to request directly from the server a protobuf response (i.e. pathSQL in & protobuf out; for debugging etc.)."
             logging.info("pathSQL (in protobuf): %s" % pQstr)
-            lRaw = MVStoreConnection.getCurrentDbConnection().q(pQstr)
+            lRaw = AffinityConnection.getCurrentDbConnection().q(pQstr, pOptions)
             if lRaw == None:
                 return None
-            #displayPBStr(lRaw, pTitle="response obtained from mvstore for _queryPB")
+            #displayPBStr(lRaw, pTitle="response obtained from Affinity for _queryPB")
             return parsePBStr(lRaw)
-        def _queryPB2(self, pQstr):
-            return MVStoreConnection.PBTransactionCtx._queryPBOut(pQstr)
-        def queryPB(self, pQstr):
-            return self._queryPB2(pQstr) # TODO: switch to _queryPB1 when it's glitchless... (right now it's still buggier somehow).
+        def _queryPB2(self, pQstr, pOptions):
+            return AffinityConnection.PBTransactionCtx._queryPBOut(pQstr, pOptions)
+        def queryPB(self, pQstr, pOptions):
+            return self._queryPB2(pQstr, pOptions) # TODO: switch to _queryPB1 when it's glitchless... (right now it's still buggier somehow).
         # ---
         # Accumulation of PIN updates.
         def recordPINUpdate(self, pPINUpdate): # TODO: also record the original pin, to pad its ids
-            "Record a PIN update (allows to defer dialogue with mvStore in some cases, and reduce chattiness)."
+            "Record a PIN update (allows to defer dialogue with Affinity in some cases, and reduce chattiness)."
             if self.performImmediateUpdates():
                 raise Exception
             logging.debug("")
@@ -401,7 +419,7 @@ class MVStoreConnection(object):
         # ---
         # Accumulation of protobuf segments.
         def _pushData(self):
-            "Push all accumulated serialized protobuf segments to mvStore; parse and store the output."
+            "Push all accumulated serialized protobuf segments to Affinity; parse and store the output."
             lSegmentsExpectOutput = self.mSegmentsExpectOutput
             logging.debug("%s segments" % len(self.mSegments))
             lMessage = "".join(self.mSegments)
@@ -414,11 +432,11 @@ class MVStoreConnection(object):
             if 0 == len(lMessage):
                 logging.debug("no message to send")
                 return
-            #displayPBStr(lMessage, pTitle="message sent to mvstore")
+            #displayPBStr(lMessage, pTitle="message sent to Affinity")
             #savePBStr(lMessage, "./sent01.pbdata")
             if self.mLPToken:
                 self.mRC, lRawOutput = self.mConnection._continuelongpost(self.mLPToken, lMessage, lSegmentsExpectOutput)
-                #displayPBStr(lRawOutput, pTitle="response obtained from mvstore (longpost)")
+                #displayPBStr(lRawOutput, pTitle="response obtained from Affinity (longpost)")
                 if lSegmentsExpectOutput and lRawOutput:
                     logging.debug("result: RC=%s (%s bytes)" % (self.mRC, len(lRawOutput)))
                     self.mPBOutput = parsePBStr(lRawOutput)
@@ -426,7 +444,7 @@ class MVStoreConnection(object):
                     logging.debug("result: RC=%s" % self.mRC)
             else:
                 self.mRC, lRawOutput = self.mConnection._post(lMessage)
-                #displayPBStr(lRawOutput, pTitle="response obtained from mvstore")
+                #displayPBStr(lRawOutput, pTitle="response obtained from Affinity")
                 if lSegmentsExpectOutput and lRawOutput:
                     logging.debug("result: RC=%s (%s bytes)" % (self.mRC, len(lRawOutput)))
                     self.mPBOutput = parsePBStr(lRawOutput)
@@ -438,10 +456,10 @@ class MVStoreConnection(object):
         self.mPort = pPort
         self.mOwner = pOwner
         self.mPassword = pPassword
-        if MVStoreConnection.isInproc():
+        if AffinityConnection.isInproc():
             self.mImpl = self.Inproc()
         else:
-            self.mImpl = self.MvServer(self)
+            self.mImpl = self.AfyServer(self)
         self.mSessionStack = []
         self.mTxCtx = None
     def open(self, pKeepAlive=False):
@@ -454,9 +472,10 @@ class MVStoreConnection(object):
         return self.mImpl.close()
     def host(self): return "%s:%s" % (self.mHost, self.mPort)
     def basicauth(self): return base64.b64encode("%s:%s" % (self.mOwner, ("", self.mPassword)[None != self.mPassword]))
-    def q(self, pMsg, pFlags=0, pSession=None): logging.info("pathSQL: %s" % pMsg); return self.mImpl.get(pMsg, pFlags, self._s(pSession))
-    def qProto(self, pQstr): return self._txCtx().queryPB(pQstr)
-    def check(self, pMsg, pSession=None): return self.mImpl.check(pMsg, self._s(pSession))
+    def q(self, pQstr, pOptions=None, pSession=None): logging.info("pathSQL: %s" % pQstr); return self.mImpl.get(pQstr, pOptions, self._s(pSession))
+    def qCount(self, pQstr, pSession=None): logging.info("pathSQL (count): %s" % pQstr); return self.mImpl.get(pQstr, {"count":True}, self._s(pSession))
+    def qProto(self, pQstr, pOptions=None): return self._txCtx().queryPB(pQstr, pOptions)
+    def check(self, pQstr, pOptions=None, pSession=None): return self.mImpl.check(pQstr, pOptions, self._s(pSession))
     def startTx(self): self._txCtx().startTx()
     def commitTx(self): self._txCtx().commitTx()
     def rollbackTx(self): self._txCtx().rollbackTx()
@@ -489,15 +508,15 @@ class MVStoreConnection(object):
     def _s(self, pSession): return (pSession, len(self.mSessionStack) > 0 and self.mSessionStack[-1])[pSession == None]
     def _txCtx(self):
         if None == self.mTxCtx:
-            self.mTxCtx = MVStoreConnection.PBTransactionCtx(pConnection=self)
+            self.mTxCtx = AffinityConnection.PBTransactionCtx(pConnection=self)
         return self.mTxCtx
-MVStoreConnection.DEFAULT_CONNECTION = MVStoreConnection()
-def MVSTORE(): return MVStoreConnection.getCurrentDbConnection()
+AffinityConnection.DEFAULT_CONNECTION = AffinityConnection()
+def AFFINITY(): return AffinityConnection.getCurrentDbConnection()
     
 # Core Objects: response stream reading context.
 # Note: In a majority of cases the developer needs not be aware of this (PIN.loadPINs hides it).
 class PBReadCtx(object):
-    """In-memory representation of the global contextual information returned by mvStore in a response stream."""
+    """In-memory representation of the global contextual information returned by Affinity in a response stream."""
     def __init__(self, pPBStream):
         self.mPBStream = pPBStream
         self.mPropID2Name = {}
@@ -544,7 +563,7 @@ class PIN(dict):
     # Special Keys.
     SK_PID = "__PID__"
     SK_UPDATE = "__UPD__"
-    # mvstore time offset (1600 vs 1970).
+    # Affinity time offset (1600 vs 1970).
     TIME_OFFSET = (datetime.datetime(1970,1,1) - datetime.datetime(1601,1,1)).days * 24 * 60 * 60 * 1000000
     #--------
     # PUBLIC: Collection.
@@ -586,14 +605,14 @@ class PIN(dict):
                         lEid = lExtras[i].mEid
                         del lExtras[i]
                         # Record a persistent update.
-                        self.mPIN._handlePINUpdate(PIN({PIN.SK_PID:self.mPIN.mPID, self.mProperty:(0, PIN.Extra(pOp=mvstore_pb2.Value.OP_DELETE, pEid=lEid))}))
+                        self.mPIN._handlePINUpdate(PIN({PIN.SK_PID:self.mPIN.mPID, self.mProperty:(0, PIN.Extra(pOp=affinity_pb2.Value.OP_DELETE, pEid=lEid))}))
                     elif isinstance(i, slice):
                         # TODO: range checks
                         lEids = [iE.mEid for iE in lExtras[i]]
                         del lExtras[i]
                         # Record a persistent update.
                         for iEid in lEids:
-                            self.mPIN._handlePINUpdate(PIN({PIN.SK_PID:self.mPIN.mPID, self.mProperty:(0, PIN.Extra(pOp=mvstore_pb2.Value.OP_DELETE, pEid=iEid))}))
+                            self.mPIN._handlePINUpdate(PIN({PIN.SK_PID:self.mPIN.mPID, self.mProperty:(0, PIN.Extra(pOp=affinity_pb2.Value.OP_DELETE, pEid=iEid))}))
                     else:
                         raise InvalidParameter("unexpected type for i: %s" % type(i))
             # Modify the list itself.
@@ -622,9 +641,9 @@ class PIN(dict):
                             raise Exception("i out of range: %d (%d elements)" % (i, len(lExtras)))
                         if isinstance(v, (list, tuple)): # Review: accept a PIN.Extra here?
                             raise Exception
-                        lEid = EID_LAST_ELEMENT; lOp = mvstore_pb2.Value.OP_ADD
+                        lEid = EID_LAST_ELEMENT; lOp = affinity_pb2.Value.OP_ADD
                         if i < len(lExtras):
-                            lEid = lExtras[i].mEid; lOp = mvstore_pb2.Value.OP_ADD_BEFORE
+                            lEid = lExtras[i].mEid; lOp = affinity_pb2.Value.OP_ADD_BEFORE
                         lExtras.insert(i, PIN.Extra()) # Review: Can do better?
                         # Record a persistent update.
                         self.mPIN._handlePINUpdate(PIN({PIN.SK_PID:self.mPIN.mPID, self.mProperty:(v, PIN.Extra(pOp=lOp, pEid=lEid))}))
@@ -655,8 +674,8 @@ class PIN(dict):
                 lE = lExtras.pop(iTuple[2])
                 lExtras.insert(i, lE)
                 # Record a persistent update.
-                lOp = (mvstore_pb2.Value.OP_MOVE_BEFORE, mvstore_pb2.Value.OP_MOVE)[lPrevEid != EID_FIRST_ELEMENT]
-                self.mPIN._handlePINUpdate(PIN({PIN.SK_PID:self.mPIN.mPID, self.mProperty:(lPrevEid, PIN.Extra(pType=mvstore_pb2.Value.VT_UINT, pOp=lOp, pEid=iTuple[1]))}))
+                lOp = (affinity_pb2.Value.OP_MOVE_BEFORE, affinity_pb2.Value.OP_MOVE)[lPrevEid != EID_FIRST_ELEMENT]
+                self.mPIN._handlePINUpdate(PIN({PIN.SK_PID:self.mPIN.mPID, self.mProperty:(lPrevEid, PIN.Extra(pType=affinity_pb2.Value.VT_UINT, pOp=lOp, pEid=iTuple[1]))}))
                 lPrevEid = iTuple[1]
         def __str__(self):
             return str(self.mList)
@@ -664,7 +683,7 @@ class PIN(dict):
     # PUBLIC: Extra class.
     #--------
     class Extra(object):
-        """Semi-hidden representation of all the mvStore adornments on a plain value (e.g. eid, meta, type, op, etc.).
+        """Semi-hidden representation of all the Affinity adornments on a plain value (e.g. eid, meta, type, op, etc.).
         This allows to present the PIN as a simple dictionary where keys are property names, and values are native python values.
         Everything else is hidden as 'extras', and used mostly transparently when needed."""
         OP_NAMES = \
@@ -676,16 +695,16 @@ class PIN(dict):
         VT_NAMES = \
             ("VT_ANY", \
              "VT_INT", "VT_UINT", "VT_INT64", "VT_UINT64", \
-             "VT_DECIMAL", "VT_FLOAT", "VT_DOUBLE", "VT_BOOL", \
+             "VT_RESERVED2", "VT_FLOAT", "VT_DOUBLE", "VT_BOOL", \
              "VT_DATETIME", "VT_INTERVAL", \
              "VT_URIID", "VT_IDENTITY", \
-             "VT_STRING", "VT_BSTR", "VT_URL", "VT_ENUM", \
+             "VT_STRING", "VT_BSTR", "VT_URL", "VT_RESERVED1", \
              "[undefined-17]", \
-             "VT_REFID", "[undefined-19]", "VT_REFIDPROP", "[undefined-21]", "VT_REFIDELT", "VT_EXPR", "VT_QUERY", \
-             "VT_ARRAY", "[undefined-26]", "VT_STRUCT", "VT_RANGE", "[undefined-29]", "VT_CURRENT", "VT_REFCID") # Review: can this be done with introspection?
-        def __init__(self, pPropID=None, pType=mvstore_pb2.Value.VT_ANY, pOp=mvstore_pb2.Value.OP_SET, pEid=EID_COLLECTION, pMeta=0):
-            self.mPropID = pPropID # Conceptually redundant with the key, but kept for efficiency, since mvstore doesn't require a StringMap for existing propids.
-            self.mType = pType # There are cases where a single native python value type covers multiple mvstore VT types... so we keep the actual specific type for future updates.
+             "VT_REFID", "[undefined-19]", "VT_REFIDPROP", "[undefined-21]", "VT_REFIDELT", "VT_EXPR", "VT_STMT", \
+             "VT_ARRAY", "[undefined-26]", "VT_STRUCT", "VT_RANGE", "[undefined-29]", "VT_CURRENT", "VT_VARREF", "[undefined-32]") # Review: can this be done with introspection?
+        def __init__(self, pPropID=None, pType=affinity_pb2.Value.VT_ANY, pOp=affinity_pb2.Value.OP_SET, pEid=EID_COLLECTION, pMeta=0):
+            self.mPropID = pPropID # Conceptually redundant with the key, but kept for efficiency, since Affinity doesn't require a StringMap for existing propids.
+            self.mType = pType # There are cases where a single native python value type covers multiple Affinity VT types... so we keep the actual specific type for future updates.
             self.mOp = pOp
             self.mEid = pEid
             self.mMeta = pMeta
@@ -693,7 +712,7 @@ class PIN(dict):
             return "%s:%s:%x" % (PIN.Extra.OP_NAMES[self.mOp], PIN.Extra.VT_NAMES[self.mType], self.mEid)
         @classmethod
         def createFromPB(cls, pPBValue):
-            "Create a 'Extra' instance for the specified mvstore_pb2.Value."
+            "Create a 'Extra' instance for the specified affinity_pb2.Value."
             return PIN.Extra(pPropID=pPBValue.property, pType=pPBValue.type, pOp=pPBValue.op, pEid=pPBValue.eid, pMeta=pPBValue.meta)
     #--------
     # PUBLIC: PID & Ref classes.
@@ -822,7 +841,7 @@ class PIN(dict):
                 super(PIN, self).__setitem__(pKey, PIN.Collection(self, pKey, pValue))
                 lExtras = [PIN.Extra()]
                 for i in xrange(len(pValue) - 1):
-                    lExtras.append(PIN.Extra(pOp=mvstore_pb2.Value.OP_ADD, pEid=EID_LAST_ELEMENT))
+                    lExtras.append(PIN.Extra(pOp=affinity_pb2.Value.OP_ADD, pEid=EID_LAST_ELEMENT))
                 self.mExtras[pKey] = lExtras # Simplifies things by guarantying that there are 'extras' everywhere... but may want to refine this.
         else:
             super(PIN, self).__setitem__(pKey, pValue)
@@ -835,7 +854,7 @@ class PIN(dict):
         if self.mExtras.has_key(pKey):
             del self.mExtras[pKey]
         if self.mPID != None:
-            self._handlePINUpdate(PIN({PIN.SK_PID:self.mPID, pKey:(0, PIN.Extra(pOp=mvstore_pb2.Value.OP_DELETE))}))
+            self._handlePINUpdate(PIN({PIN.SK_PID:self.mPID, pKey:(0, PIN.Extra(pOp=affinity_pb2.Value.OP_DELETE))}))
     def update(self, *args, **kwargs):
         "Override of the dict implementation, to extract the optional 'Extra' specifications and store them separately."
         def _assign(_pDict):
@@ -896,14 +915,14 @@ class PIN(dict):
             raise InvalidParameter()
         self.mIsUpdate = pUpdate
     #--------
-    # PUBLIC: PIN saving (to mvStore). Note: At this level of the API, a PIN can represent a whole mvStore PIN, or just a set of updates to be applied on an actual mvStore PIN.
+    # PUBLIC: PIN saving (to Affinity). Note: At this level of the API, a PIN can represent a whole Affinity PIN, or just a set of updates to be applied on an actual Affinity PIN.
     #--------
     @classmethod
     def _savePINsi(cls, pPINs, pTxCtx):
         "[internal] Core  implementation of savePINs."
         def _insertsCollectionElements(_pPBPin):
             for _iV in _pPBPin.values:
-                if _iV.op in (mvstore_pb2.Value.OP_ADD, mvstore_pb2.Value.OP_ADD_BEFORE):
+                if _iV.op in (affinity_pb2.Value.OP_ADD, affinity_pb2.Value.OP_ADD_BEFORE):
                     return True
             return False
         if 0 == len(pPINs) or None == pTxCtx:
@@ -918,13 +937,13 @@ class PIN(dict):
         for iPin in pPINs:
             lPBPin = pTxCtx.getPBStream().pins.add()
             if iPin.mPID != None:
-                lPBPin.op = mvstore_pb2.MVStream.OP_UPDATE
+                lPBPin.op = affinity_pb2.MVStream.OP_UPDATE
                 lPBPin.id.id = iPin.mPID.mLocalPID
                 lPBPin.id.ident = iPin.mPID.mIdent
             else:
-                lPBPin.op = mvstore_pb2.MVStream.OP_INSERT
+                lPBPin.op = affinity_pb2.MVStream.OP_INSERT
             iPin._preparePBValues(pTxCtx, lPBPin)
-            lPBPin.rtt = (mvstore_pb2.RT_PIDS, mvstore_pb2.RT_PINS)[_insertsCollectionElements(lPBPin)]
+            lPBPin.rtt = (affinity_pb2.RT_PIDS, affinity_pb2.RT_PINS)[_insertsCollectionElements(lPBPin)]
             #print ("requested rtt=%s" % lPBPin.rtt)
             lPBPin.nValues = len(lPBPin.values)
         if len(pPINs) > 0:
@@ -935,7 +954,7 @@ class PIN(dict):
         if 0 == len(pPINs):
             return
         # Serialize, and request an immediate response (synchronous reception of resulting PIDs, eids etc.).
-        lTxCtx = pTxCtx or MVSTORE()._txCtx()
+        lTxCtx = pTxCtx or AFFINITY()._txCtx()
         try:
             cls._savePINsi(pPINs, lTxCtx)
             lTxCtx.flush()
@@ -955,7 +974,7 @@ class PIN(dict):
                     break
         if not lProcessOutput or not lTxCtx.mPBOutput:
             return pPINs
-        # Obtain the resulting IDs generated by mvStore.
+        # Obtain the resulting IDs generated by Affinity.
         if len(lTxCtx.mPBOutput.pins) != len(pPINs):
             logging.warn("%s PINs were saved, but response contained only %s PINs." % (len(pPINs), len(lTxCtx.mPBOutput.pins)))
         lReadCtx = PBReadCtx(lTxCtx.mPBOutput)
@@ -976,12 +995,12 @@ class PIN(dict):
             for iV in iPBPin.values:
                 lPN = lReadCtx.getPropName(iV.property)
                 lExtra = lPin.mExtras[lPN]
-                if mvstore_pb2.Value.VT_ARRAY == iV.type:
+                if affinity_pb2.Value.VT_ARRAY == iV.type:
                     for i, iE in zip(xrange(iV.varray.l), iV.varray.v): # Review: always true?
-                        if (lExtra[i].mEid in (EID_COLLECTION, EID_LAST_ELEMENT, EID_FIRST_ELEMENT)) or (lExtra[i].mOp in (mvstore_pb2.Value.OP_ADD, mvstore_pb2.Value.OP_ADD_BEFORE)):
+                        if (lExtra[i].mEid in (EID_COLLECTION, EID_LAST_ELEMENT, EID_FIRST_ELEMENT)) or (lExtra[i].mOp in (affinity_pb2.Value.OP_ADD, affinity_pb2.Value.OP_ADD_BEFORE)):
                             lExtra[i].mEid = iE.eid
                             logging.debug("obtained eid=%s (%s)" % (iE.eid, lPN))
-                elif lExtra[0].mOp in (mvstore_pb2.Value.OP_ADD, mvstore_pb2.Value.OP_ADD_BEFORE):
+                elif lExtra[0].mOp in (affinity_pb2.Value.OP_ADD, affinity_pb2.Value.OP_ADD_BEFORE):
                     lExtra[0].mEid = iV.eid
                     logging.debug("obtained eid=%s (%s)" % (iV.eid, lPN))
                 else:
@@ -1002,7 +1021,7 @@ class PIN(dict):
             if isinstance(self[pProperty], PIN.Collection):
                 self[pProperty].append(pValue)
             else:
-                self[pProperty] = ((self[pProperty], self.getExtra(pProperty)), (pValue, PIN.Extra(pOp=mvstore_pb2.Value.OP_ADD, pEid=EID_LAST_ELEMENT)))
+                self[pProperty] = ((self[pProperty], self.getExtra(pProperty)), (pValue, PIN.Extra(pOp=affinity_pb2.Value.OP_ADD, pEid=EID_LAST_ELEMENT)))
         elif pAlwaysCollection:
             self[pProperty] = (pValue, )
         else:
@@ -1014,20 +1033,20 @@ class PIN(dict):
         "In the collection specified by pProperty, move the element at index pXpos before the element at index pYpos."
         return self._moveXvsY(pProperty, pXpos, pYpos, pAfter=False, pTxCtx=pTxCtx)
     #--------
-    # PUBLIC: PIN deletion (from mvStore).
+    # PUBLIC: PIN deletion (from Affinity).
     #--------
     # TODO: soft vs purge, undelete etc.
     @classmethod
     def deletePINs(cls, pPIDs, pTxCtx=None):
         "Delete pPIDs from the store."
-        lTxCtx = pTxCtx or MVSTORE()._txCtx()
+        lTxCtx = pTxCtx or AFFINITY()._txCtx()
         for iPid in pPIDs:
             if not isinstance(iPid, PIN.PID):
                 raise InvalidParameter()
             lPBPin = lTxCtx.getPBStream().pins.add()
             lPBPin.id.id = iPid.mLocalPID
             lPBPin.id.ident = iPid.mIdent
-            lPBPin.op = mvstore_pb2.MVStream.OP_DELETE
+            lPBPin.op = affinity_pb2.MVStream.OP_DELETE
         lTxCtx.flush(pExplicit=False)
         # TODO: Decide if final confirmation is a RC or an exception.
     def deletePIN(self, pTxCtx=None):
@@ -1036,7 +1055,7 @@ class PIN(dict):
             raise InvalidParameter()
         PIN.deletePINs((self.mPID, ), pTxCtx)
     #--------
-    # PUBLIC: PIN loading/refreshing (from mvStore).
+    # PUBLIC: PIN loading/refreshing (from Affinity).
     #--------
     @classmethod
     def loadPINs(cls, pPBStream):
@@ -1046,7 +1065,7 @@ class PIN(dict):
     @classmethod
     def createFromPID(cls, pPID):
         "Load the PIN specified by pPID, and return it as a new PIN object."
-        lPBStream = MVSTORE().qProto("SELECT * FROM {@%x};" % pPID.mLocalPID)
+        lPBStream = AFFINITY().qProto("SELECT * FROM {@%x};" % pPID.mLocalPID)
         return PIN().loadPIN(PBReadCtx(lPBStream), lPBStream.pins[0])
     def loadPIN(self, pReadCtx, pPBPin):
         "Load the specified PIN in-place."
@@ -1061,7 +1080,7 @@ class PIN(dict):
         "Refresh the contents of self, by rereading the whole PIN from the store."
         if None == self.mPID:
             return self
-        lPBStream = MVSTORE().qProto("SELECT * FROM {@%x};" % self.mPID.mLocalPID)
+        lPBStream = AFFINITY().qProto("SELECT * FROM {@%x};" % self.mPID.mLocalPID)
         return self.loadPIN(PBReadCtx(lPBStream), lPBStream.pins[0])
     def _clearPIN(self):
         "Clear the contents of self."
@@ -1069,131 +1088,131 @@ class PIN(dict):
         self.clear()
         self.mExtras.clear()
     #---------
-    # PRIVATE: Conversions between mvstoree_pb2.Value and our python native representation of values.
+    # PRIVATE: Conversions between affinity_pb2.Value and our python native representation of values.
     #---------
     @staticmethod
     def _valuePY2PB(pPBValue, pPYValue, pPropDict):
-        "[internal] Convert a native python value (pPYValue) into a mvstore_pb2.Value. If pPYValue is a tuple containing an 'Extra' description, use every available field."
+        "[internal] Convert a native python value (pPYValue) into a affinity_pb2.Value. If pPYValue is a tuple containing an 'Extra' description, use every available field."
         lType = pPBValue.type
-        pPBValue.type = mvstore_pb2.Value.VT_ANY
+        pPBValue.type = affinity_pb2.Value.VT_ANY
         if isinstance(pPYValue, PIN.Url):
             pPBValue.str = pPYValue
-            lType = mvstore_pb2.Value.VT_URL
+            lType = affinity_pb2.Value.VT_URL
         elif isinstance(pPYValue, str):
             pPBValue.str = pPYValue
-            lType = mvstore_pb2.Value.VT_STRING
+            lType = affinity_pb2.Value.VT_STRING
         elif isinstance(pPYValue, unicode):
             pPBValue.str = pPYValue
-            lType = mvstore_pb2.Value.VT_STRING
+            lType = affinity_pb2.Value.VT_STRING
         elif isinstance(pPYValue, bytearray):
             pPBValue.bstr = str(pPYValue)
-            lType = mvstore_pb2.Value.VT_BSTR
+            lType = affinity_pb2.Value.VT_BSTR
         elif isinstance(pPYValue, bool):
             pPBValue.b = pPYValue
-            lType = mvstore_pb2.Value.VT_BOOL
+            lType = affinity_pb2.Value.VT_BOOL
         elif isinstance(pPYValue, (int, long)):
             # If we already know the type, don't mess with it.
             # Review: There might be cases where the new value is voluntarily not compatible; for now, expect explicit type spec in such case.
-            if lType == mvstore_pb2.Value.VT_INT:
+            if lType == affinity_pb2.Value.VT_INT:
                 pPBValue.i = pPYValue
-            elif lType == mvstore_pb2.Value.VT_UINT:
+            elif lType == affinity_pb2.Value.VT_UINT:
                 pPBValue.ui = pPYValue
-            elif lType == mvstore_pb2.Value.VT_INT64:
+            elif lType == affinity_pb2.Value.VT_INT64:
                 pPBValue.i64 = pPYValue
-            elif lType == mvstore_pb2.Value.VT_UINT64:
+            elif lType == affinity_pb2.Value.VT_UINT64:
                 pPBValue.ui64 = pPYValue
             # Otherwise, guess.
             elif (pPYValue >= -2147483648 and pPYValue <= 2147483647):
                 pPBValue.i = pPYValue
-                lType = mvstore_pb2.Value.VT_INT
+                lType = affinity_pb2.Value.VT_INT
             elif pPYValue >= 0 and pPYValue <= 4294967295:
                 pPBValue.ui = pPYValue
-                lType = mvstore_pb2.Value.VT_UINT
+                lType = affinity_pb2.Value.VT_UINT
             elif pPYValue <= 9223372036854775807:
                 pPBValue.i64 = pPYValue
-                lType = mvstore_pb2.Value.VT_INT64
+                lType = affinity_pb2.Value.VT_INT64
             else:
                 pPBValue.ui64 = pPYValue
-                lType = mvstore_pb2.Value.VT_UINT64
+                lType = affinity_pb2.Value.VT_UINT64
         elif isinstance(pPYValue, float):
-            if lType == mvstore_pb2.Value.VT_FLOAT:
+            if lType == affinity_pb2.Value.VT_FLOAT:
                 pPBValue.f = pPYValue
             else:
                 pPBValue.d = pPYValue
-                lType = mvstore_pb2.Value.VT_DOUBLE
+                lType = affinity_pb2.Value.VT_DOUBLE
         elif isinstance(pPYValue, PIN.Ref):
             if pPYValue.mEid != None:
                 pPBValue.ref.id.id = pPYValue.mLocalPID
                 pPBValue.ref.id.ident = pPYValue.mIdent
                 pPBValue.ref.property = pPropDict.get(pPYValue.mProperty)
                 pPBValue.ref.eid = pPYValue.mEid
-                lType = mvstore_pb2.Value.VT_REFIDELT
+                lType = affinity_pb2.Value.VT_REFIDELT
             elif pPYValue.mProperty != None:
                 pPBValue.ref.id.id = pPYValue.mLocalPID
                 pPBValue.ref.id.ident = pPYValue.mIdent
                 pPBValue.ref.property = pPropDict.get(pPYValue.mProperty)
-                lType = mvstore_pb2.Value.VT_REFIDPROP
+                lType = affinity_pb2.Value.VT_REFIDPROP
             else:
                 pPBValue.id.id = pPYValue.mLocalPID
                 pPBValue.id.ident = pPYValue.mIdent            
-                lType = mvstore_pb2.Value.VT_REFID
+                lType = affinity_pb2.Value.VT_REFID
         elif isinstance(pPYValue, datetime.datetime):
-            # Review: Probably shouldn't need to deal with {mvstore, timezone, dst} conversion on client side. 
+            # Review: Probably shouldn't need to deal with {Affinity, timezone, dst} conversion on client side. 
             lTT = list(pPYValue.timetuple()); lTT[8] = 0
             pPBValue.datetime = int(1000000.0 * time.mktime(lTT) + pPYValue.microsecond + PIN.TIME_OFFSET)
-            lType = mvstore_pb2.Value.VT_DATETIME
+            lType = affinity_pb2.Value.VT_DATETIME
         elif isinstance(pPYValue, datetime.timedelta):
             pPBValue.interval = int(pPYValue.days*86400000000.0 + pPYValue.seconds*1000000.0 + pPYValue.microseconds)
-            lType = mvstore_pb2.Value.VT_INTERVAL
+            lType = affinity_pb2.Value.VT_INTERVAL
         else:
             logging.warn("Value type not yet supported: %s (%s)" % (type(pPYValue), pPYValue))
-        if pPBValue.type == mvstore_pb2.Value.VT_ANY:
+        if pPBValue.type == affinity_pb2.Value.VT_ANY:
             pPBValue.type = lType
     @staticmethod
     def _valuePB2PY(pPBReadCtx, pPBValue):
-        "[internal] Convert a mvstore_pb2.Value into either a single (native python value, Extra), or a list of them (if pPBValue is a collection), and return it."
-        if (pPBValue.type == mvstore_pb2.Value.VT_ARRAY):
+        "[internal] Convert a affinity_pb2.Value into either a single (native python value, Extra), or a list of them (if pPBValue is a collection), and return it."
+        if (pPBValue.type == affinity_pb2.Value.VT_ARRAY):
             lResult = []
             for iV in pPBValue.varray.v:
                 lResult.append(PIN._valuePB2PY(pPBReadCtx, iV))
             return lResult
         lExtra = PIN.Extra.createFromPB(pPBValue)
-        if (pPBValue.type == mvstore_pb2.Value.VT_URL):
+        if (pPBValue.type == affinity_pb2.Value.VT_URL):
             return (PIN.Url(pPBValue.str), lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_STRING):
+        elif (pPBValue.type == affinity_pb2.Value.VT_STRING):
             return (str(pPBValue.str), lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_BSTR):
+        elif (pPBValue.type == affinity_pb2.Value.VT_BSTR):
             return (bytearray(pPBValue.bstr), lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_INT):
+        elif (pPBValue.type == affinity_pb2.Value.VT_INT):
             return (pPBValue.i, lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_UINT):
+        elif (pPBValue.type == affinity_pb2.Value.VT_UINT):
             return (pPBValue.ui, lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_INT64):
+        elif (pPBValue.type == affinity_pb2.Value.VT_INT64):
             return (pPBValue.i64, lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_UINT64):
+        elif (pPBValue.type == affinity_pb2.Value.VT_UINT64):
             return (pPBValue.ui64, lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_FLOAT):
+        elif (pPBValue.type == affinity_pb2.Value.VT_FLOAT):
             return (pPBValue.f, lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_DOUBLE):
+        elif (pPBValue.type == affinity_pb2.Value.VT_DOUBLE):
             return (pPBValue.d, lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_INTERVAL):
+        elif (pPBValue.type == affinity_pb2.Value.VT_INTERVAL):
             return (datetime.timedelta(microseconds=pPBValue.interval), lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_BOOL):
+        elif (pPBValue.type == affinity_pb2.Value.VT_BOOL):
             return ((False, True)[pPBValue.b != 0], lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_DATETIME):
-            # Review: Probably shouldn't need to deal with {mvstore, timezone, dst} conversion on client side. 
+        elif (pPBValue.type == affinity_pb2.Value.VT_DATETIME):
+            # Review: Probably shouldn't need to deal with {Affinity, timezone, dst} conversion on client side. 
             lMsInS = float(pPBValue.datetime % 1000000) / 1000000.0
             lTT = list(time.gmtime(float(pPBValue.datetime - PIN.TIME_OFFSET) / 1000000.0 - time.timezone)); lTT[8] = -1
             return (datetime.datetime.fromtimestamp(time.mktime(lTT) + lMsInS), lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_QUERY):
+        elif (pPBValue.type == affinity_pb2.Value.VT_QUERY):
             return (pPBValue.str, lExtra)
-        elif (pPBValue.type == mvstore_pb2.Value.VT_REFID):
+        elif (pPBValue.type == affinity_pb2.Value.VT_REFID):
             return (PIN.Ref(pLocalPID=pPBValue.id.id, pIdent=pPBValue.id.ident), lExtra) 
-        elif (pPBValue.type == mvstore_pb2.Value.VT_REFIDPROP):
+        elif (pPBValue.type == affinity_pb2.Value.VT_REFIDPROP):
             return (PIN.Ref(pLocalPID=pPBValue.ref.id.id, pIdent=pPBValue.ref.id.ident, pProperty=pPBReadCtx.getPropName(pPBValue.ref.property)), lExtra) 
-        elif (pPBValue.type == mvstore_pb2.Value.VT_REFIDELT):
+        elif (pPBValue.type == affinity_pb2.Value.VT_REFIDELT):
             return (PIN.Ref(pLocalPID=pPBValue.ref.id.id, pIdent=pPBValue.ref.id.ident, pProperty=pPBReadCtx.getPropName(pPBValue.ref.property), pEid=pPBValue.ref.eid), lExtra) 
-        elif (pPBValue.type == mvstore_pb2.Value.VT_URIID):
+        elif (pPBValue.type == affinity_pb2.Value.VT_URIID):
             lV = pPBReadCtx.getPropName(pPBValue.ui)
             if lV == None:
                 lV = pPBValue.ui
@@ -1202,7 +1221,7 @@ class PIN(dict):
         logging.warn("Unknown value type %s" % pPBValue.type)
         return None
     #---------
-    # PRIVATE: Preparation steps for protobuf streams sent to mvStore.
+    # PRIVATE: Preparation steps for protobuf streams sent to Affinity.
     #---------
     def _preparePBPropIDs(self, pTxCtx):
         "[internal] Extract the StringMap of this PIN's properties, and merge it into pTxCtx.mPropDict."
@@ -1210,7 +1229,7 @@ class PIN(dict):
             if not pTxCtx.mPropDict.has_key(_pPropName):
                 _lPBProp = pTxCtx.getPBStream().properties.add()
                 _lPBProp.str = _pPropName
-                _lPBProp.id = (mvstore_pb2.SP_MAX + 1) + len(pTxCtx.mPropDict)
+                _lPBProp.id = (affinity_pb2.SP_MAX + 1) + len(pTxCtx.mPropDict)
                 pTxCtx.mPropDict[_lPBProp.str] = _lPBProp.id
         def __preprefid(_pValue):
             if isinstance(_pValue, PIN.Ref) and _pValue.mProperty != None:
@@ -1227,7 +1246,7 @@ class PIN(dict):
             else:
                 __preprefid(iPV[1])
     def _preparePBValues(self, pTxCtx, pPBPin):
-        "[internal] Add mvstore_pb2.Value objects to pPBPin, representing self.items()."
+        "[internal] Add affinity_pb2.Value objects to pPBPin, representing self.items()."
         def __prep(_pPropName, _pExtra, _pPYVal):
             _lV = pPBPin.values.add()
             _lV.property = 0
@@ -1263,7 +1282,7 @@ class PIN(dict):
         def __exit__(self, etyp, einst, etb):
             self.mPIN.mPID = self.mPID
     def _handlePINUpdate(self, pPINUpdate, pTxCtx=None):
-        lTxCtx = pTxCtx or MVSTORE().mTxCtx
+        lTxCtx = pTxCtx or AFFINITY().mTxCtx
         pPINUpdate.markAsUpdate(PIN.PINUpdate([self]))
         if lTxCtx and not lTxCtx.performImmediateUpdates() and 0 != lTxCtx.mTxCnt: # XXXXX check that equivalent...
             lTxCtx.recordPINUpdate(pPINUpdate)
@@ -1289,63 +1308,7 @@ class PIN(dict):
         # Prepare and record/execute the persistent update.
         lE1 = self.getExtra(pProperty, pEpos=pXpos).mEid
         lE2 = self.getExtra(pProperty, pEpos=pYpos).mEid
-        lOp = (mvstore_pb2.Value.OP_MOVE_BEFORE, mvstore_pb2.Value.OP_MOVE)[pAfter]
+        lOp = (affinity_pb2.Value.OP_MOVE_BEFORE, affinity_pb2.Value.OP_MOVE)[pAfter]
         self._handlePINUpdate(PIN({ \
             PIN.SK_PID:self.mPID, \
-            pProperty:(lE2, PIN.Extra(pType=mvstore_pb2.Value.VT_UINT, pOp=lOp, pEid=lE1))}))
-
-# TODO: document the effect of recordPINUpdate, and correct usage (e.g. since updates are deferred, queries can be affected)
-# TODO: better del support, for the pin itself; better remove for last element of collection
-# TODO: finish testing the more esoteric formats, to make sure their conversion is good
-# TODO: test that units of measurement work ok back and forth between pathSQL and pure protobuf
-# ---
-# TODO: mark pins that have participated to a rolled-back transaction as dirty, and refresh them if reused
-# TODO: make sure that all paths produce exceptions when necessary (e.g. all MVSTORE().get/post failures); show better in samples/tests
-# TODO: could accept a PIN as a reference value (equivalent to PIN.Ref) - although it may open up hopes and questions that we may want to avoid
-# TODO: could add mass moving helpers (for coll elements: move all in X=(...) before/after Y [in the order specified in X]).
-# TODO: produce warnings/errors when (or deal with) a PIN with extras is manipulated in such a way that consistency between extras and values is lost.
-# TODO: probably discard the notion of session in MVStoreConnection (it was desirable in a test environment, but here I feel it's more questionable).
-# TODO: maybe implement __deepcopy__
-# TODO: when available, offer the option to apply modifs only if the stamp didn't change
-# TODO: support namespaces in protobuf mode?
-
-# TODO: in PBTransactionCtx, introduce streaming, as an option to fetch the data as a cursor instead of as a MVStream. Probably a few more options as well: PB output, PIN output, PID output, cursor, ...
-    #from google.protobuf.internal import decoder, encoder
-    #def test_streaming(pPinIDs):
-        ## write something like InternalParse
-        #lRawRes = gMvStore.q("SELECT * FROM {@%x};" % pPinIDs[0].id)
-        #lStreamObj = mvstore_pb2.MVStream()
-        ##lStreamRes.ParseFromString(lRawRes)
-        ## Note:
-        ##   I adapted the code below from protobuf/reflection.py:InternalParse,
-        ##   which is the implementation of ParseFromString. This highlights the
-        ##   required mechanisms to implement streaming of inner/repeated fields
-        ##   for read, in python. I will be using this in the upcoming python
-        ##   library.
-        #lTag_pins = encoder.TagBytes(3, 2) # mvstore_pb2.MVStream.pins.number, length-delimited wire type
-        #pos = 0
-        #local_ReadTag = decoder.ReadTag
-        #local_SkipField = decoder.SkipField
-        #decoders_by_tag = lStreamObj.__class__._decoders_by_tag
-        ##print decoders_by_tag
-        #lFieldDict = lStreamObj._fields
-        #while pos != len(lRawRes):
-          #(tag_bytes, new_pos) = local_ReadTag(lRawRes, pos)          
-          #field_decoder = decoders_by_tag.get(tag_bytes)
-          #if tag_bytes == lTag_pins and False:
-              #print "just for fun, skip the pins"
-              #field_decoder = None
-          #if field_decoder is None:
-            #new_pos = local_SkipField(lRawRes, new_pos, len(lRawRes), tag_bytes)
-            #if new_pos == -1:
-              #return pos
-            #pos = new_pos
-          #else:
-            #pos = field_decoder(lRawRes, new_pos, len(lRawRes), lStreamObj, lFieldDict)
-        #if pos != len(lRawRes):
-            #raise Exception
-        #print "number of pins found via streaming: %d" % len(lStreamObj.pins)
-        #if len(lStreamObj.pins) > 0:
-            #lReader = MVStoreReader(lStreamObj)
-            #lPinChk = lReader.readPIN(lStreamObj.pins[0])
-            #print "pin read via streaming: %s" % lPinChk
+            pProperty:(lE2, PIN.Extra(pType=affinity_pb2.Value.VT_UINT, pOp=lOp, pEid=lE1))}))
