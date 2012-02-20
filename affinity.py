@@ -81,7 +81,7 @@ configureAfyLogging() # Review: May remove this by default (arguably belongs to 
 # Misc. Helpers.
 def displayPBStr(pPBStr, pTitle=None):
     "[internal] Invoke the command-line 'protoc --decode' to produce a readable form of the pPBStr serialized protobuf string."
-    lP = subprocess.Popen(["protoc", "--decode=MVStorePB.MVStream", "--proto_path=../kernel/src/", "../kernel/src/mvstore.proto"], shell=False, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+    lP = subprocess.Popen(["protoc", "--decode=AffinityPB.AfyStream", "--proto_path=../kernel/src/", "../kernel/src/affinity.proto"], shell=False, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
     #lP = subprocess.Popen(["protoc", "--decode_raw"], shell=False, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
     lOut = lP.communicate(input=pPBStr)[0]
     #lOut = filter(lambda c: c==" " or c not in string.whitespace, lOut) # Keep spaces but not crlf, tabs etc.
@@ -96,7 +96,7 @@ def savePBStr(pPBStr, pOutputFileName):
     lF.close()
 def parsePBStr(pPBStr):
     "[internal] Parse the raw pPBStr and returned the resulting protobuf structure."
-    lPBStream = affinity_pb2.MVStream()
+    lPBStream = affinity_pb2.AfyStream()
     try:
         lPBStream.ParseFromString(pPBStr)
         return lPBStream
@@ -291,7 +291,7 @@ class AffinityConnection(object):
     # ---
     class PBTransactionCtx(object):
         """[internal] Transaction context for protobuf. Allows to run long transactions and fetch intermediate results
-        (without any dependency on a keep-alive connection). Facilitates the concatenation of protobuf logical MVStream segments,
+        (without any dependency on a keep-alive connection). Facilitates the concatenation of protobuf logical AfyStream segments,
         to produce the final outgoing stream."""
         MODE_IGNORE_OUTPUT = 0x0001
         MODE_IMMEDIATE_UPDATES = 0x0002
@@ -301,12 +301,12 @@ class AffinityConnection(object):
             self.mConnection = pConnection
             if not self.mConnection:
                 self.mConnection = AffinityConnection.getCurrentDbConnection()
-            self.mPBStream = affinity_pb2.MVStream() # The current stream segment.
+            self.mPBStream = affinity_pb2.AfyStream() # The current stream segment.
             self.mSegments = [] # The accumulated stream segments.
             self.mSegmentsExpectOutput = False # Maybe just a workaround until commit produces bits in the response stream...
             self.mMode = pMode # The combination of modes in which we operate currently.
             self.mRC = None # The return code from Affinity.
-            self.mPBOutput = None # The parsed (MVStream) protobuf output.
+            self.mPBOutput = None # The parsed (AfyStream) protobuf output.
             self.mPropDict = {} # Accumulated dictionary of {propname, propid}.
             self.mLPToken = None # For long-running transactions (protobuf).
             self.mTxCnt = 0 # Holds a count of nested transactions.
@@ -321,7 +321,7 @@ class AffinityConnection(object):
             if len(self.mPBStream.pins) > 0:
                 # Review: The final condition will be different, but for the moment I'm not sure I can do better.
                 for iP in self.mPBStream.pins:
-                    if affinity_pb2.MVStream.OP_INSERT == iP.op:
+                    if affinity_pb2.AfyStream.OP_INSERT == iP.op:
                         self.mSegmentsExpectOutput = True
                         break
                 self.mSegments.append(self.mPBStream.SerializeToString())
@@ -333,7 +333,7 @@ class AffinityConnection(object):
             else:
                 logging.warn("An empty mPBStream was captured... and ignored.")
             logging.debug("%s segments, %s bytes%s" % (len(self.mSegments), sum([len(iS) for iS in self.mSegments]), ("", ", FLUSH")[len(self.mPBStream.flush) > 0]))
-            self.mPBStream = affinity_pb2.MVStream()
+            self.mPBStream = affinity_pb2.AfyStream()
         def flush(self, pExplicit=True):
             if pExplicit:
                 self.mPBStream.flush.append(0)
@@ -349,19 +349,19 @@ class AffinityConnection(object):
             logging.debug("")
             if not self.mLPToken:
                 self.mLPToken = self.mConnection._beginlongpost()
-            self.mPBStream.txop.append(affinity_pb2.MVStream.TX_START)
+            self.mPBStream.txop.append(affinity_pb2.AfyStream.TX_START)
             self.capture()
             self.mTxCnt += 1
         def commitTx(self):
             logging.debug("")
-            self.mPBStream.txop.append(affinity_pb2.MVStream.TX_COMMIT)
+            self.mPBStream.txop.append(affinity_pb2.AfyStream.TX_COMMIT)
             self.capture()
             self.mTxCnt -= 1
             if 0 == self.mTxCnt:
                 self._terminate()
         def rollbackTx(self):
             logging.debug("")
-            self.mPBStream.txop.append(affinity_pb2.MVStream.TX_ROLLBACK)
+            self.mPBStream.txop.append(affinity_pb2.AfyStream.TX_ROLLBACK)
             self.capture()
             self.mTxCnt -= 1
             if 0 == self.mTxCnt:
@@ -937,11 +937,11 @@ class PIN(dict):
         for iPin in pPINs:
             lPBPin = pTxCtx.getPBStream().pins.add()
             if iPin.mPID != None:
-                lPBPin.op = affinity_pb2.MVStream.OP_UPDATE
+                lPBPin.op = affinity_pb2.AfyStream.OP_UPDATE
                 lPBPin.id.id = iPin.mPID.mLocalPID
                 lPBPin.id.ident = iPin.mPID.mIdent
             else:
-                lPBPin.op = affinity_pb2.MVStream.OP_INSERT
+                lPBPin.op = affinity_pb2.AfyStream.OP_INSERT
             iPin._preparePBValues(pTxCtx, lPBPin)
             lPBPin.rtt = (affinity_pb2.RT_PIDS, affinity_pb2.RT_PINS)[_insertsCollectionElements(lPBPin)]
             #print ("requested rtt=%s" % lPBPin.rtt)
@@ -1046,7 +1046,7 @@ class PIN(dict):
             lPBPin = lTxCtx.getPBStream().pins.add()
             lPBPin.id.id = iPid.mLocalPID
             lPBPin.id.ident = iPid.mIdent
-            lPBPin.op = affinity_pb2.MVStream.OP_DELETE
+            lPBPin.op = affinity_pb2.AfyStream.OP_DELETE
         lTxCtx.flush(pExplicit=False)
         # TODO: Decide if final confirmation is a RC or an exception.
     def deletePIN(self, pTxCtx=None):

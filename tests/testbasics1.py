@@ -43,7 +43,7 @@ def _entryPoint():
 
     print ("\nGet resulting pins.")
     lRaw = lAffinity.q("SELECT * FROM \"http://localhost/afy/class/testbasics1/c1\";")
-    lPBStream = affinity_pb2.MVStream()
+    lPBStream = affinity_pb2.AfyStream()
     lPBStream.ParseFromString(lRaw)
     if False:
         displayPBStr(lRaw, pTitle="raw result of SELECT * FROM \"http://localhost/afy/class/testbasics1/c1\"")
