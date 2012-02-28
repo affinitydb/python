@@ -1,4 +1,18 @@
 #!/usr/bin/env python2.6
+# Copyright (c) 2004-2012 VMware, Inc. All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,  WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+# -----
 """This module defines the key components of Affinity's low-level client library in python:
 AffinityConnection and PIN (including PIN.PID and PIN.Collection).
 The library talks to the store via pathSQL and protobuf exclusively.
@@ -653,6 +667,7 @@ class PIN(dict):
             # Modify the list itself.
             self.mList.insert(i, v)
         def sort(self, cmp=cmp, key=None, reverse=False):
+            # TODO: review... slightly incorrect... see ruby version for corrections...
             # More for fun than anything; demonstrates ease of use.
             # Collect the list of values to sort.
             lToSort = [(self.mList[i], self.mPIN.getExtra(self.mProperty, pEpos=i).mEid, i) for i in xrange(len(self.mList))]
@@ -1087,6 +1102,7 @@ class PIN(dict):
         self.mPID = None # Assign first, since the goal is not to clear the persisted PIN.
         self.clear()
         self.mExtras.clear()
+        # Review: mIsUpdate?
     #---------
     # PRIVATE: Conversions between affinity_pb2.Value and our python native representation of values.
     #---------
