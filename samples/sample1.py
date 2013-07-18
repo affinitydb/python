@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-# Copyright (c) 2004-2012 VMware, Inc. All Rights Reserved.
+# Copyright (c) 2004-2013 GoPivotal, Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ if __name__ == '__main__':
         # Note:
         #   Checking for class existence is not mandatory, provided that class creation is done within try-except;
         #   here, for documentation sake, both approaches are demonstrated in combination.  
-        if 0 == lAffinity.qCount("SELECT * FROM afy:ClassOfClasses WHERE afy:classID='sample1_knownage';"):
+        if 0 == lAffinity.qCount("SELECT * FROM afy:Classes WHERE afy:objectID='sample1_knownage';"):
             lAffinity.qProto("CREATE CLASS sample1_knownage AS SELECT * WHERE age IN :0 and EXISTS(name);")
         else:
             print ("family already existed.")

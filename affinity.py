@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-# Copyright (c) 2004-2012 VMware, Inc. All Rights Reserved.
+# Copyright (c) 2004-2013 GoPivotal, Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -68,17 +68,18 @@ SP_PROPERTY_NAMES = \
     affinity_pb2.SP_UPDATED:"afy:updated", \
     affinity_pb2.SP_UPDATEDBY:"afy:updatedBy", \
     affinity_pb2.SP_ACL:"afy:ACL", \
-    affinity_pb2.SP_URI:"afy:URI", \
     affinity_pb2.SP_STAMP:"afy:stamp", \
-    affinity_pb2.SP_CLASSID:"afy:classID", \
+    affinity_pb2.SP_OBJID:"afy:objectID", \
     affinity_pb2.SP_PREDICATE:"afy:predicate", \
-    affinity_pb2.SP_NINSTANCES:"afy:nInstances", \
-    affinity_pb2.SP_NDINSTANCES:"afy:nDelInstances", \
+    affinity_pb2.SP_COUNT:"afy:count", \
     affinity_pb2.SP_SUBCLASSES:"afy:subclasses", \
     affinity_pb2.SP_SUPERCLASSES:"afy:superclasses", \
-    affinity_pb2.SP_CLASS_INFO:"afy:classInfo", \
     affinity_pb2.SP_INDEX_INFO:"afy:indexInfo", \
     affinity_pb2.SP_PROPERTIES:"afy:properties", \
+    affinity_pb2.SP_ONENTER:"afy:onEnter", \
+    affinity_pb2.SP_ONUPDATE:"afy:onUpdate", \
+    affinity_pb2.SP_ONLEAVE:"afy:onLeave"
+    # TODO: catch-up with latest stuff...
 }    
 
 # Internal logging.
@@ -710,13 +711,13 @@ class PIN(dict):
         VT_NAMES = \
             ("VT_ANY", \
              "VT_INT", "VT_UINT", "VT_INT64", "VT_UINT64", \
-             "VT_RESERVED2", "VT_FLOAT", "VT_DOUBLE", "VT_BOOL", \
+             "VT_FLOAT", "VT_DOUBLE", "VT_BOOL", \
              "VT_DATETIME", "VT_INTERVAL", \
-             "VT_URIID", "VT_IDENTITY", \
-             "VT_STRING", "VT_BSTR", "VT_URL", "VT_RESERVED1", \
-             "[undefined-17]", \
-             "VT_REFID", "[undefined-19]", "VT_REFIDPROP", "[undefined-21]", "VT_REFIDELT", "VT_EXPR", "VT_STMT", \
-             "VT_ARRAY", "[undefined-26]", "VT_STRUCT", "VT_RANGE", "[undefined-29]", "VT_CURRENT", "VT_VARREF", "[undefined-32]") # Review: can this be done with introspection?
+             "VT_URIID", "VT_IDENTITY", "VT_ENUM", \
+             "VT_STRING", "VT_BSTR", "VT_URL", \
+             "[undefined-16]", "VT_REFID", "[undefined-18]", "VT_REFIDPROP", "[undefined-20]", "VT_REFIDELT", \
+             "VT_EXPR", "VT_QUERY", \
+             "VT_ARRAY", "[undefined-25]", "VT_STRUCT", "VT_MAP", "VT_RANGE", "[undefined-29]", "VT_CURRENT") # Review: can this be done with introspection?
         def __init__(self, pPropID=None, pType=affinity_pb2.Value.VT_ANY, pOp=affinity_pb2.Value.OP_SET, pEid=EID_COLLECTION, pMeta=0):
             self.mPropID = pPropID # Conceptually redundant with the key, but kept for efficiency, since Affinity doesn't require a StringMap for existing propids.
             self.mType = pType # There are cases where a single native python value type covers multiple Affinity VT types... so we keep the actual specific type for future updates.
@@ -1170,7 +1171,7 @@ class PIN(dict):
                 lType = affinity_pb2.Value.VT_REFIDPROP
             else:
                 pPBValue.id.id = pPYValue.mLocalPID
-                pPBValue.id.ident = pPYValue.mIdent            
+                pPBValue.id.ident = pPYValue.mIdent
                 lType = affinity_pb2.Value.VT_REFID
         elif isinstance(pPYValue, datetime.datetime):
             # Review: Probably shouldn't need to deal with {Affinity, timezone, dst} conversion on client side. 
@@ -1264,18 +1265,19 @@ class PIN(dict):
     def _preparePBValues(self, pTxCtx, pPBPin):
         "[internal] Add affinity_pb2.Value objects to pPBPin, representing self.items()."
         def __prep(_pPropName, _pExtra, _pPYVal):
-            _lV = pPBPin.values.add()
-            _lV.property = 0
-            if _pExtra.mPropID != None:
-                _lV.property = _pExtra.mPropID
-            if _pExtra.mType != None:
-                _lV.type = _pExtra.mType
-            _lV.op = _pExtra.mOp
-            _lV.eid = _pExtra.mEid
-            _lV.meta = _pExtra.mMeta
-            PIN._valuePY2PB(_lV, _pPYVal, pTxCtx.mPropDict)
-            if 0 == _lV.property:
-                _lV.property = pTxCtx.mPropDict[_pPropName]
+            if (_pPYVal != None):
+                _lV = pPBPin.values.add()
+                _lV.property = 0
+                if _pExtra.mPropID != None:
+                    _lV.property = _pExtra.mPropID
+                if _pExtra.mType != None:
+                    _lV.type = _pExtra.mType
+                _lV.op = _pExtra.mOp
+                _lV.eid = _pExtra.mEid
+                _lV.meta = _pExtra.mMeta
+                PIN._valuePY2PB(_lV, _pPYVal, pTxCtx.mPropDict)
+                if 0 == _lV.property:
+                    _lV.property = pTxCtx.mPropDict[_pPropName]
         for iPV, iExtra in zip(self.iteritems(), self.mExtras.itervalues()):
             # Collection.
             if isinstance(iPV[1], (list, tuple, MutableSequence)):

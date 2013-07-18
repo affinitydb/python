@@ -13,29 +13,24 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 # -----
-"""This module performs a simple store dump, and demonstrates basic querying options."""
+
+# TODO: test in-place modifs more in depth (with tx etc.)
+# TODO: test MODE_IMMEDIATE_UPDATES vs not
+# TODO: make sure that changes across pins, and multi-changes on a property, work well
+
+from copy import copy
 from affinity import *
+import random
 import time
 
 if __name__ == '__main__':
     lAffinity = AFFINITY()
     lAffinity.open()
-    # Define the parameters of the query.
-    lQuery = "SELECT *"
-    lCount = lAffinity.qCount(lQuery)
-    print ("TOTAL COUNT: %s" % lCount)
-    time.sleep(1)
-    lPageSize = 200
-    lProtoOut = True
-    # Go.
-    lOffset = 0
-    while lOffset < lCount:
-        lOptions = {"limit":lPageSize, "offset":lOffset}
-        if lProtoOut: # Protobuf output.
-            lPins = PIN.loadPINs(lAffinity.qProto(lQuery, lOptions))
-            for iP in lPins:
-                print (iP)
-        else: # JSON output.
-            print (lAffinity.check(lQuery, lOptions))
-        lOffset = lOffset + lPageSize
+
+    # start by exploring the python-specific aspects (until locking is reenabled, it's difficult to assess transactions)
+    # ---
+    # create 2 threads
+    # have a step value
+    # each thread waits for the step, and performs
+
     lAffinity.close()

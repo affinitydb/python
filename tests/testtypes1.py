@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-# Copyright (c) 2004-2012 VMware, Inc. All Rights Reserved.
+# Copyright (c) 2004-2013 GoPivotal, Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ def _entryPoint():
     assert lValue == lPin['http://localhost/afy/property/testtypes1/value2']
     assert affinity_pb2.Value.VT_BSTR == lPin.getExtra('http://localhost/afy/property/testtypes1/value1').mType
     assert affinity_pb2.Value.VT_BSTR == lPin.getExtra('http://localhost/afy/property/testtypes1/value2').mType
-    
+
     # VT_URL
     lValue = "urn:issn:1234-5678"
     lPin = PIN.loadPINs(lAffinity.qProto("INSERT (\"http://localhost/afy/property/testtypes1/value1\") VALUES (U'%s');" % lValue))[0]
@@ -53,7 +53,7 @@ def _entryPoint():
     assert lValue == lPin['http://localhost/afy/property/testtypes1/value2']
     assert affinity_pb2.Value.VT_URL == lPin.getExtra('http://localhost/afy/property/testtypes1/value1').mType
     assert affinity_pb2.Value.VT_URL == lPin.getExtra('http://localhost/afy/property/testtypes1/value2').mType
-    
+
     # VT_INT
     lValue = 12345
     lPin = PIN.loadPINs(lAffinity.qProto("INSERT (\"http://localhost/afy/property/testtypes1/value1\") VALUES (%d);" % lValue))[0]
@@ -163,24 +163,24 @@ def _entryPoint():
 
     # VT_REFIDPROP
     lValue = PIN.Ref(pLocalPID=lReferenced1.mPID.mLocalPID, pIdent=lReferenced1.mPID.mIdent, pProperty='http://localhost/afy/property/testtypes1/value1')
-    lPin = PIN.loadPINs(lAffinity.qProto("INSERT (\"http://localhost/afy/property/testtypes1/value1\") VALUES (%s.\"http://localhost/afy/property/testtypes1/value1\");" % lReferenced1.mPID))[0]
+    lPin = PIN.loadPINs(lAffinity.qProto("INSERT (\"http://localhost/afy/property/testtypes1/value1\") VALUES (&%s.\"http://localhost/afy/property/testtypes1/value1\");" % lReferenced1.mPID))[0]
     lPin['http://localhost/afy/property/testtypes1/value2'] = lValue
     lPin.refreshPIN()
     assert lValue == lPin['http://localhost/afy/property/testtypes1/value1']
     assert lValue == lPin['http://localhost/afy/property/testtypes1/value2']
     assert affinity_pb2.Value.VT_REFIDPROP == lPin.getExtra('http://localhost/afy/property/testtypes1/value1').mType
     assert affinity_pb2.Value.VT_REFIDPROP == lPin.getExtra('http://localhost/afy/property/testtypes1/value2').mType
-    
+
     # VT_REFIDELT    
     lValue = PIN.Ref(pLocalPID=lReferenced1.mPID.mLocalPID, pIdent=lReferenced1.mPID.mIdent, pProperty='http://localhost/afy/property/testtypes1/value1', pEid=lReferenced1.getExtra('http://localhost/afy/property/testtypes1/value1', pEpos=1).mEid)
-    lPin = PIN.loadPINs(lAffinity.qProto("INSERT (\"http://localhost/afy/property/testtypes1/value1\") VALUES (%s.\"http://localhost/afy/property/testtypes1/value1\"[%d]);" % (lReferenced1.mPID, lValue.mEid)))[0]
+    lPin = PIN.loadPINs(lAffinity.qProto("INSERT (\"http://localhost/afy/property/testtypes1/value1\") VALUES (&%s.\"http://localhost/afy/property/testtypes1/value1\"[%d]);" % (lReferenced1.mPID, lValue.mEid)))[0]
     lPin['http://localhost/afy/property/testtypes1/value2'] = lValue
     lPin.refreshPIN()
     assert lValue == lPin['http://localhost/afy/property/testtypes1/value1']
     assert lValue == lPin['http://localhost/afy/property/testtypes1/value2']
     assert affinity_pb2.Value.VT_REFIDELT == lPin.getExtra('http://localhost/afy/property/testtypes1/value1').mType
     assert affinity_pb2.Value.VT_REFIDELT == lPin.getExtra('http://localhost/afy/property/testtypes1/value2').mType    
-    
+
     # TODO: VT_EXPR
     # TODO: VT_QUERY
     # TODO: VT_CURRENT - available?

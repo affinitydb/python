@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-# Copyright (c) 2004-2012 VMware, Inc. All Rights Reserved.
+# Copyright (c) 2004-2013 GoPivotal, Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -137,13 +137,13 @@ class ERSchema(object):
         self.mAffinity = AFFINITY()
         self.mQNames = pQNames
         self.mPaths2QNames = {}
-        self.mClasses = PIN.loadPINs(self.mAffinity.qProto("SELECT * FROM afy:ClassOfClasses;"))
+        self.mClasses = PIN.loadPINs(self.mAffinity.qProto("SELECT * FROM afy:Classes;"))
         self.mEntities = {}
         # Create the 'Entity' objects.
         for iC in self.mClasses:
-            if 0 == iC[SP_PROPERTY_NAMES[affinity_pb2.SP_CLASSID]]:
+            if 0 == iC[SP_PROPERTY_NAMES[affinity_pb2.SP_OBJID]]:
                 continue
-            lClassURI = self._withQName(iC[SP_PROPERTY_NAMES[affinity_pb2.SP_CLASSID]])
+            lClassURI = self._withQName(iC[SP_PROPERTY_NAMES[affinity_pb2.SP_OBJID]])
             self.mEntities[lClassURI] = ERSchema.Entity(lClassURI, iC)
         # Create the 'Attribute' and 'Relation' objects, for each 'Entity'.
         for iE in self.mEntities.values():
@@ -155,7 +155,7 @@ class ERSchema(object):
             # Deal with the relations.
             if True:
                 #lPropertiesStr = ','.join(["'%s'" % iEP for iEP in lProperties])
-                #lRelations = PIN.loadPINs(self.mAffinity.qProto("SELECT * FROM %s AS r1 JOIN afy:ClassOfClasses AS e1 ON (r1.%s = e1.afy:properties) WHERE (e1.afy:classID='%s');" % \
+                #lRelations = PIN.loadPINs(self.mAffinity.qProto("SELECT * FROM %s AS r1 JOIN afy:Classes AS e1 ON (r1.%s = e1.afy:properties) WHERE (e1.afy:objectID='%s');" % \
                 #lRelations = PIN.loadPINs(self.mAffinity.qProto("SELECT * FROM %s WHERE %s IN (%s);" % \
                 #    (AFYURI_CLASS_OF_RELATION_DESCR, AFYURI_PROP_URI_OF_RELATION, lPropertiesStr)))
                 lRelations = PIN.loadPINs(self.mAffinity.qProto("SELECT * FROM \"%s\" WHERE \"%s\"='%s';" % \

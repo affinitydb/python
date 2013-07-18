@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-# Copyright (c) 2004-2012 VMware, Inc. All Rights Reserved.
+# Copyright (c) 2004-2013 GoPivotal, Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -28,6 +28,12 @@ import datetime
 if not sys.modules.has_key('affinityinproc') or not AffinityConnection.DEFAULT_INPROC:
     print ("Running in server mode - relying on keep-alive.");
 
+# Setting up prefixes for qnames
+TESTPHOTOS1 = "SET PREFIX testphotos1: 'http://localhost/afy/class/testphotos1b/';"
+TAGONT = "SET PREFIX tagont: 'http://code.google.com/p/tagont/';"
+FOAF = "SET PREFIX foaf: 'http://xmlns.com/foaf/0.1/';"
+SEMANTICDESKTOP = "SET PREFIX semanticdesktop: 'http://www.semanticdesktop.org/ontologies/2007/03/22/';"
+
 lAffinity = AFFINITY()
 lInMemoryChk = InMemoryChk()
 def _getpins(_pQuery):
@@ -50,7 +56,7 @@ def _onWalk(_pArg, _pDir, _pFileNames):
             os.path.walk(_f, _onWalk, _pArg)
 def _selectDistinctGroups():
     # Review: eventually Affinity will allow to SELECT DISTINCT(groupid) FROM users...
-    _lGroupsRaw = _getpins("SELECT * FROM testphotos1:user;")
+    _lGroupsRaw = _getpins(TESTPHOTOS1+"SELECT * FROM testphotos1:user;")
     _lGroupsIds = set()
     for _iG in _lGroupsRaw:
         _lGroupsIds.add(_iG["http://xmlns.com/foaf/0.1/member/adomain:Group"])
@@ -60,7 +66,7 @@ def _createPhoto(_pDir, _pFileName):
     print ("adding file %s/%s" % (_pDir, _pFileName))
     _lFullPath = "%s/%s" % (_pDir, _pFileName)
     _lDate = datetime.datetime.fromtimestamp(os.path.getctime(_lFullPath))
-    lAffinity.q("INSERT (semanticdesktop:\"nfo#hasHash\", \"http://www.w3.org/2001/XMLSchema#date\", \"http://www.w3.org/2001/XMLSchema#time\", semanticdesktop:\"nfo#fileUrl\", semanticdesktop:\"nfo#fileName\") VALUES ('%s', TIMESTAMP'%s', INTERVAL'%s', '%s', '%s');" % \
+    lAffinity.q(SEMANTICDESKTOP+"INSERT (semanticdesktop:\"nfo#hasHash\", \"http://www.w3.org/2001/XMLSchema#date\", \"http://www.w3.org/2001/XMLSchema#time\", semanticdesktop:\"nfo#fileUrl\", semanticdesktop:\"nfo#fileName\") VALUES ('%s', TIMESTAMP'%s', INTERVAL'%s', '%s', '%s');" % \
         (uuid.uuid4().hex, AffinityTest.strftime(_lDate, "%4Y-%2m-%2d"), AffinityTest.strftime(_lDate, "%2H:%2M:%2S"), _pDir, _pFileName))
 def _randomTag(_pTagName, _pRatio=0.10):
     "Assign pTagName to a random selection of 'photos'."
@@ -68,14 +74,14 @@ def _randomTag(_pTagName, _pRatio=0.10):
     # Note: Using UNIQUE to handle duplicates (e.g. http://www.tutorialspoint.com/mysql/mysql-handling-duplicates.htm)
     #       is not an option with pathSQL...
     lAffinity.q("START TRANSACTION;")
-    _lCount = lAffinity.qCount("SELECT * FROM testphotos1:tag WHERE tagont:hasTagLabel='%s';" % _pTagName) # review: index by tag
+    _lCount = lAffinity.qCount(TESTPHOTOS1+TAGONT+"SELECT * FROM testphotos1:tag WHERE tagont:hasTagLabel='%s';" % _pTagName) # review: index by tag
     if 0 == _lCount:
         print ("adding tag %s" % _pTagName)
-        lAffinity.q("INSERT (tagont:hasTagLabel) VALUES ('%s');" % _pTagName)
+        lAffinity.q(TAGONT+"INSERT (tagont:hasTagLabel) VALUES ('%s');" % _pTagName)
     # Select an arbitrary number of 'photos', and tag them.
-    for _iP in _getpins("SELECT * FROM testphotos1:photo;"):
+    for _iP in _getpins(TESTPHOTOS1+"SELECT * FROM testphotos1:photo;"):
         if random.random() <= _pRatio:
-            lAffinity.q("INSERT (semanticdesktop:\"nfo#hasHash\", tagont:hasTagLabel) VALUES ('%s', '%s');" % (_iP["http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash"], _pTagName))
+            lAffinity.q(SEMANTICDESKTOP+TAGONT+"INSERT (semanticdesktop:\"nfo#hasHash\", tagont:hasTagLabel) VALUES ('%s', '%s');" % (_iP["http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash"], _pTagName))
             lInMemoryChk.tagPhoto(_iP["http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash"], _pTagName)
     lAffinity.q("COMMIT;")
 def _randomGroupPrivileges():
@@ -84,27 +90,27 @@ def _randomGroupPrivileges():
     _lGroupIds = _selectDistinctGroups()
     print ("groups: %s" % _lGroupIds)
     # Get the existing tags.
-    _lTags = _getpins("SELECT * FROM testphotos1:tag;")
+    _lTags = _getpins(TESTPHOTOS1+"SELECT * FROM testphotos1:tag;")
     print ("tags: %s" % [_ip["http://code.google.com/p/tagont/hasTagLabel"] for _ip in _lTags])
     # Attribute randomly the privilege to see some tags to each group.
     for _iG in _lGroupIds:
         _lRights = random.sample(_lTags, random.randrange(len(_lTags) / 2))
         for _iR in _lRights:
-            lAffinity.q("INSERT (tagont:hasTagLabel, tagont:hasVisibility) VALUES ('%s', '%s');" % (_iR["http://code.google.com/p/tagont/hasTagLabel"], _iG))
+            lAffinity.q(TAGONT+"INSERT (tagont:hasTagLabel, tagont:hasVisibility) VALUES ('%s', '%s');" % (_iR["http://code.google.com/p/tagont/hasTagLabel"], _iG))
             lInMemoryChk.addGroupPrivilege(_iG, _iR["http://code.google.com/p/tagont/hasTagLabel"])
 def _randomUserPrivileges():
     "Assign a random selection of tags to each existing user."
     # Get the existing users.
-    _lUsers = _getpins("SELECT * FROM testphotos1:user;")
+    _lUsers = _getpins(TESTPHOTOS1+"SELECT * FROM testphotos1:user;")
     print ("users: %s" % [_ip["http://xmlns.com/foaf/0.1/mbox"] for _ip in _lUsers])
     # Get the existing tags.
-    _lTags = _getpins("SELECT * FROM testphotos1:tag;")
+    _lTags = _getpins(TESTPHOTOS1+"SELECT * FROM testphotos1:tag;")
     print ("tags: %s" % [_ip["http://code.google.com/p/tagont/hasTagLabel"] for _ip in _lTags])
     # Attribute randomly the privilege to see some tags to each user.
     for _iU in _lUsers:
         _lRights = random.sample(_lTags, random.randrange(len(_lTags)))
         for _iR in _lRights:
-            lAffinity.q("INSERT (tagont:hasTagLabel, tagont:hasVisibility) VALUES ('%s', '%s');" % (_iR["http://code.google.com/p/tagont/hasTagLabel"], _iU["http://xmlns.com/foaf/0.1/mbox"]))
+            lAffinity.q(TAGONT+"INSERT (tagont:hasTagLabel, tagont:hasVisibility) VALUES ('%s', '%s');" % (_iR["http://code.google.com/p/tagont/hasTagLabel"], _iU["http://xmlns.com/foaf/0.1/mbox"]))
             lInMemoryChk.addUserPrivilege(_iU["http://xmlns.com/foaf/0.1/mbox"], _iR["http://code.google.com/p/tagont/hasTagLabel"])
 def _entryPoint():
     # Start.
@@ -130,27 +136,22 @@ def _entryPoint():
     #   The term "attribute domain" is taken from relational modeling, and designates the domain from which
     #   values of the attribute can be taken (usual mathematical meaning). The rdfs/owl terminology
     #   assigns a different meaning to "rdfs:domain"... "rdfs:range" is closer to our "adomain".
-    print ("Setting up prefixes for qnames.")
-    lAffinity.q("SET PREFIX testphotos1: 'http://localhost/afy/class/testphotos1b/';");
-    lAffinity.q("SET PREFIX tagont: 'http://code.google.com/p/tagont/';");
-    lAffinity.q("SET PREFIX foaf: 'http://xmlns.com/foaf/0.1/';");
-    lAffinity.q("SET PREFIX semanticdesktop: 'http://www.semanticdesktop.org/ontologies/2007/03/22/';");
     print ("Creating classes.")
     try:
-        lAffinity.q("CREATE CLASS \"http://localhost/afy/class/testphotos1b/photo\" AS SELECT * WHERE semanticdesktop:\"nfo#hasHash\" IN :0 AND EXISTS(\"http://www.w3.org/2001/XMLSchema#date\") AND EXISTS(\"http://www.w3.org/2001/XMLSchema#time\") AND EXISTS(semanticdesktop:\"nfo#fileUrl\") AND EXISTS (semanticdesktop:\"nfo#fileName\");")
-        lAffinity.q("CREATE CLASS testphotos1:tag AS SELECT * WHERE tagont:hasTagLabel in :0 AND NOT EXISTS(semanticdesktop:\"nfo#hasHash\") AND NOT EXISTS(tagont:hasVisibility);") # Interesting... without "AND NOT EXISTS(id)", it indexes also my tagging table and my privilege table... which would be cool, if only I could listValues to retrieve my distinct tags...
-        lAffinity.q("CREATE CLASS testphotos1:tagging AS SELECT * WHERE EXISTS(tagont:hasTagLabel) AND semanticdesktop:\"nfo#hasHash\" in :0;")
-        lAffinity.q("CREATE CLASS testphotos1:user AS SELECT * WHERE foaf:mbox in :0 AND EXISTS(\"http://www.w3.org/2002/01/p3prdfv1#user.login.password\") AND EXISTS(foaf:\"member/adomain:Group\");")
-        lAffinity.q("CREATE CLASS testphotos1:privilege AS SELECT * WHERE tagont:hasTagLabel in :0 and EXISTS(tagont:hasVisibility);")
+        lAffinity.q(SEMANTICDESKTOP + "CREATE CLASS \"http://localhost/afy/class/testphotos1b/photo\" AS SELECT * WHERE semanticdesktop:\"nfo#hasHash\" IN :0 AND EXISTS(\"http://www.w3.org/2001/XMLSchema#date\") AND EXISTS(\"http://www.w3.org/2001/XMLSchema#time\") AND EXISTS(semanticdesktop:\"nfo#fileUrl\") AND EXISTS (semanticdesktop:\"nfo#fileName\");")
+        lAffinity.q(TAGONT + TESTPHOTOS1 + SEMANTICDESKTOP + "CREATE CLASS testphotos1:tag AS SELECT * WHERE tagont:hasTagLabel in :0 AND NOT EXISTS(semanticdesktop:\"nfo#hasHash\") AND NOT EXISTS(tagont:hasVisibility);") # Interesting... without "AND NOT EXISTS(id)", it indexes also my tagging table and my privilege table... which would be cool, if only I could listValues to retrieve my distinct tags...
+        lAffinity.q(TESTPHOTOS1 + SEMANTICDESKTOP + TAGONT+"CREATE CLASS testphotos1:tagging AS SELECT * WHERE EXISTS(tagont:hasTagLabel) AND semanticdesktop:\"nfo#hasHash\" in :0;")
+        lAffinity.q(TESTPHOTOS1 + FOAF + "CREATE CLASS testphotos1:user AS SELECT * WHERE foaf:mbox in :0 AND EXISTS(\"http://www.w3.org/2002/01/p3prdfv1#user.login.password\") AND EXISTS(foaf:\"member/adomain:Group\");")
+        lAffinity.q(TAGONT + TESTPHOTOS1 + "CREATE CLASS testphotos1:privilege AS SELECT * WHERE tagont:hasTagLabel in :0 and EXISTS(tagont:hasVisibility);")
     except:
         pass
     # Delete old instances, if any.
     print ("Deleting old data.")
-    lAffinity.q("DELETE FROM testphotos1:photo;")
-    lAffinity.q("DELETE FROM testphotos1:tag;")
-    lAffinity.q("DELETE FROM testphotos1:tagging;")
-    lAffinity.q("DELETE FROM testphotos1:user;")
-    lAffinity.q("DELETE FROM testphotos1:privilege;")
+    lAffinity.q(TESTPHOTOS1 + "DELETE FROM testphotos1:photo;")
+    lAffinity.q(TESTPHOTOS1 + "DELETE FROM testphotos1:tag;")
+    lAffinity.q(TESTPHOTOS1 + "DELETE FROM testphotos1:tagging;")
+    lAffinity.q(TESTPHOTOS1 + "DELETE FROM testphotos1:user;")
+    lAffinity.q(TESTPHOTOS1 + "DELETE FROM testphotos1:privilege;")
     # lAffinity.q("DELETE FROM \"http://localhost/afy/class/testphotos1b/privilege\";") # TODO: review why this fails after running testphotos1...
     # Create a few photos.
     lAffinity.q("START TRANSACTION;")
@@ -159,7 +160,7 @@ def _entryPoint():
     lCreateWalkArgs = [POPULATE_USE_THIS_EXTENSION, _createPhoto, None, 0]
     os.path.walk(POPULATE_WALK_THIS_DIRECTORY, _onWalk, lCreateWalkArgs)
     lAffinity.q("COMMIT;")
-    lCntPhotos = lAffinity.qCount("SELECT * FROM testphotos1:photo;")
+    lCntPhotos = lAffinity.qCount(TESTPHOTOS1 + "SELECT * FROM testphotos1:photo;")
     _chkCount("photos", _pExpected=lCreateWalkArgs[3], _pActual=lCntPhotos)
     # Create a few tags and tag some photos.
     lAffinity.q("START TRANSACTION;")
@@ -174,30 +175,31 @@ def _entryPoint():
         "john@hurray.com", "claire@obscure.com", "stanley@puck.com", "grey@ball.com", "john@wimbledon.com", "mark@up.com", "sabrina@cool.com")
     for iU in lUsers:
         lGroup = random.choice(lGroups)
-        lNewUserPin = _getpins("INSERT (foaf:mbox, \"http://www.w3.org/2002/01/p3prdfv1#user.login.password\", foaf:\"member/adomain:Group\") VALUES ('%s', '%s', '%s');" % (iU, ''.join(random.choice(string.letters) for i in xrange(20)), lGroup))
+        lNewUserPin = _getpins(FOAF+"INSERT (foaf:mbox, \"http://www.w3.org/2002/01/p3prdfv1#user.login.password\", foaf:\"member/adomain:Group\") VALUES ('%s', '%s', '%s');" % (iU, ''.join(random.choice(string.letters) for i in xrange(20)), lGroup))
         lInMemoryChk.setUserGroup(iU, lGroup)
-        lCntUsersInGroup = lAffinity.qCount("SELECT * FROM testphotos1:user WHERE foaf:\"member/adomain:Group\"='%s';" % lGroup)
+        lCntUsersInGroup = lAffinity.qCount(TESTPHOTOS1+FOAF+"SELECT * FROM testphotos1:user WHERE foaf:\"member/adomain:Group\"='%s';" % lGroup)
         print ("group %s contains %d users" % (lGroup, lCntUsersInGroup))
     lAffinity.q("COMMIT;")
+
     lCntUserGroups = len(_selectDistinctGroups())
-    lCntUsers = lAffinity.qCount("SELECT * FROM testphotos1:user;")
+    lCntUsers = lAffinity.qCount(TESTPHOTOS1+"SELECT * FROM testphotos1:user;")
     _chkCount("groups", _pExpected=len(lGroups), _pActual=lCntUserGroups)
     _chkCount("users", _pExpected=len(lUsers), _pActual=lCntUsers)
     # Assign group/user privileges, and query on those.
     _randomGroupPrivileges()
     _randomUserPrivileges()
-    lCntPrivileges = lAffinity.qCount("SELECT * FROM testphotos1:privilege;")
+    lCntPrivileges = lAffinity.qCount(TESTPHOTOS1+"SELECT * FROM testphotos1:privilege;")
     print ("%d privileges assigned." % lCntPrivileges)
     # Find a user who can view any of the first 5 tags, and count how many photos he can view.
-    lTags = _getpins("SELECT * FROM testphotos1:tag;")
+    lTags = _getpins(TESTPHOTOS1+"SELECT * FROM testphotos1:tag;")
     lFirstTagStr = "'%s'" % lTags[0]["http://code.google.com/p/tagont/hasTagLabel"]
     lFirstTagsStr = ','.join(["'%s'" % iT["http://code.google.com/p/tagont/hasTagLabel"] for iT in lTags[:5]])
-    lUsersOfInterest = _getpins("SELECT * FROM testphotos1:privilege(%s) AS p JOIN testphotos1:user AS u ON (p.tagont:hasVisibility = u.foaf:mbox);" % lFirstTagStr)
+    lUsersOfInterest = _getpins(TESTPHOTOS1+TAGONT+FOAF+"SELECT * FROM testphotos1:privilege(%s) AS p JOIN testphotos1:user AS u ON (p.tagont:hasVisibility = u.foaf:mbox);" % lFirstTagStr)
     # TODO: isolate and log as bug (same pattern seems to work elsewhere)
     #lUsersOfInterest = _getpins("SELECT * FROM testphotos1:privilege AS p JOIN testphotos1:user AS u ON (p.tagont:hasVisibility = u.foaf:mbox) WHERE (p.tagont:hasTagLabel IN (%s));" % lFirstTagsStr)
     print ("users that have one of %s: %s" % (lFirstTagStr, [iU.get("http://code.google.com/p/tagont/hasVisibility") for iU in lUsersOfInterest]))
     def _countUserPhotos(_pUser):
-        _lTagsP = _getpins("SELECT * FROM testphotos1:privilege WHERE tagont:hasVisibility='%s';" % _pUser)
+        _lTagsP = _getpins(TESTPHOTOS1+TAGONT+"SELECT * FROM testphotos1:privilege WHERE tagont:hasVisibility='%s';" % _pUser)
         _lExpected_usPriv = lInMemoryChk.getTags_usPriv(_pUser)
         _lTags = set()
         for _iP in _lTagsP:
@@ -206,7 +208,7 @@ def _entryPoint():
         if len(_lExpected_usPriv.difference(_lTags)) > 0:
             print ("WARNING: expected user-privilege tags %s" % _lExpected_usPriv.difference(_lTags))
             assert False
-        _lTagsP = _getpins("SELECT * FROM testphotos1:privilege AS p JOIN testphotos1:user('%s') AS u ON (p.tagont:hasVisibility = u.foaf:\"member/adomain:Group\");" % _pUser)
+        _lTagsP = _getpins(TESTPHOTOS1+TAGONT+FOAF+"SELECT * FROM testphotos1:privilege AS p JOIN testphotos1:user('%s') AS u ON (p.tagont:hasVisibility = u.foaf:\"member/adomain:Group\");" % _pUser)
         #_lTagsP = _getpins("SELECT * FROM testphotos1:privilege AS p JOIN testphotos1:user AS u ON (p.tagont:hasVisibility = u.foaf:\"member/adomain:Group\") WHERE u.foaf:mbox='%s';" % _pUser)
         #_lTagsP = _getpins("SELECT * FROM testphotos1:privilege WHERE tagont:hasVisibility='%s' UNION SELECT * FROM testphotos1:privilege AS p JOIN testphotos1:user AS u ON (p.tagont:hasVisibility = u.foaf:mbox) WHERE u.foaf:mbox='%s';" % (_pUser, _pUser)) # this segfaults... should check why
         for _iP in _lTagsP:
@@ -216,7 +218,7 @@ def _entryPoint():
         if len(_lExpectedTags.difference(_lTags)) > 0:
             print ("WARNING: expected tags %s" % _lExpectedTags.difference(_lTags))
             assert False
-        _lPhotos = _getpins("SELECT * FROM testphotos1:photo AS p JOIN testphotos1:tagging AS t ON (p.semanticdesktop:\"nfo#hasHash\" = t.semanticdesktop:\"nfo#hasHash\") WHERE t.tagont:hasTagLabel IN (%s);" % ','.join([("'%s'" % _iT) for _iT in _lTags]))
+        _lPhotos = _getpins(TESTPHOTOS1+TAGONT+SEMANTICDESKTOP+"SELECT * FROM testphotos1:photo AS p JOIN testphotos1:tagging AS t ON (p.semanticdesktop:\"nfo#hasHash\" = t.semanticdesktop:\"nfo#hasHash\") WHERE t.tagont:hasTagLabel IN (%s);" % ','.join([("'%s'" % _iT) for _iT in _lTags]))
         _lUniquePhotos = set()
         for _iP in _lPhotos:
             _lUniquePhotos.add(_iP["http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#hasHash"])

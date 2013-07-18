@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-# Copyright (c) 2004-2012 VMware, Inc. All Rights Reserved.
+# Copyright (c) 2004-2013 GoPivotal, Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -89,10 +89,23 @@ if __name__ == '__main__':
             _lTest.execute()
     def _runall(_pBogus):
         "Run all tests."
+        print "Start to run all tests ... "
         _lTestN = AFFINITY_ALL_TESTS.keys()
+        results = {} # casename and result mappings.
         for _i, _iT in zip(xrange(len(_lTestN)), _lTestN):
             print ("\nRunning test %s [%d/%d]\n" % (_iT, (1 + _i), len(_lTestN)))
-            _run(_iT)
+            try:
+                _run(_iT)
+                results[_iT] = "Pass"
+            except AssertionError, ex:
+                print "AssertionError : " + repr(ex)
+                results[_iT] = "Fail"
+
+        print "All tests completed! "
+        print "Python test results:"
+        for each in results:
+            print each + ":" +  results[each]
+
     _loadAllTests()
     lCmds = ("run", "runall")
     lCmdsi = (_run, _runall)
