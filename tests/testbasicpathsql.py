@@ -41,20 +41,20 @@ def test_case_1():
     lPins = PIN.loadPINs(lAffinity.qProto("select * where exists(prop2);"))
     assert(11 == lPins[0]['prop2'])
     
-    CUM = "set PREFIX customer: \'http://foo.trading/customer\';"
-    PDT = "set PREFIX product: \'http://foo.trading/product\';"
-    ORD = "set PREFIX orders: \'http://foo.trading/orders\';"
-    lAffinity.q(CUM + "create class customer as select * where exists(customer:id) and exists(customer:name)")
-    lAffinity.q(PDT + "create class product as select * where exists(product:id) and exists(product:name)")
-    lAffinity.q(ORD + "create class orders as select * where exists(orders:id)")
+    lAffinity.setPrefix("customer", "http://foo.trading/customer")
+    lAffinity.setPrefix("product", "http://foo.trading/product")
+    lAffinity.setPrefix("orders", "http://foo.trading/orders")
+    lAffinity.q("create class customer as select * where exists(customer:id) and exists(customer:name)")
+    lAffinity.q("create class product as select * where exists(product:id) and exists(product:name)")
+    lAffinity.q("create class orders as select * where exists(orders:id)")
 
-    lAffinity.q(CUM + "insert (customer:id, customer:name) values (1, \'Albert\')")
-    lAffinity.q(CUM + "insert (customer:id, customer:name) values (2, \'Black\')")
-    lAffinity.q(PDT + "insert (product:id, product:name) values (101, \'notebook\')")
-    lAffinity.q(PDT + "insert (product:id, product:name) values (102, \'ipad\')")
-    lAffinity.q(PDT + "insert (product:id, product:name) values (103, \'iphone\')")
-    lAffinity.q(ORD + CUM + "insert (orders:id, customer:id, orders:cnt) values (1001, 1, 3)")
-    lAffinity.q(ORD + CUM + "insert (orders:id, customer:id, orders:cnt) values (1002, 2, 17)")  
+    lAffinity.q("insert (customer:id, customer:name) values (1, \'Albert\')")
+    lAffinity.q("insert (customer:id, customer:name) values (2, \'Black\')")
+    lAffinity.q("insert (product:id, product:name) values (101, \'notebook\')")
+    lAffinity.q("insert (product:id, product:name) values (102, \'ipad\')")
+    lAffinity.q("insert (product:id, product:name) values (103, \'iphone\')")
+    lAffinity.q("insert (orders:id, customer:id, orders:cnt) values (1001, 1, 3)")
+    lAffinity.q("insert (orders:id, customer:id, orders:cnt) values (1002, 2, 17)")  
     
     assert (lAffinity.qCount("select * from customer") == 2)
     assert (lAffinity.qCount("select * from product") == 3)
@@ -62,7 +62,7 @@ def test_case_1():
 
     # this statement caused an exception
     # lAffinity.qProto("select c.customer:name from customer as c join orders as o on(c.customer:id=o.customer:id) where (o.orders:cnt < 10);")
-    assert (lAffinity.qCount(CUM+ORD+"select c.customer:name from customer as c join orders as o on(c.customer:id=o.customer:id) where (o.orders:cnt < 10);") == 1)
+    assert (lAffinity.qCount("select c.customer:name from customer as c join orders as o on(c.customer:id=o.customer:id) where (o.orders:cnt < 10);") == 1)
 
     lAffinity.close()
     return True
@@ -187,7 +187,8 @@ def test_case_9():
     sql = "SELECT afy:pinID, \"a/b/c/d/e\" FROM " + str(pin[0].mPID)
     lAffinity.q(sql)
     assert lAffinity.qCount(sql) == 1
-    sql = "SET PREFIX q: \'a/b/c/d/\'; SELECT afy:pinID, q:e FROM " + str(pin[0].mPID)
+    lAffinity.setPrefix("q", "a/b/c/d/")
+    sql = "SELECT afy:pinID, q:e FROM " + str(pin[0].mPID)
     lAffinity.q(sql)
     assert lAffinity.qCount(sql) == 1
     lAffinity.close()

@@ -28,13 +28,13 @@ def _entryPoint():
     #AFYNOTIFIER.open(lAffinity)
 
     print ("1. create a few classes")
-    TN2C = "SET PREFIX tn2c: 'http://localhost/afy/class/testnotifications2/';"
-    TN2P = "SET PREFIX tn2p: 'http://localhost/afy/property/testnotifications2/';"
+    lAffinity.setPrefix("tn2c", "http://localhost/afy/class/testnotifications2/")
+    lAffinity.setPrefix("tn2p", "http://localhost/afy/property/testnotifications2/")
     try:
-        lAffinity.q(TN2C+TN2P+"CREATE CLASS tn2c:Person AS SELECT * WHERE tn2p:name IN :0;")
-        lAffinity.q(TN2C+TN2P+"CREATE CLASS tn2c:Location AS SELECT * WHERE BEGINS(tn2p:postalcode, :0);")
-        lAffinity.q(TN2C+TN2P+"CREATE CLASS tn2c:Occupation AS SELECT * WHERE BEGINS(tn2p:occupation, :0);")
-        lAffinity.q(TN2C+TN2P+"CREATE CLASS tn2c:Age AS SELECT * WHERE BEGINS(tn2p:age, :0);")
+        lAffinity.q("CREATE CLASS tn2c:Person AS SELECT * WHERE tn2p:name IN :0;")
+        lAffinity.q("CREATE CLASS tn2c:Location AS SELECT * WHERE BEGINS(tn2p:postalcode, :0);")
+        lAffinity.q("CREATE CLASS tn2c:Occupation AS SELECT * WHERE BEGINS(tn2p:occupation, :0);")
+        lAffinity.q("CREATE CLASS tn2c:Age AS SELECT * WHERE BEGINS(tn2p:age, :0);")
     except:
         pass
 
@@ -94,13 +94,13 @@ def _entryPoint():
     lAffinity.commitTx()
 
     lLocLetter = random.choice(string.letters).upper()
-    lCntLoc = lAffinity.qCount(TN2C+"SELECT * FROM tn2c:Location('%s');" % lLocLetter)
+    lCntLoc = lAffinity.qCount("SELECT * FROM tn2c:Location('%s');" % lLocLetter)
     print ("%d instances found with a postal-code starting with '%s'" % (lCntLoc, lLocLetter))
     lAge = random.randrange(12,100)
-    lCntAge = lAffinity.qCount(TN2C+"SELECT * FROM tn2c:Age(%s);" % lAge)
+    lCntAge = lAffinity.qCount("SELECT * FROM tn2c:Age(%s);" % lAge)
     print ("%d instances found with age %s" % (lCntAge, lAge))
     lOccLetter = random.choice(string.letters).lower()
-    lCntOcc = lAffinity.qCount(TN2C+"SELECT * FROM tn2c:Occupation('%s');" % lOccLetter)
+    lCntOcc = lAffinity.qCount("SELECT * FROM tn2c:Occupation('%s');" % lOccLetter)
     print ("%d instances found with an occupation starting with '%s'" % (lCntOcc, lOccLetter))
 
     def intersectSelect():
@@ -108,11 +108,11 @@ def _entryPoint():
         #return ('&', 'INTERSECT SELECT * FROM')[random.choice([False, True])]
         return '&'
     lIJ = intersectSelect()
-    lCntI1 = lAffinity.qCount(TN2C+"SELECT * FROM tn2c:Location('%s') %s tn2c:Age(%s) %s tn2c:Occupation('%s');" % (lLocLetter, lIJ, lAge, lIJ, lOccLetter))
+    lCntI1 = lAffinity.qCount("SELECT * FROM tn2c:Location('%s') %s tn2c:Age(%s) %s tn2c:Occupation('%s');" % (lLocLetter, lIJ, lAge, lIJ, lOccLetter))
     print ("%d instances found corresponding to postal-code(%s) age(%s) occupation(%s)" % (lCntI1, lLocLetter, lAge, lOccLetter))
-    lCntI2 = lAffinity.qCount(TN2C+"SELECT * FROM tn2c:Location('%s') %s tn2c:Age(%s);" % (lLocLetter, intersectSelect(), lAge))
+    lCntI2 = lAffinity.qCount("SELECT * FROM tn2c:Location('%s') %s tn2c:Age(%s);" % (lLocLetter, intersectSelect(), lAge))
     print ("%d instances found corresponding to postal-code(%s) age(%s)" % (lCntI2, lLocLetter, lAge))
-    lCntI4 = lAffinity.qCount(TN2C+"SELECT * FROM tn2c:Age(%s) %s tn2c:Occupation('%s');" % (lAge, intersectSelect(), lOccLetter))
+    lCntI4 = lAffinity.qCount("SELECT * FROM tn2c:Age(%s) %s tn2c:Occupation('%s');" % (lAge, intersectSelect(), lOccLetter))
     print ("%d instances found corresponding to age(%s) occupation(%s)" % (lCntI4, lAge, lOccLetter))
     
     AFYNOTIFIER.open(lAffinity)
@@ -146,7 +146,7 @@ def _entryPoint():
     waitForNotifs(10, 3 * lCntI2)
 
     # lAffinity.q("SET PREFIX tn2c: 'http://localhost/afy/class/testnotifications2/';") # Note: the protobuf request resets the connection...
-    lCntI3 = lAffinity.qCount(TN2C+"SELECT * FROM tn2c:Location('%s') %s tn2c:Occupation('%s');" % (lLocLetter, intersectSelect(), lOccLetter))
+    lCntI3 = lAffinity.qCount("SELECT * FROM tn2c:Location('%s') %s tn2c:Occupation('%s');" % (lLocLetter, intersectSelect(), lOccLetter))
     print ("%d instances found corresponding to postal-code(%s) occupation(%s)" % (lCntI3, lLocLetter, lOccLetter))
 
     print ("4. Unclassify instances of occupation(%s) that intersect with postal-code(%s)" % (lOccLetter, lLocLetter))

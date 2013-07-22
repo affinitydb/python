@@ -167,6 +167,7 @@ class AffinityConnection(object):
     on the stack. Not designed to be used concurrently (use one connection per thread)."""
     DEFAULT_INPROC = True
     DEFAULT_CONNECTION = None
+    __mPrefixes = {}
     @staticmethod
     def isInproc():
         return sys.modules.has_key('affinityinproc') and AffinityConnection.DEFAULT_INPROC
@@ -485,12 +486,19 @@ class AffinityConnection(object):
     def close(self):
         self.terminateSession()
         return self.mImpl.close()
+    def setPrefix(self,name,prefix): self.__mPrefixes[name]=prefix
+    def clearPrefixes(self): self.__mPrefixes.clear()
+    def __composePrefixes(self):
+        lPrefixes = ""
+        for key in self.__mPrefixes.keys():
+            lPrefixes += "SET PREFIX " + key + ":\'" + self.__mPrefixes[key] + "\';"
+        return lPrefixes
     def host(self): return "%s:%s" % (self.mHost, self.mPort)
     def basicauth(self): return base64.b64encode("%s:%s" % (self.mOwner, ("", self.mPassword)[None != self.mPassword]))
-    def q(self, pQstr, pOptions=None, pSession=None): logging.info("pathSQL: %s" % pQstr); return self.mImpl.get(pQstr, pOptions, self._s(pSession))
-    def qCount(self, pQstr, pSession=None): logging.info("pathSQL (count): %s" % pQstr); return self.mImpl.get(pQstr, {"count":True}, self._s(pSession))
-    def qProto(self, pQstr, pOptions=None): return self._txCtx().queryPB(pQstr, pOptions)
-    def check(self, pQstr, pOptions=None, pSession=None): return self.mImpl.check(pQstr, pOptions, self._s(pSession))
+    def q(self, pQstr, pOptions=None, pSession=None): logging.info("pathSQL: %s" % pQstr); return self.mImpl.get(self.__composePrefixes() + pQstr, pOptions, self._s(pSession))
+    def qCount(self, pQstr, pSession=None): logging.info("pathSQL (count): %s" % pQstr); return self.mImpl.get(self.__composePrefixes() + pQstr, {"count":True}, self._s(pSession))
+    def qProto(self, pQstr, pOptions=None): return self._txCtx().queryPB(self.__composePrefixes() + pQstr, pOptions)
+    def check(self, pQstr, pOptions=None, pSession=None): return self.mImpl.check(self.__composePrefixes() + pQstr, pOptions, self._s(pSession))
     def startTx(self): self._txCtx().startTx()
     def commitTx(self): self._txCtx().commitTx()
     def rollbackTx(self): self._txCtx().rollbackTx()
