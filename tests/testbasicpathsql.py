@@ -153,7 +153,7 @@ def test_case_7():
     lAffinity.open()
     lAffinity.q("INSERT address_t7=\'1234 Sherbrooke\', machines={(INSERT type=\'alarm\', model=\'123\',state=0), (INSERT type=\'washer\', model=\'456\')};")
     lAffinity.q("CREATE CLASS homes AS SELECT * WHERE EXISTS(machines);")
-    lAffinity.q("CREATE CLASS c7 AS SELECT * WHERE EXISTS(signal) SET machine=(SELECT * WHERE type=\'washer\'), afy:onEnter=${UPDATE @class ADD _home=(SELECT afy:pinID FROM homes WHERE @class.machine=machines)};")
+    lAffinity.q("CREATE CLASS c7 AS SELECT * WHERE EXISTS(signal) SET machine=(SELECT * WHERE type=\'washer\'), afy:onEnter=${UPDATE @ctx ADD _home=(SELECT afy:pinID FROM homes WHERE @ctx.machine=machines)};")
     lAffinity.q("INSERT signal=1;")
     lAffinity.close()
     return True    
@@ -425,11 +425,65 @@ def test_case_21():
     lAffinity.close()
     return True    
                 
+def test_case_22():
+    # test for using name pin
+    lAffinity = AFFINITY()
+    lAffinity.open()
+
+    lAffinity.clearPrefixes();                  
+    lAffinity.setPrefix("p","http://myprefix")
+    lAffinity.q("INSERT afy:objectID=.p:myobject, t22_myvalue=10;")
+    lAffinity.q("UPDATE #p:myobject SET t22_myvalue=11");
+    lPins = PIN.loadPINs(lAffinity.qProto("SELECT * WHERE afy:objectID=.p:myobject;"))
+    assert lPins[0]['t22_myvalue'] == 11
+    # again here I notice that the substitution is destructive... there's no memory of p:myobject in the timer... no big deal, but should document...
+    lAffinity.q("CREATE TIMER t22_t1 INTERVAL '00:00:05' AS UPDATE #p:myobject SET t22_myvalue=t22_myvalue+1, t22_t=CURRENT_TIMESTAMP")
+    lAffinity.q("CREATE CLASS t22_c1 AS SELECT * WHERE EXISTS(t22_signal) SET afy:onEnter=${UPDATE #p:myobject SET t22_myvalue=t22_myvalue+@self.t22_v, t22_t=CURRENT_TIMESTAMP}")
+    lAffinity.q("INSERT t22_signal=15, t22_v=123")
+    
+    lAffinity.close()
+    return True
+
+def test_case_23():
+    #for reproducing bug#434
+    lAffinity = AFFINITY()
+    lAffinity.open()
+    
+    lAffinity.setPrefix("control","http://example/control")
+    lAffinity.setPrefix("simulation","http://example/simulation")
+    # Declare a base class of signalable entities, triggered by single timer.
+    lAffinity.q("CREATE CLASS control:\"rt/signalable\" AS SELECT * WHERE EXISTS(control:\"rt/time/signal\")")
+    # Declare a sub-class with a specific event handler.
+    lAffinity.q("CREATE CLASS control:\"step/handler/on.off.572ef13c\" AS SELECT * FROM control:\"rt/signalable\" WHERE control:\"sensor/model\"=.simulation:\"sensor/on.off.572ef13c\" SET afy:onUpdate={${UPDATE @ctx SET tmp1=(SELECT control:\"rt/time/signal\" FROM @self)},${INSERT simulation:\"rt/value\"=(SELECT simulation:\"offset/value\" FROM @self), control:\"sensor/model\"=(SELECT control:\"sensor/model\" FROM @self), control:handler=(SELECT afy:objectID FROM @ctx), control:at=CURRENT_TIMESTAMP}}")
+    # Declare a few signalable entities.
+    lAffinity.q("INSERT control:\"rt/time/signal\"=0, control:\"sensor/name\"='sensor A',control:\"sensor/model\"=.simulation:\"sensor/on.off.572ef13c\",simulation:\"offset/value\"=100")
+    lAffinity.q("INSERT control:\"rt/time/signal\"=0,control:\"sensor/name\"='sensor B',control:\"sensor/model\"=.simulation:\"sensor/on.off.572ef13c\",simulation:\"offset/value\"=1000")
+    # Trigger all signalable entities.
+    lAffinity.q("CREATE TIMER control:\"rt/source/timer\" INTERVAL '00:00:01' AS UPDATE control:\"rt/signalable\" SET control:\"rt/time/signal\"=EXTRACT(SECOND FROM CURRENT_TIMESTAMP), control:\"rt/time\"=CURRENT_TIMESTAMP")
+
+    lAffinity.close()
+    return True
+
+def test_case_24():
+    #for reproducing bug#431
+    lAffinity = AFFINITY()
+    lAffinity.open()
+    
+    lAffinity.q("INSERT t24_bla=1")
+    lAffinity.q("CREATE CLASS t24_c1 AS SELECT * WHERE EXISTS(t24_signal) SET afy:onEnter=${UPDATE * SET t24_x=@self.bogus, t24__at=CURRENT_TIMESTAMP WHERE EXISTS(t24_bla)}")
+    lAffinity.q("INSERT t24_signal=10")
+    assert lAffinity.qCount("SELECT * WHERE EXISTS(t24_x)") == 0
+    assert lAffinity.qCount("SELECT * WHERE EXISTS(t24__at)") == 1
+    
+    lAffinity.close()
+    return True
+
 def _entryPoint():
     # test cases are logged here
     test_cases = ['test_case_1','test_case_2','test_case_3','test_case_4','test_case_5','test_case_6','test_case_7',\
 'test_case_8','test_case_9','test_case_10','test_case_11','test_case_12','test_case_13','test_case_14','test_case_15',\
-'test_case_16','test_case_17','test_case_18','test_case_19', 'test_case_20', 'test_case_21']
+'test_case_16','test_case_17','test_case_18','test_case_19', 'test_case_20', 'test_case_21','test_case_22','test_case_23',\
+'test_case_24']
     
     start = time.time()
     for i in range(0, len(test_cases)):
