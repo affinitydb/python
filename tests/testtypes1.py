@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-# Copyright (c) 2004-2013 GoPivotal, Inc. All Rights Reserved.
+# Copyright (c) 2004-2014 GoPivotal, Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -43,16 +43,6 @@ def _entryPoint():
     assert lValue == lPin['http://localhost/afy/property/testtypes1/value2']
     assert affinity_pb2.Value.VT_BSTR == lPin.getExtra('http://localhost/afy/property/testtypes1/value1').mType
     assert affinity_pb2.Value.VT_BSTR == lPin.getExtra('http://localhost/afy/property/testtypes1/value2').mType
-
-    # VT_URL
-    lValue = "urn:issn:1234-5678"
-    lPin = PIN.loadPINs(lAffinity.qProto("INSERT (\"http://localhost/afy/property/testtypes1/value1\") VALUES (U'%s');" % lValue))[0]
-    lPin['http://localhost/afy/property/testtypes1/value2'] = PIN.Url(lValue)
-    lPin.refreshPIN()
-    assert lValue == lPin['http://localhost/afy/property/testtypes1/value1']
-    assert lValue == lPin['http://localhost/afy/property/testtypes1/value2']
-    assert affinity_pb2.Value.VT_URL == lPin.getExtra('http://localhost/afy/property/testtypes1/value1').mType
-    assert affinity_pb2.Value.VT_URL == lPin.getExtra('http://localhost/afy/property/testtypes1/value2').mType
 
     # VT_INT
     lValue = 12345

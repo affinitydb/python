@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-# Copyright (c) 2004-2013 GoPivotal, Inc. All Rights Reserved.
+# Copyright (c) 2004-2014 GoPivotal, Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 # -----
-
 """This test case is to test Affinity's online materials, including executable doc and tutorial."""
 
 from testfwk import AffinityTest
@@ -46,7 +45,7 @@ def test_executable_doc():
     SQLs = []
     # read PathSQL statements in doc/pathSQL primer.md,
     # execute them one by one
-    name = "../server/src/www/doc/pathSQL primer.html"
+    name = "../server/src/www/doc/pathSQL basics [control].html"
     execDoc = open(name, "r")
     PATHSQL = re.compile(r'.*pathsql_snippet.*')
     lines = execDoc.readlines()
@@ -157,16 +156,16 @@ def test_tutorial():
     # q("CREATE CLASS workers AS SELECT * WHERE EXISTS(name) AND profession IN :0;");
     # q("SELECT * FROM workers;"); 
     # q("SELECT * FROM workers('musician');");
-    # q("SELECT * FROM workers(['l', 'n']);"); 
+    # q("SELECT * FROM workers(@['l', 'n']);"); 
     # q("CREATE CLASS people AS SELECT * WHERE name IN :0;"); 
-    # q("SELECT * FROM people(['A', 'G']);");
+    # q("SELECT * FROM people(@['A', 'G']);");
     print "Start step7"
     lAffinity.q("CREATE CLASS workers AS SELECT * WHERE EXISTS(name) AND profession IN :0;")
     lAffinity.q("SELECT * FROM workers;")
     lAffinity.q("SELECT * FROM workers('musician');")
-    lAffinity.q("SELECT * FROM workers(['l', 'n']);")
+    lAffinity.q("SELECT * FROM workers(@['l', 'n']);")
     lAffinity.q("CREATE CLASS people AS SELECT * WHERE name IN :0;")
-    lAffinity.q("SELECT * FROM people(['A', 'G']);")
+    lAffinity.q("SELECT * FROM people(@['A', 'G']);")
     print "Step7 complete!" 
 
     # step8
@@ -224,26 +223,27 @@ def test_tutorial():
     # friends = q("SELECT * FROM workers.friends;");
     # for (i = 0; i < friends.length; i++) print("friend of a worker: " + friends[i].name + " (" + friends[i].id + ")");
     # q("SELECT * FROM workers('mathematician').friends.friends.friends;");
-    # q("SELECT name, profession FROM workers(['d', 'n']).friends[age > 10 AND age < 50].friends;");
-    # q("SELECT * FROM people(['A', 'J']).friends[SUBSTR(name, 0, 1) IN ['A', 'J']];");
-    # q("SELECT * FROM workers(['d', 'n']).friends{+}[age < 50];");
-    # q("SELECT * FROM workers(['d', 'n']).friends{*}.cars[year IN [1980, 2000]];");
+    # q("SELECT name, profession FROM workers(@['d', 'n']).friends[age > 10 AND age < 50].friends;");
+    # q("SELECT * FROM people(@['A', 'J']).friends[SUBSTR(name, 0, 1) IN @['A', 'J']];");
+    # q("SELECT * FROM workers(@['d', 'n']).friends{+}[age < 50];");
+    # q("SELECT * FROM workers(@['d', 'n']).friends{*}.cars[year IN @[1980, 2000]];");
     print "Start step10"
     friends = PIN.loadPINs(lAffinity.qProto("SELECT * FROM workers.friends;"))
     for i in range(len(friends)):
         print "friend of a worker: " + friends[i]['name'] + " (" + str(friends[i].mPID) + ")"
     # TODO: How to verify the results?
     lAffinity.q("SELECT * FROM workers('mathematician').friends.friends.friends;")
-    lAffinity.q("SELECT name, profession FROM workers(['d', 'n']).friends[age > 10 AND age < 50].friends;")
-    lAffinity.q("SELECT * FROM people(['A', 'J']).friends[SUBSTR(name, 0, 1) IN ['A', 'J']];")
-    lAffinity.q("SELECT * FROM workers(['d', 'n']).friends{+}[age < 50];")
-    lAffinity.q("SELECT * FROM workers(['d', 'n']).friends{*}.cars[year IN [1980, 2000]];")
+    lAffinity.q("SELECT name, profession FROM workers(@['d', 'n']).friends[age > 10 AND age < 50].friends;")
+    lAffinity.q("SELECT * FROM people(@['A', 'J']).friends[SUBSTR(name, 0, 1) IN @['A', 'J']];")
+    lAffinity.q("SELECT * FROM workers(@['d', 'n']).friends{+}[age < 50];")
+    lAffinity.q("SELECT * FROM workers(@['d', 'n']).friends{*}.cars[year IN @[1980, 2000]];")
     print "Step10 complete!" 
     
     # step11
-    # q("SELECT * FROM cars AS c JOIN workers(['d', 'n']) AS w ON (c.afy:pinID = w.cars) WHERE (c.year IN [1980, 2000]);");
-    print "Start step11"    
-    pins = PIN.loadPINs(lAffinity.qProto("SELECT * FROM cars AS c JOIN workers(['d', 'n']) AS w ON (c.afy:pinID = w.cars) WHERE (c.year IN [1980, 2000]);"))
+    # q("SELECT * FROM cars AS c JOIN workers(@['d', 'n']) AS w ON (c.afy:pinID = w.cars) WHERE (c.year IN @[1980, 2000]);");
+    # print "JSON result: %s" % lAffinity.check("SELECT * FROM cars AS c JOIN workers(@['d', 'n']) AS w ON (c.afy:pinID = w.cars) WHERE (c.year IN @[1980, 2000]);")
+    print "Start step11"
+    pins = PIN.loadPINs(lAffinity.qProto("SELECT * FROM cars AS c JOIN workers(@['d', 'n']) AS w ON (c.afy:pinID = w.cars) WHERE (c.year IN @[1980, 2000]);"))
     assert len(pins) > 0
     print "Step11 complete!" 
 
@@ -256,7 +256,7 @@ def test_tutorial():
 
 def _entryPoint():
     start = time.time()
-    test_executable_doc()
+    test_executable_doc() # TODO: Review... doesn't seem happy...
     test_tutorial()
     end = time.time()
     print "TestOnlineMaterials costs : " + timeToString(end - start)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-# Copyright (c) 2004-2013 GoPivotal, Inc. All Rights Reserved.
+# Copyright (c) 2004-2014 GoPivotal, Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ def test_case_2():
     lAffinity = AFFINITY()
     lAffinity.open()
     # define a class for fire warning
-    lAffinity.q("CREATE CLASS FIRE_WARNING AS (SELECT * WHERE EXISTS(FID) AND TEMPERATURE> 50 AND DISTANCE < 5) SET afy:onEnter=${PERSIST}")
+    lAffinity.q("CREATE CLASS FIRE_WARNING AS (SELECT * WHERE EXISTS(FID) AND TEMPERATURE> 50 AND DISTANCE < 5) SET afy:onEnter=${UPDATE @self EDIT afy:self={NOT TRANSIENT, PERSISTENT}}")
     
     records={}
     for i in range(TOTAL):
@@ -90,7 +90,7 @@ def test_case_3():
     lAffinity.q("CREATE CLASS ORDERS AS SELECT * WHERE EXISTS(OID) AND EXISTS(PRICE) AND EXISTS(CNT) SET afy:onEnter=${INSERT OPTIONS(TRANSIENT) OID=@.OID, TOTAL_PRICE=((@.PRICE) * (@.CNT))}")
     
     # define a class BIG_DEAL
-    lAffinity.q("CREATE CLASS BIG_DEAL AS SELECT * WHERE EXISTS(OID) AND TOTAL_PRICE > 10000 SET afy:onEnter=${PERSIST}")
+    lAffinity.q("CREATE CLASS BIG_DEAL AS SELECT * WHERE EXISTS(OID) AND TOTAL_PRICE > 10000 SET afy:onEnter=${UPDATE @self EDIT afy:self={NOT TRANSIENT, PERSISTENT}}")
     
     records={}
     for i in range(TOTAL):
@@ -200,7 +200,7 @@ def _entryPoint():
     test_case_1()
     test_case_2()
     test_case_3()
-    test_case_4()
+    #test_case_4()
     test_case_5()
     test_case_6()
     end = time.time()

@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-# Copyright (c) 2004-2013 GoPivotal, Inc. All Rights Reserved.
+# Copyright (c) 2004-2014 GoPivotal, Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -120,7 +120,7 @@ class Circuit(object):
                     lMaxX = lComp1.cx + 2 * Circuit.DISPLAY_WIDTH + Circuit.DISPLAY_MARGIN
                     lMinY = lComp1.cy - Circuit.DISPLAY_HEIGHT - Circuit.DISPLAY_MARGIN
                     lMaxY = lComp1.cy + 2 * Circuit.DISPLAY_HEIGHT + Circuit.DISPLAY_MARGIN
-                    lCondition = " WHERE ((cp.afy:pinID NOT IN (%s)) AND (cp.\"http://localhost/afy/property/1.0/circuit/component/x\" IN [%s, %s]) AND (cp.\"http://localhost/afy/property/1.0/circuit/component/y\" IN [%s, %s]))" % (lExcludedStr, lMinX, lMaxX, lMinY, lMaxY)
+                    lCondition = " WHERE ((cp.afy:pinID NOT IN (%s)) AND (cp.\"http://localhost/afy/property/1.0/circuit/component/x\" IN @[%s, %s]) AND (cp.\"http://localhost/afy/property/1.0/circuit/component/y\" IN @[%s, %s]))" % (lExcludedStr, lMinX, lMaxX, lMinY, lMaxY)
                     # TODO: enable when bug 108 is fixed.
                     #lCondition = " WHERE (cp.afy:pinID NOT IN (%s))" % lExcludedStr
                     lCandidates = PIN.loadPINs(self.mAffinity.qProto( \

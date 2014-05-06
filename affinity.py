@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.6
-# Copyright (c) 2004-2013 GoPivotal, Inc. All Rights Reserved.
+# Copyright (c) 2004-2014 GoPivotal, Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -56,6 +56,24 @@ EID_COLLECTION = 4294967295
 EID_LAST_ELEMENT = 4294967294
 EID_FIRST_ELEMENT = 4294967293
 
+# Names for special classes.
+SC_CLASSE_NAMES = \
+{ \
+    affinity_pb2.SC_CLASSES:"afy:Classes", \
+    affinity_pb2.SC_TIMERS:"afy:Timers", \
+    affinity_pb2.SC_LISTENERS:"afy:Listeners", \
+    affinity_pb2.SC_LOADERS:"afy:Loaders", \
+    affinity_pb2.SC_PACKAGES:"afy:Packages", \
+    affinity_pb2.SC_NAMED:"afy:NamedObjects", \
+    affinity_pb2.SC_ENUMS:"afy:Enumerations", \
+    affinity_pb2.SC_STORES:"afy:Stores", \
+    affinity_pb2.SC_SERVICES:"afy:Services", \
+    affinity_pb2.SC_FSMCTX:"afy:FSMCtx", \
+    affinity_pb2.SC_FSMS:"afy:FSMs", \
+    affinity_pb2.SC_HANDLERS:"afy:EventHandlers"
+    # TODO: keep up-to-date with affinity.h, affinity.proto and kernel/src/named.cpp
+}
+
 # Names for special properties.
 SP_PROPERTY_NAMES = \
 { \
@@ -78,8 +96,40 @@ SP_PROPERTY_NAMES = \
     affinity_pb2.SP_PROPERTIES:"afy:properties", \
     affinity_pb2.SP_ONENTER:"afy:onEnter", \
     affinity_pb2.SP_ONUPDATE:"afy:onUpdate", \
-    affinity_pb2.SP_ONLEAVE:"afy:onLeave"
-    # TODO: catch-up with latest stuff...
+    affinity_pb2.SP_ONLEAVE:"afy:onLeave", \
+    affinity_pb2.SP_WINDOW:"afy:window", \
+    affinity_pb2.SP_TRANSITION:"afy:transition", \
+    affinity_pb2.SP_EVENT:"afy:event", \
+    affinity_pb2.SP_CONDITION:"afy:condition", \
+    affinity_pb2.SP_ACTION:"afy:action", \
+    affinity_pb2.SP_REF:"afy:ref", \
+    affinity_pb2.SP_STATE:"afy:state", \
+    affinity_pb2.SP_INTERVAL:"afy:timerInterval", \
+    affinity_pb2.SP_LOAD:"afy:load", \
+    affinity_pb2.SP_SERVICE:"afy:service", \
+    affinity_pb2.SP_LISTEN:"afy:listen", \
+    affinity_pb2.SP_ADDRESS:"afy:address", \
+    affinity_pb2.SP_RESOLVE:"afy:resolve", \
+    affinity_pb2.SP_POSITION:"afy:position", \
+    affinity_pb2.SP_REQUEST:"afy:request", \
+    affinity_pb2.SP_CONTENT:"afy:content", \
+    affinity_pb2.SP_BUFSIZE:"afy:bufferSize", \
+    affinity_pb2.SP_EXCEPTION:"afy:exception", \
+    affinity_pb2.SP_VERSION:"afy:version", \
+    affinity_pb2.SP_WEIGHT:"afy:weight", \
+    affinity_pb2.SP_SELF:"afy:self", \
+    affinity_pb2.SP_PATTERN:"afy:pattern", \
+    affinity_pb2.SP_PROTOTYPE:"afy:prototype", \
+    affinity_pb2.SP_UNDO:"afy:undo", \
+    affinity_pb2.SP_NAMESPACE:"afy:namespace", \
+    affinity_pb2.SP_SUBPACKAGE:"afy:subpackage", \
+    affinity_pb2.SP_ENUM:"afy:enum", \
+    affinity_pb2.SP_IDENTITY:"afy:identity", \
+    affinity_pb2.SP_CONTENTTYPE:"afy:contentType", \
+    affinity_pb2.SP_CONTENTLENGTH:"afy:contentLength", \
+    affinity_pb2.SP_ACCEPT:"afy:accept", \
+    affinity_pb2.SP_TOKEN:"afy:token"
+    # TODO: keep up-to-date with affinity.h, affinity.proto and kernel/src/named.cpp
 }    
 
 # Internal logging.
@@ -538,6 +588,7 @@ def AFFINITY(): return AffinityConnection.getCurrentDbConnection()
     
 # Core Objects: response stream reading context.
 # Note: In a majority of cases the developer needs not be aware of this (PIN.loadPINs hides it).
+# Review: Should use URI instead of Prop in this interface, to avoid confusion.
 class PBReadCtx(object):
     """In-memory representation of the global contextual information returned by Affinity in a response stream."""
     def __init__(self, pPBStream):
@@ -554,6 +605,9 @@ class PBReadCtx(object):
             self.mPropID2Name[iP.id] = iP.str
             self.mPropName2ID[iP.str] = iP.id
         for iP in SP_PROPERTY_NAMES.items():
+            self.mPropID2Name[iP[0]] = iP[1]
+            self.mPropName2ID[iP[1]] = iP[0]
+        for iP in SC_CLASSE_NAMES.items():
             self.mPropID2Name[iP[0]] = iP[1]
             self.mPropName2ID[iP[1]] = iP[0]
         lIdents = pPBStream.identities
@@ -713,19 +767,21 @@ class PIN(dict):
         OP_NAMES = \
             ("OP_SET", "OP_ADD", "OP_ADD_BEFORE", "OP_MOVE", "OP_MOVE_BEFORE", "OP_DELETE", "OP_EDIT", "OP_RENAME", \
              "OP_PLUS", "OP_MINUS", "OP_MUL", "OP_DIV", "OP_MOD", "OP_NEG", "OP_NOT", "OP_AND", "OP_OR", "OP_XOR", \
-             "OP_LSHIFT", "OP_RSHIFT", "OP_MIN", "OP_MAX", "OP_ABS", "OP_LN", "OP_EXP", "OP_POW", "OP_SQRT", \
-             "OP_FLOOR", "OP_CEIL", "OP_CONCAT", "OP_LOWER", "OP_UPPER", "OP_TONUM", \
-             "OP_TOINUM", "OP_CAST") # Review: could this be done with introspection?
+             "OP_LSHIFT", "OP_RSHIFT", "OP_SETBIT", "OP_RESETBIT", "OP_MIN", "OP_MAX", "OP_ARGMIN", "OP_ARGMAX", \
+             "OP_ABS", "OP_LN", "OP_EXP", "OP_POW", "OP_SQRT", \
+             "OP_SIN", "OP_COS", "OP_TAN", "OP_ASIN", "OP_ACOS", "OP_ATAN", \
+             "OP_NORM", "OP_TRACE", "OP_INV", "OP_DET", "OP_RANK", "OP_TRANSPOSE", \
+             "OP_FLOOR", "OP_CEIL", "OP_CONCAT", "OP_LOWER", "OP_UPPER", "OP_TONUM", "OP_TOINUM", "OP_CAST") # Review: could this be done with introspection?
         VT_NAMES = \
             ("VT_ANY", \
              "VT_INT", "VT_UINT", "VT_INT64", "VT_UINT64", \
              "VT_FLOAT", "VT_DOUBLE", "VT_BOOL", \
              "VT_DATETIME", "VT_INTERVAL", \
              "VT_URIID", "VT_IDENTITY", "VT_ENUM", \
-             "VT_STRING", "VT_BSTR", "VT_URL", \
+             "VT_STRING", "VT_BSTR", \
              "[undefined-16]", "VT_REFID", "[undefined-18]", "VT_REFIDPROP", "[undefined-20]", "VT_REFIDELT", \
-             "VT_EXPR", "VT_QUERY", \
-             "VT_ARRAY", "[undefined-25]", "VT_STRUCT", "VT_MAP", "VT_RANGE", "[undefined-29]", "VT_CURRENT") # Review: can this be done with introspection?
+             "VT_EXPR", "VT_STMT", \
+             "VT_COLLECTION", "VT_STRUCT", "VT_MAP", "VT_RANGE", "VT_ARRAY", "[undefined-29]", "VT_CURRENT") # Review: can this be done with introspection?
         def __init__(self, pPropID=None, pType=affinity_pb2.Value.VT_ANY, pOp=affinity_pb2.Value.OP_SET, pEid=EID_COLLECTION, pMeta=0):
             self.mPropID = pPropID # Conceptually redundant with the key, but kept for efficiency, since Affinity doesn't require a StringMap for existing propids.
             self.mType = pType # There are cases where a single native python value type covers multiple Affinity VT types... so we keep the actual specific type for future updates.
@@ -1019,7 +1075,7 @@ class PIN(dict):
             for iV in iPBPin.values:
                 lPN = lReadCtx.getPropName(iV.property)
                 lExtra = lPin.mExtras[lPN]
-                if affinity_pb2.Value.VT_ARRAY == iV.type:
+                if affinity_pb2.Value.VT_COLLECTION == iV.type:
                     for i, iE in zip(xrange(iV.varray.l), iV.varray.v): # Review: always true?
                         if (lExtra[i].mEid in (EID_COLLECTION, EID_LAST_ELEMENT, EID_FIRST_ELEMENT)) or (lExtra[i].mOp in (affinity_pb2.Value.OP_ADD, affinity_pb2.Value.OP_ADD_BEFORE)):
                             lExtra[i].mEid = iE.eid
@@ -1120,10 +1176,7 @@ class PIN(dict):
         "[internal] Convert a native python value (pPYValue) into a affinity_pb2.Value. If pPYValue is a tuple containing an 'Extra' description, use every available field."
         lType = pPBValue.type
         pPBValue.type = affinity_pb2.Value.VT_ANY
-        if isinstance(pPYValue, PIN.Url):
-            pPBValue.str = pPYValue
-            lType = affinity_pb2.Value.VT_URL
-        elif isinstance(pPYValue, str):
+        if isinstance(pPYValue, str):
             pPBValue.str = pPYValue
             lType = affinity_pb2.Value.VT_STRING
         elif isinstance(pPYValue, unicode):
@@ -1196,15 +1249,13 @@ class PIN(dict):
     @staticmethod
     def _valuePB2PY(pPBReadCtx, pPBValue):
         "[internal] Convert a affinity_pb2.Value into either a single (native python value, Extra), or a list of them (if pPBValue is a collection), and return it."
-        if (pPBValue.type == affinity_pb2.Value.VT_ARRAY):
+        if (pPBValue.type == affinity_pb2.Value.VT_COLLECTION):
             lResult = []
             for iV in pPBValue.varray.v:
                 lResult.append(PIN._valuePB2PY(pPBReadCtx, iV))
             return lResult
         lExtra = PIN.Extra.createFromPB(pPBValue)
-        if (pPBValue.type == affinity_pb2.Value.VT_URL):
-            return (PIN.Url(pPBValue.str), lExtra)
-        elif (pPBValue.type == affinity_pb2.Value.VT_STRING):
+        if (pPBValue.type == affinity_pb2.Value.VT_STRING):
             return (str(pPBValue.str), lExtra)
         elif (pPBValue.type == affinity_pb2.Value.VT_BSTR):
             return (bytearray(pPBValue.bstr), lExtra)
