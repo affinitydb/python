@@ -90,8 +90,8 @@ SP_PROPERTY_NAMES = \
     affinity_pb2.SP_OBJID:"afy:objectID", \
     affinity_pb2.SP_PREDICATE:"afy:predicate", \
     affinity_pb2.SP_COUNT:"afy:count", \
-    affinity_pb2.SP_SUBCLASSES:"afy:subclasses", \
-    affinity_pb2.SP_SUPERCLASSES:"afy:superclasses", \
+    affinity_pb2.SP_SPECIALIZATION:"afy:specialization", \
+    affinity_pb2.SP_ABSTRACTION:"afy:abstraction", \
     affinity_pb2.SP_INDEX_INFO:"afy:indexInfo", \
     affinity_pb2.SP_PROPERTIES:"afy:properties", \
     affinity_pb2.SP_ONENTER:"afy:onEnter", \
@@ -765,7 +765,7 @@ class PIN(dict):
         This allows to present the PIN as a simple dictionary where keys are property names, and values are native python values.
         Everything else is hidden as 'extras', and used mostly transparently when needed."""
         OP_NAMES = \
-            ("OP_SET", "OP_ADD", "OP_ADD_BEFORE", "OP_MOVE", "OP_MOVE_BEFORE", "OP_DELETE", "OP_EDIT", "OP_RENAME", \
+            ("OP_SET", "OP_ADD", "OP_ADD_BEFORE", "OP_MOVE", "OP_MOVE_BEFORE", "OP_DELETE", "OP_RENAME", \
              "OP_PLUS", "OP_MINUS", "OP_MUL", "OP_DIV", "OP_MOD", "OP_NEG", "OP_NOT", "OP_AND", "OP_OR", "OP_XOR", \
              "OP_LSHIFT", "OP_RSHIFT", "OP_SETBIT", "OP_RESETBIT", "OP_MIN", "OP_MAX", "OP_ARGMIN", "OP_ARGMAX", \
              "OP_ABS", "OP_LN", "OP_EXP", "OP_POW", "OP_SQRT", \

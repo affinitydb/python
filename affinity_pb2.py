@@ -14,7 +14,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='affinity.proto',
   package='AffinityPB',
-  serialized_pb='\n\x0e\x61\x66\x66inity.proto\x12\nAffinityPB\" \n\x03PID\x12\n\n\x02id\x18\x01 \x01(\x04\x12\r\n\x05ident\x18\x02 \x01(\r\"N\n\x03Ref\x12\x1b\n\x02id\x18\x01 \x02(\x0b\x32\x0f.AffinityPB.PID\x12\x10\n\x08property\x18\x02 \x02(\r\x12\x0b\n\x03\x65id\x18\x03 \x01(\r\x12\x0b\n\x03vid\x18\x04 \x01(\r\"\xb5\x10\n\x05Value\x12)\n\x04type\x18\x01 \x01(\x0e\x32\x1b.AffinityPB.Value.ValueType\x12\x10\n\x08property\x18\x02 \x01(\r\x12\x0b\n\x03str\x18\x03 \x01(\t\x12\x0c\n\x04\x62str\x18\x04 \x01(\x0c\x12\t\n\x01i\x18\x05 \x01(\x11\x12\n\n\x02ui\x18\x06 \x01(\r\x12\x0b\n\x03i64\x18\x07 \x01(\x12\x12\x0c\n\x04ui64\x18\x08 \x01(\x04\x12\t\n\x01\x66\x18\t \x01(\x02\x12\t\n\x01\x64\x18\n \x01(\x01\x12\x10\n\x08\x64\x61tetime\x18\x0b \x01(\x06\x12\x10\n\x08interval\x18\x0c \x01(\x10\x12\x1b\n\x02id\x18\r \x01(\x0b\x32\x0f.AffinityPB.PID\x12(\n\x06varray\x18\x0e \x01(\x0b\x32\x18.AffinityPB.Value.VArray\x12\x1c\n\x03ref\x18\x0f \x01(\x0b\x32\x0f.AffinityPB.Ref\x12\t\n\x01\x62\x18\x10 \x01(\x08\x12+\n\x02op\x18\x11 \x01(\x0e\x32\x17.AffinityPB.Value.ModOp:\x06OP_SET\x12\x17\n\x03\x65id\x18\x12 \x01(\r:\n4294967295\x12\x0c\n\x04meta\x18\x13 \x01(\r\x12\'\n\x04\x65\x64it\x18\x14 \x01(\x0b\x32\x19.AffinityPB.Value.StrEdit\x12\r\n\x05units\x18\x15 \x01(\r\x12$\n\x03\x65nu\x18\x16 \x01(\x0b\x32\x17.AffinityPB.Value.VEnum\x12#\n\x03map\x18\x17 \x01(\x0b\x32\x16.AffinityPB.Value.VMap\x12\'\n\x04\x62\x65\x64t\x18\x18 \x01(\x0b\x32\x19.AffinityPB.Value.BitEdit\x12+\n\x06\x62\x65\x64t64\x18\x19 \x01(\x0b\x32\x1b.AffinityPB.Value.BitEdit64\x12%\n\x03\x61rr\x18\x1a \x01(\x0b\x32\x18.AffinityPB.Value.AArray\x12\x0c\n\x03\x63id\x18\x80\x01 \x01(\x04\x1a\x44\n\x07StrEdit\x12\x0b\n\x03str\x18\x01 \x01(\t\x12\x0c\n\x04\x62str\x18\x02 \x01(\x0c\x12\x0e\n\x06length\x18\x03 \x02(\r\x12\x0e\n\x06offset\x18\x04 \x01(\x04\x1a%\n\x07\x42itEdit\x12\x0c\n\x04\x62its\x18\x01 \x02(\r\x12\x0c\n\x04mask\x18\x02 \x02(\r\x1a\'\n\tBitEdit64\x12\x0c\n\x04\x62its\x18\x01 \x02(\x04\x12\x0c\n\x04mask\x18\x02 \x02(\x04\x1a\x31\n\x06VArray\x12\t\n\x01l\x18\x01 \x01(\r\x12\x1c\n\x01v\x18\x02 \x03(\x0b\x32\x11.AffinityPB.Value\x1a&\n\x05VEnum\x12\r\n\x05\x65nuid\x18\x01 \x02(\r\x12\x0e\n\x06\x65nuelt\x18\x02 \x02(\r\x1aK\n\x07VMapElt\x12\x1e\n\x03key\x18\x01 \x02(\x0b\x32\x11.AffinityPB.Value\x12 \n\x05value\x18\x02 \x02(\x0b\x32\x11.AffinityPB.Value\x1a\x37\n\x04VMap\x12\t\n\x01l\x18\x01 \x01(\r\x12$\n\x01v\x18\x02 \x03(\x0b\x32\x19.AffinityPB.Value.VMapElt\x1am\n\x06\x41\x41rray\x12\x0c\n\x04xdim\x18\x01 \x01(\r\x12\x0c\n\x04ydim\x18\x02 \x01(\r\x12\r\n\x05start\x18\x03 \x01(\r\x12)\n\x04type\x18\x04 \x01(\x0e\x32\x1b.AffinityPB.Value.ValueType\x12\r\n\x05\x66lags\x18\x05 \x01(\r\"\x87\x03\n\tValueType\x12\n\n\x06VT_ANY\x10\x00\x12\n\n\x06VT_INT\x10\x01\x12\x0b\n\x07VT_UINT\x10\x02\x12\x0c\n\x08VT_INT64\x10\x03\x12\r\n\tVT_UINT64\x10\x04\x12\x0c\n\x08VT_FLOAT\x10\x05\x12\r\n\tVT_DOUBLE\x10\x06\x12\x0b\n\x07VT_BOOL\x10\x07\x12\x0f\n\x0bVT_DATETIME\x10\x08\x12\x0f\n\x0bVT_INTERVAL\x10\t\x12\x0c\n\x08VT_URIID\x10\n\x12\x0f\n\x0bVT_IDENTITY\x10\x0b\x12\x0b\n\x07VT_ENUM\x10\x0c\x12\r\n\tVT_STRING\x10\r\x12\x0b\n\x07VT_BSTR\x10\x0e\x12\x0c\n\x08VT_REFID\x10\x10\x12\x10\n\x0cVT_REFIDPROP\x10\x12\x12\x0f\n\x0bVT_REFIDELT\x10\x14\x12\x0b\n\x07VT_EXPR\x10\x15\x12\x0c\n\x08VT_QUERY\x10\x16\x12\x11\n\rVT_COLLECTION\x10\x17\x12\r\n\tVT_STRUCT\x10\x18\x12\n\n\x06VT_MAP\x10\x19\x12\x0c\n\x08VT_RANGE\x10\x1a\x12\x0c\n\x08VT_ARRAY\x10\x1b\x12\x0e\n\nVT_CURRENT\x10\x1d\"\xa5\x04\n\x05ModOp\x12\n\n\x06OP_SET\x10\x00\x12\n\n\x06OP_ADD\x10\x01\x12\x11\n\rOP_ADD_BEFORE\x10\x02\x12\x0b\n\x07OP_MOVE\x10\x03\x12\x12\n\x0eOP_MOVE_BEFORE\x10\x04\x12\r\n\tOP_DELETE\x10\x05\x12\x0b\n\x07OP_EDIT\x10\x06\x12\r\n\tOP_RENAME\x10\x07\x12\x0b\n\x07OP_PLUS\x10\x08\x12\x0c\n\x08OP_MINUS\x10\t\x12\n\n\x06OP_MUL\x10\n\x12\n\n\x06OP_DIV\x10\x0b\x12\n\n\x06OP_MOD\x10\x0c\x12\n\n\x06OP_NEG\x10\r\x12\n\n\x06OP_NOT\x10\x0e\x12\n\n\x06OP_AND\x10\x0f\x12\t\n\x05OP_OR\x10\x10\x12\n\n\x06OP_XOR\x10\x11\x12\r\n\tOP_LSHIFT\x10\x12\x12\r\n\tOP_RSHIFT\x10\x13\x12\n\n\x06OP_MIN\x10\x14\x12\n\n\x06OP_MAX\x10\x15\x12\n\n\x06OP_ABS\x10\x16\x12\t\n\x05OP_LN\x10\x17\x12\n\n\x06OP_EXP\x10\x18\x12\n\n\x06OP_POW\x10\x19\x12\x0b\n\x07OP_SQRT\x10\x1a\x12\n\n\x06OP_SIN\x10\x1b\x12\n\n\x06OP_COS\x10\x1c\x12\n\n\x06OP_TAN\x10\x1d\x12\x0b\n\x07OP_ASIN\x10\x1e\x12\x0b\n\x07OP_ACOS\x10\x1f\x12\x0b\n\x07OP_ATAN\x10 \x12\x0c\n\x08OP_FLOOR\x10!\x12\x0b\n\x07OP_CEIL\x10\"\x12\r\n\tOP_CONCAT\x10#\x12\x0c\n\x08OP_LOWER\x10$\x12\x0c\n\x08OP_UPPER\x10%\x12\x0c\n\x08OP_TONUM\x10&\x12\r\n\tOP_TOINUM\x10\'\x12\x0b\n\x07OP_CAST\x10(\"\xe0\x0b\n\tAfyStream\x12.\n\x05owner\x18\x01 \x01(\x0b\x32\x1f.AffinityPB.AfyStream.StringMap\x12\x0f\n\x07storeID\x18\x02 \x01(\r\x12\'\n\x04pins\x18\x03 \x03(\x0b\x32\x19.AffinityPB.AfyStream.PIN\x12\x33\n\nproperties\x18\x04 \x03(\x0b\x32\x1f.AffinityPB.AfyStream.StringMap\x12\x33\n\nidentities\x18\x05 \x03(\x0b\x32\x1f.AffinityPB.AfyStream.StringMap\x12+\n\x04stmt\x18\x06 \x03(\x0b\x32\x1d.AffinityPB.AfyStream.PathSQL\x12(\n\x04txop\x18\x07 \x03(\x0e\x32\x1a.AffinityPB.AfyStream.TXOP\x12,\n\x06result\x18\x08 \x03(\x0b\x32\x1c.AffinityPB.AfyStream.Result\x12\x30\n\x08\x63ompound\x18\t \x03(\x0b\x32\x1e.AffinityPB.AfyStream.Compound\x12,\n\x06status\x18\n \x03(\x0b\x32\x1c.AffinityPB.AfyStream.Status\x12\r\n\x05\x66lush\x18\x0b \x03(\r\x12\x35\n\x08resPages\x18\x0c \x03(\x0b\x32#.AffinityPB.AfyStream.ReservedPages\x12!\n\x06values\x18\r \x03(\x0b\x32\x11.AffinityPB.Value\x12\x0b\n\x03\x45OS\x18\x0e \x01(\x08\x1a$\n\tStringMap\x12\x0b\n\x03str\x18\x01 \x02(\t\x12\n\n\x02id\x18\x02 \x02(\r\x1as\n\x06Result\x12\x0b\n\x03\x63id\x18\x01 \x01(\x04\x12$\n\x05\x65rror\x18\x02 \x01(\x0e\x32\x15.AffinityPB.ErrorCode\x12\r\n\x05\x63ount\x18\x03 \x01(\x04\x12\'\n\x02op\x18\x04 \x01(\x0e\x32\x1b.AffinityPB.AfyStream.MODOP\x1a\xbb\x01\n\x07PathSQL\x12\n\n\x02sq\x18\x01 \x02(\t\x12\x0b\n\x03\x63id\x18\x02 \x01(\x04\x12#\n\x03rtt\x18\x03 \x01(\x0e\x32\x16.AffinityPB.ReturnType\x12\x0c\n\x04uids\x18\x04 \x03(\r\x12!\n\x06params\x18\x05 \x03(\x0b\x32\x11.AffinityPB.Value\x12\r\n\x05limit\x18\x06 \x01(\r\x12\x0e\n\x06offset\x18\x07 \x01(\r\x12\x0c\n\x04mode\x18\x08 \x01(\r\x12\x14\n\x0c\x61\x62ortOnError\x18\t \x01(\x08\x1a\xbf\x01\n\x03PIN\x12\'\n\x02op\x18\x01 \x01(\x0e\x32\x1b.AffinityPB.AfyStream.MODOP\x12\x1b\n\x02id\x18\x02 \x01(\x0b\x32\x0f.AffinityPB.PID\x12\x0c\n\x04mode\x18\x03 \x01(\r\x12\x0f\n\x07nValues\x18\x04 \x01(\r\x12!\n\x06values\x18\x05 \x03(\x0b\x32\x11.AffinityPB.Value\x12\x0b\n\x03\x63id\x18\x06 \x01(\x04\x12#\n\x03rtt\x18\x07 \x01(\x0e\x32\x16.AffinityPB.ReturnType\x1aO\n\x08\x43ompound\x12\r\n\x05nPINs\x18\x01 \x01(\r\x12\'\n\x04pins\x18\x02 \x03(\x0b\x32\x19.AffinityPB.AfyStream.PIN\x12\x0b\n\x03\x63id\x18\x03 \x01(\x04\x1a#\n\x06Status\x12\x0c\n\x04\x63ode\x18\x01 \x01(\r\x12\x0b\n\x03\x63id\x18\x02 \x01(\x04\x1a/\n\rReservedPages\x12\x0e\n\x06nPages\x18\x01 \x01(\r\x12\x0e\n\x06pageID\x18\x02 \x03(\r\"R\n\x05MODOP\x12\r\n\tOP_INSERT\x10\x00\x12\r\n\tOP_UPDATE\x10\x01\x12\r\n\tOP_DELETE\x10\x02\x12\x0b\n\x07OP_COPY\x10\x03\x12\x0f\n\x0bOP_UNDELETE\x10\x04\"\x8d\x01\n\x04TXOP\x12\x0c\n\x08TX_START\x10\x01\x12\r\n\tTX_COMMIT\x10\x02\x12\x11\n\rTX_COMMIT_ALL\x10\x03\x12\x0f\n\x0bTX_ROLLBACK\x10\x04\x12\x13\n\x0fTX_ROLLBACK_ALL\x10\x05\x12\x15\n\x11TX_START_READONLY\x10\x06\x12\x18\n\x14TX_START_CLASSMODIFY\x10\x07*\x96\x04\n\tErrorCode\x12\x0f\n\x0bRC_NOTFOUND\x10\x01\x12\x14\n\x10RC_ALREADYEXISTS\x10\x02\x12\x0f\n\x0bRC_INTERNAL\x10\x03\x12\x0f\n\x0bRC_NOACCESS\x10\x04\x12\x0c\n\x08RC_NOMEM\x10\x05\x12\x0b\n\x07RC_FULL\x10\x06\x12\x10\n\x0cRC_DEVICEERR\x10\x07\x12\x10\n\x0cRC_DATAERROR\x10\x08\x12\n\n\x06RC_EOF\x10\t\x12\x0e\n\nRC_TIMEOUT\x10\n\x12\r\n\tRC_REPEAT\x10\x0b\x12\x10\n\x0cRC_CORRUPTED\x10\x0c\x12\x0f\n\x0bRC_CANCELED\x10\r\x12\x0e\n\nRC_VERSION\x10\x0e\x12\x0b\n\x07RC_TRUE\x10\x0f\x12\x0c\n\x08RC_FALSE\x10\x10\x12\x0b\n\x07RC_TYPE\x10\x11\x12\x0b\n\x07RC_DIV0\x10\x12\x12\x0f\n\x0bRC_INVPARAM\x10\x13\x12\r\n\tRC_READTX\x10\x14\x12\x0c\n\x08RC_OTHER\x10\x15\x12\x0f\n\x0bRC_DEADLOCK\x10\x16\x12\x0c\n\x08RC_QUOTA\x10\x17\x12\x0f\n\x0bRC_SHUTDOWN\x10\x18\x12\x0e\n\nRC_DELETED\x10\x19\x12\r\n\tRC_CLOSED\x10\x1a\x12\x0f\n\x0bRC_READONLY\x10\x1b\x12\x10\n\x0cRC_NOSESSION\x10\x1c\x12\x0c\n\x08RC_INVOP\x10\x1d\x12\r\n\tRC_SYNTAX\x10\x1e\x12\r\n\tRC_TOOBIG\x10\x1f\x12\x0f\n\x0bRC_PAGEFULL\x10 \x12\x11\n\rRC_CONSTRAINT\x10!*\xde\x06\n\x08SpecProp\x12\x0c\n\x08SP_PINID\x10\x11\x12\x0f\n\x0bSP_DOCUMENT\x10\x12\x12\r\n\tSP_PARENT\x10\x13\x12\x0c\n\x08SP_VALUE\x10\x14\x12\x0e\n\nSP_CREATED\x10\x15\x12\x10\n\x0cSP_CREATEDBY\x10\x16\x12\x0e\n\nSP_UPDATED\x10\x17\x12\x10\n\x0cSP_UPDATEDBY\x10\x18\x12\n\n\x06SP_ACL\x10\x19\x12\x0c\n\x08SP_STAMP\x10\x1a\x12\x0c\n\x08SP_OBJID\x10\x1b\x12\x10\n\x0cSP_PREDICATE\x10\x1c\x12\x0c\n\x08SP_COUNT\x10\x1d\x12\x11\n\rSP_SUBCLASSES\x10\x1e\x12\x13\n\x0fSP_SUPERCLASSES\x10\x1f\x12\x11\n\rSP_INDEX_INFO\x10 \x12\x11\n\rSP_PROPERTIES\x10!\x12\x0e\n\nSP_ONENTER\x10\"\x12\x0f\n\x0bSP_ONUPDATE\x10#\x12\x0e\n\nSP_ONLEAVE\x10$\x12\r\n\tSP_WINDOW\x10%\x12\x11\n\rSP_TRANSITION\x10&\x12\x0c\n\x08SP_EVENT\x10\'\x12\x10\n\x0cSP_CONDITION\x10(\x12\r\n\tSP_ACTION\x10)\x12\n\n\x06SP_REF\x10*\x12\x0c\n\x08SP_STATE\x10+\x12\x0f\n\x0bSP_INTERVAL\x10,\x12\x0b\n\x07SP_LOAD\x10-\x12\x0e\n\nSP_SERVICE\x10.\x12\r\n\tSP_LISTEN\x10/\x12\x0e\n\nSP_ADDRESS\x10\x30\x12\x0e\n\nSP_RESOLVE\x10\x31\x12\x0f\n\x0bSP_POSITION\x10\x32\x12\x0e\n\nSP_REQUEST\x10\x33\x12\x0e\n\nSP_CONTENT\x10\x34\x12\x0e\n\nSP_BUFSIZE\x10\x35\x12\x10\n\x0cSP_EXCEPTION\x10\x36\x12\x0e\n\nSP_VERSION\x10\x37\x12\r\n\tSP_WEIGHT\x10\x38\x12\x0b\n\x07SP_SELF\x10\x39\x12\x0e\n\nSP_PATTERN\x10:\x12\x10\n\x0cSP_PROTOTYPE\x10;\x12\x0b\n\x07SP_UNDO\x10<\x12\x10\n\x0cSP_NAMESPACE\x10=\x12\x11\n\rSP_SUBPACKAGE\x10>\x12\x0b\n\x07SP_ENUM\x10?\x12\x0f\n\x0bSP_IDENTITY\x10@\x12\x12\n\x0eSP_CONTENTTYPE\x10\x41\x12\x14\n\x10SP_CONTENTLENGTH\x10\x42\x12\r\n\tSP_ACCEPT\x10\x43\x12\x0c\n\x08SP_TOKEN\x10\x44\x12\x0b\n\x06SP_MAX\x10\xff\x01*\xc8\x01\n\x0bSpecClasses\x12\x0e\n\nSC_CLASSES\x10\x00\x12\r\n\tSC_TIMERS\x10\x01\x12\x10\n\x0cSC_LISTENERS\x10\x02\x12\x0e\n\nSC_LOADERS\x10\x03\x12\x0f\n\x0bSC_PACKAGES\x10\x04\x12\x0c\n\x08SC_NAMED\x10\x05\x12\x0c\n\x08SC_ENUMS\x10\x06\x12\r\n\tSC_STORES\x10\x07\x12\x0f\n\x0bSC_SERVICES\x10\x08\x12\r\n\tSC_FSMCTX\x10\t\x12\x0b\n\x07SC_FSMS\x10\n\x12\x0f\n\x0bSC_HANDLERS\x10\x0b*e\n\x07SpecEID\x12\x1b\n\x0e\x45ID_COLLECTION\x10\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01\x12\x1d\n\x10\x45ID_LAST_ELEMENT\x10\xfe\xff\xff\xff\xff\xff\xff\xff\xff\x01\x12\x1e\n\x11\x45ID_FIRST_ELEMENT\x10\xfd\xff\xff\xff\xff\xff\xff\xff\xff\x01*z\n\x06OpMode\x12\x0e\n\x08OM_PURGE\x10\x80\x80\x10\x12\x15\n\x0eOM_CHECK_STAMP\x10\x80\x80\x80\x01\x12\x12\n\x0cOM_PURGE_IDS\x10\x80\x80@\x12\x13\n\x0cOM_ALL_WORDS\x10\x80\x80\x80\x02\x12\x11\n\nOM_DELETED\x10\x80\x80\x80\x04\x12\r\n\x06OM_RAW\x10\x80\x80\x80\x08*\x9c\x01\n\x08PINFlags\x12\x19\n\x11PF_NO_REPLICATION\x10\x80\x80\x80\x80\x04\x12\x11\n\tPF_NOTIFY\x10\x80\x80\x80\x80\x02\x12\x15\n\rPF_REPLICATED\x10\x80\x80\x80\x80\x01\x12\x10\n\tPF_HIDDEN\x10\x80\x80\x80@\x12\x0f\n\x08PF_INMEM\x10\x80\x80\x80 \x12\x13\n\x0cPF_TRANSIENT\x10\x80\x80\x80\x10\x12\x13\n\x0cPF_IMMUTABLE\x10\x80\x80\x80\x08*\xa2\x01\n\tMetaProps\x12\x0e\n\tMETA_PART\x10\x80\x01\x12\x11\n\x0cMETA_FTINDEX\x10\x80\x01\x12\x11\n\rMETA_SSTORAGE\x10@\x12\r\n\tMETA_SYNC\x10\x10\x12\x0e\n\nMETA_ASYNC\x10\x08\x12\x0f\n\x0bMETA_CREATE\x10\x04\x12\x0e\n\nMETA_WRITE\x10\x02\x12\r\n\tMETA_READ\x10\x01\x12\x0c\n\x08META_ALT\x10\x01\x1a\x02\x10\x01*G\n\nClassFlags\x12\x0e\n\nCF_SDELETE\x10\x01\x12\x0b\n\x07\x43\x46_VIEW\x10\x02\x12\x0e\n\nCF_INDEXED\x10\x04\x12\x0c\n\x08\x43\x46_INMEM\x10\x08*S\n\nReturnType\x12\x0b\n\x07RT_PINS\x10\x01\x12\x0c\n\x08RT_COUNT\x10\x02\x12\x0b\n\x07RT_PIDS\x10\x03\x12\x0e\n\nRT_SRCPINS\x10\x04\x12\r\n\tRT_VALUES\x10\x05\x42\x16\n\x0c\x63om.affinityB\x06stream')
+  serialized_pb='\n\x0e\x61\x66\x66inity.proto\x12\nAffinityPB\" \n\x03PID\x12\n\n\x02id\x18\x01 \x01(\x04\x12\r\n\x05ident\x18\x02 \x01(\r\"N\n\x03Ref\x12\x1b\n\x02id\x18\x01 \x02(\x0b\x32\x0f.AffinityPB.PID\x12\x10\n\x08property\x18\x02 \x02(\r\x12\x0b\n\x03\x65id\x18\x03 \x01(\r\x12\x0b\n\x03vid\x18\x04 \x01(\r\"\x93\x0e\n\x05Value\x12)\n\x04type\x18\x01 \x01(\x0e\x32\x1b.AffinityPB.Value.ValueType\x12\x10\n\x08property\x18\x02 \x01(\r\x12\x0b\n\x03str\x18\x03 \x01(\t\x12\x0c\n\x04\x62str\x18\x04 \x01(\x0c\x12\t\n\x01i\x18\x05 \x01(\x11\x12\n\n\x02ui\x18\x06 \x01(\r\x12\x0b\n\x03i64\x18\x07 \x01(\x12\x12\x0c\n\x04ui64\x18\x08 \x01(\x04\x12\t\n\x01\x66\x18\t \x01(\x02\x12\t\n\x01\x64\x18\n \x01(\x01\x12\x10\n\x08\x64\x61tetime\x18\x0b \x01(\x06\x12\x10\n\x08interval\x18\x0c \x01(\x10\x12\x1b\n\x02id\x18\r \x01(\x0b\x32\x0f.AffinityPB.PID\x12(\n\x06varray\x18\x0e \x01(\x0b\x32\x18.AffinityPB.Value.VArray\x12\x1c\n\x03ref\x18\x0f \x01(\x0b\x32\x0f.AffinityPB.Ref\x12\t\n\x01\x62\x18\x10 \x01(\x08\x12+\n\x02op\x18\x11 \x01(\x0e\x32\x17.AffinityPB.Value.ModOp:\x06OP_SET\x12\x17\n\x03\x65id\x18\x12 \x01(\r:\n4294967295\x12\x0c\n\x04meta\x18\x13 \x01(\r\x12\r\n\x05units\x18\x14 \x01(\r\x12$\n\x03\x65nu\x18\x15 \x01(\x0b\x32\x17.AffinityPB.Value.VEnum\x12#\n\x03map\x18\x16 \x01(\x0b\x32\x16.AffinityPB.Value.VMap\x12%\n\x03\x61rr\x18\x17 \x01(\x0b\x32\x18.AffinityPB.Value.AArray\x12\x0c\n\x03\x63id\x18\x80\x01 \x01(\x04\x1a\x31\n\x06VArray\x12\t\n\x01l\x18\x01 \x01(\r\x12\x1c\n\x01v\x18\x02 \x03(\x0b\x32\x11.AffinityPB.Value\x1a&\n\x05VEnum\x12\r\n\x05\x65nuid\x18\x01 \x02(\r\x12\x0e\n\x06\x65nuelt\x18\x02 \x02(\r\x1aK\n\x07VMapElt\x12\x1e\n\x03key\x18\x01 \x02(\x0b\x32\x11.AffinityPB.Value\x12 \n\x05value\x18\x02 \x02(\x0b\x32\x11.AffinityPB.Value\x1a\x37\n\x04VMap\x12\t\n\x01l\x18\x01 \x01(\r\x12$\n\x01v\x18\x02 \x03(\x0b\x32\x19.AffinityPB.Value.VMapElt\x1am\n\x06\x41\x41rray\x12\x0c\n\x04xdim\x18\x01 \x01(\r\x12\x0c\n\x04ydim\x18\x02 \x01(\r\x12\r\n\x05start\x18\x03 \x01(\r\x12)\n\x04type\x18\x04 \x01(\x0e\x32\x1b.AffinityPB.Value.ValueType\x12\r\n\x05\x66lags\x18\x05 \x01(\r\"\x87\x03\n\tValueType\x12\n\n\x06VT_ANY\x10\x00\x12\n\n\x06VT_INT\x10\x01\x12\x0b\n\x07VT_UINT\x10\x02\x12\x0c\n\x08VT_INT64\x10\x03\x12\r\n\tVT_UINT64\x10\x04\x12\x0c\n\x08VT_FLOAT\x10\x05\x12\r\n\tVT_DOUBLE\x10\x06\x12\x0b\n\x07VT_BOOL\x10\x07\x12\x0f\n\x0bVT_DATETIME\x10\x08\x12\x0f\n\x0bVT_INTERVAL\x10\t\x12\x0c\n\x08VT_URIID\x10\n\x12\x0f\n\x0bVT_IDENTITY\x10\x0b\x12\x0b\n\x07VT_ENUM\x10\x0c\x12\r\n\tVT_STRING\x10\r\x12\x0b\n\x07VT_BSTR\x10\x0e\x12\x0c\n\x08VT_REFID\x10\x10\x12\x10\n\x0cVT_REFIDPROP\x10\x12\x12\x0f\n\x0bVT_REFIDELT\x10\x14\x12\x0b\n\x07VT_EXPR\x10\x15\x12\x0c\n\x08VT_QUERY\x10\x16\x12\x11\n\rVT_COLLECTION\x10\x17\x12\r\n\tVT_STRUCT\x10\x18\x12\n\n\x06VT_MAP\x10\x19\x12\x0c\n\x08VT_RANGE\x10\x1a\x12\x0c\n\x08VT_ARRAY\x10\x1b\x12\x0e\n\nVT_CURRENT\x10\x1d\"\x98\x04\n\x05ModOp\x12\n\n\x06OP_SET\x10\x00\x12\n\n\x06OP_ADD\x10\x01\x12\x11\n\rOP_ADD_BEFORE\x10\x02\x12\x0b\n\x07OP_MOVE\x10\x03\x12\x12\n\x0eOP_MOVE_BEFORE\x10\x04\x12\r\n\tOP_DELETE\x10\x05\x12\r\n\tOP_RENAME\x10\x06\x12\x0b\n\x07OP_PLUS\x10\x07\x12\x0c\n\x08OP_MINUS\x10\x08\x12\n\n\x06OP_MUL\x10\t\x12\n\n\x06OP_DIV\x10\n\x12\n\n\x06OP_MOD\x10\x0b\x12\n\n\x06OP_NEG\x10\x0c\x12\n\n\x06OP_NOT\x10\r\x12\n\n\x06OP_AND\x10\x0e\x12\t\n\x05OP_OR\x10\x0f\x12\n\n\x06OP_XOR\x10\x10\x12\r\n\tOP_LSHIFT\x10\x11\x12\r\n\tOP_RSHIFT\x10\x12\x12\n\n\x06OP_MIN\x10\x13\x12\n\n\x06OP_MAX\x10\x14\x12\n\n\x06OP_ABS\x10\x15\x12\t\n\x05OP_LN\x10\x16\x12\n\n\x06OP_EXP\x10\x17\x12\n\n\x06OP_POW\x10\x18\x12\x0b\n\x07OP_SQRT\x10\x19\x12\n\n\x06OP_SIN\x10\x1a\x12\n\n\x06OP_COS\x10\x1b\x12\n\n\x06OP_TAN\x10\x1c\x12\x0b\n\x07OP_ASIN\x10\x1d\x12\x0b\n\x07OP_ACOS\x10\x1e\x12\x0b\n\x07OP_ATAN\x10\x1f\x12\x0c\n\x08OP_FLOOR\x10 \x12\x0b\n\x07OP_CEIL\x10!\x12\r\n\tOP_CONCAT\x10\"\x12\x0c\n\x08OP_LOWER\x10#\x12\x0c\n\x08OP_UPPER\x10$\x12\x0c\n\x08OP_TONUM\x10%\x12\r\n\tOP_TOINUM\x10&\x12\x0b\n\x07OP_CAST\x10\'\"\xe0\x0b\n\tAfyStream\x12.\n\x05owner\x18\x01 \x01(\x0b\x32\x1f.AffinityPB.AfyStream.StringMap\x12\x0f\n\x07storeID\x18\x02 \x01(\r\x12\'\n\x04pins\x18\x03 \x03(\x0b\x32\x19.AffinityPB.AfyStream.PIN\x12\x33\n\nproperties\x18\x04 \x03(\x0b\x32\x1f.AffinityPB.AfyStream.StringMap\x12\x33\n\nidentities\x18\x05 \x03(\x0b\x32\x1f.AffinityPB.AfyStream.StringMap\x12+\n\x04stmt\x18\x06 \x03(\x0b\x32\x1d.AffinityPB.AfyStream.PathSQL\x12(\n\x04txop\x18\x07 \x03(\x0e\x32\x1a.AffinityPB.AfyStream.TXOP\x12,\n\x06result\x18\x08 \x03(\x0b\x32\x1c.AffinityPB.AfyStream.Result\x12\x30\n\x08\x63ompound\x18\t \x03(\x0b\x32\x1e.AffinityPB.AfyStream.Compound\x12,\n\x06status\x18\n \x03(\x0b\x32\x1c.AffinityPB.AfyStream.Status\x12\r\n\x05\x66lush\x18\x0b \x03(\r\x12\x35\n\x08resPages\x18\x0c \x03(\x0b\x32#.AffinityPB.AfyStream.ReservedPages\x12!\n\x06values\x18\r \x03(\x0b\x32\x11.AffinityPB.Value\x12\x0b\n\x03\x45OS\x18\x0e \x01(\x08\x1a$\n\tStringMap\x12\x0b\n\x03str\x18\x01 \x02(\t\x12\n\n\x02id\x18\x02 \x02(\r\x1as\n\x06Result\x12\x0b\n\x03\x63id\x18\x01 \x01(\x04\x12$\n\x05\x65rror\x18\x02 \x01(\x0e\x32\x15.AffinityPB.ErrorCode\x12\r\n\x05\x63ount\x18\x03 \x01(\x04\x12\'\n\x02op\x18\x04 \x01(\x0e\x32\x1b.AffinityPB.AfyStream.MODOP\x1a\xbb\x01\n\x07PathSQL\x12\n\n\x02sq\x18\x01 \x02(\t\x12\x0b\n\x03\x63id\x18\x02 \x01(\x04\x12#\n\x03rtt\x18\x03 \x01(\x0e\x32\x16.AffinityPB.ReturnType\x12\x0c\n\x04uids\x18\x04 \x03(\r\x12!\n\x06params\x18\x05 \x03(\x0b\x32\x11.AffinityPB.Value\x12\r\n\x05limit\x18\x06 \x01(\r\x12\x0e\n\x06offset\x18\x07 \x01(\r\x12\x0c\n\x04mode\x18\x08 \x01(\r\x12\x14\n\x0c\x61\x62ortOnError\x18\t \x01(\x08\x1a\xbf\x01\n\x03PIN\x12\'\n\x02op\x18\x01 \x01(\x0e\x32\x1b.AffinityPB.AfyStream.MODOP\x12\x1b\n\x02id\x18\x02 \x01(\x0b\x32\x0f.AffinityPB.PID\x12\x0c\n\x04mode\x18\x03 \x01(\r\x12\x0f\n\x07nValues\x18\x04 \x01(\r\x12!\n\x06values\x18\x05 \x03(\x0b\x32\x11.AffinityPB.Value\x12\x0b\n\x03\x63id\x18\x06 \x01(\x04\x12#\n\x03rtt\x18\x07 \x01(\x0e\x32\x16.AffinityPB.ReturnType\x1aO\n\x08\x43ompound\x12\r\n\x05nPINs\x18\x01 \x01(\r\x12\'\n\x04pins\x18\x02 \x03(\x0b\x32\x19.AffinityPB.AfyStream.PIN\x12\x0b\n\x03\x63id\x18\x03 \x01(\x04\x1a#\n\x06Status\x12\x0c\n\x04\x63ode\x18\x01 \x01(\r\x12\x0b\n\x03\x63id\x18\x02 \x01(\x04\x1a/\n\rReservedPages\x12\x0e\n\x06nPages\x18\x01 \x01(\r\x12\x0e\n\x06pageID\x18\x02 \x03(\r\"R\n\x05MODOP\x12\r\n\tOP_INSERT\x10\x00\x12\r\n\tOP_UPDATE\x10\x01\x12\r\n\tOP_DELETE\x10\x02\x12\x0b\n\x07OP_COPY\x10\x03\x12\x0f\n\x0bOP_UNDELETE\x10\x04\"\x8d\x01\n\x04TXOP\x12\x0c\n\x08TX_START\x10\x01\x12\r\n\tTX_COMMIT\x10\x02\x12\x11\n\rTX_COMMIT_ALL\x10\x03\x12\x0f\n\x0bTX_ROLLBACK\x10\x04\x12\x13\n\x0fTX_ROLLBACK_ALL\x10\x05\x12\x15\n\x11TX_START_READONLY\x10\x06\x12\x18\n\x14TX_START_CLASSMODIFY\x10\x07*\x96\x04\n\tErrorCode\x12\x0f\n\x0bRC_NOTFOUND\x10\x01\x12\x14\n\x10RC_ALREADYEXISTS\x10\x02\x12\x0f\n\x0bRC_INTERNAL\x10\x03\x12\x0f\n\x0bRC_NOACCESS\x10\x04\x12\x0c\n\x08RC_NOMEM\x10\x05\x12\x0b\n\x07RC_FULL\x10\x06\x12\x10\n\x0cRC_DEVICEERR\x10\x07\x12\x10\n\x0cRC_DATAERROR\x10\x08\x12\n\n\x06RC_EOF\x10\t\x12\x0e\n\nRC_TIMEOUT\x10\n\x12\r\n\tRC_REPEAT\x10\x0b\x12\x10\n\x0cRC_CORRUPTED\x10\x0c\x12\x0f\n\x0bRC_CANCELED\x10\r\x12\x0e\n\nRC_VERSION\x10\x0e\x12\x0b\n\x07RC_TRUE\x10\x0f\x12\x0c\n\x08RC_FALSE\x10\x10\x12\x0b\n\x07RC_TYPE\x10\x11\x12\x0b\n\x07RC_DIV0\x10\x12\x12\x0f\n\x0bRC_INVPARAM\x10\x13\x12\r\n\tRC_READTX\x10\x14\x12\x0c\n\x08RC_OTHER\x10\x15\x12\x0f\n\x0bRC_DEADLOCK\x10\x16\x12\x0c\n\x08RC_QUOTA\x10\x17\x12\x0f\n\x0bRC_SHUTDOWN\x10\x18\x12\x0e\n\nRC_DELETED\x10\x19\x12\r\n\tRC_CLOSED\x10\x1a\x12\x0f\n\x0bRC_READONLY\x10\x1b\x12\x10\n\x0cRC_NOSESSION\x10\x1c\x12\x0c\n\x08RC_INVOP\x10\x1d\x12\r\n\tRC_SYNTAX\x10\x1e\x12\r\n\tRC_TOOBIG\x10\x1f\x12\x0f\n\x0bRC_PAGEFULL\x10 \x12\x11\n\rRC_CONSTRAINT\x10!*\xe1\x06\n\x08SpecProp\x12\x0c\n\x08SP_PINID\x10\x11\x12\x0f\n\x0bSP_DOCUMENT\x10\x12\x12\r\n\tSP_PARENT\x10\x13\x12\x0c\n\x08SP_VALUE\x10\x14\x12\x0e\n\nSP_CREATED\x10\x15\x12\x10\n\x0cSP_CREATEDBY\x10\x16\x12\x0e\n\nSP_UPDATED\x10\x17\x12\x10\n\x0cSP_UPDATEDBY\x10\x18\x12\n\n\x06SP_ACL\x10\x19\x12\x0c\n\x08SP_STAMP\x10\x1a\x12\x0c\n\x08SP_OBJID\x10\x1b\x12\x10\n\x0cSP_PREDICATE\x10\x1c\x12\x0c\n\x08SP_COUNT\x10\x1d\x12\x15\n\x11SP_SPECIALIZATION\x10\x1e\x12\x12\n\x0eSP_ABSTRACTION\x10\x1f\x12\x11\n\rSP_INDEX_INFO\x10 \x12\x11\n\rSP_PROPERTIES\x10!\x12\x0e\n\nSP_ONENTER\x10\"\x12\x0f\n\x0bSP_ONUPDATE\x10#\x12\x0e\n\nSP_ONLEAVE\x10$\x12\r\n\tSP_WINDOW\x10%\x12\x11\n\rSP_TRANSITION\x10&\x12\x0c\n\x08SP_EVENT\x10\'\x12\x10\n\x0cSP_CONDITION\x10(\x12\r\n\tSP_ACTION\x10)\x12\n\n\x06SP_REF\x10*\x12\x0c\n\x08SP_STATE\x10+\x12\x0f\n\x0bSP_INTERVAL\x10,\x12\x0b\n\x07SP_LOAD\x10-\x12\x0e\n\nSP_SERVICE\x10.\x12\r\n\tSP_LISTEN\x10/\x12\x0e\n\nSP_ADDRESS\x10\x30\x12\x0e\n\nSP_RESOLVE\x10\x31\x12\x0f\n\x0bSP_POSITION\x10\x32\x12\x0e\n\nSP_REQUEST\x10\x33\x12\x0e\n\nSP_CONTENT\x10\x34\x12\x0e\n\nSP_BUFSIZE\x10\x35\x12\x10\n\x0cSP_EXCEPTION\x10\x36\x12\x0e\n\nSP_VERSION\x10\x37\x12\r\n\tSP_WEIGHT\x10\x38\x12\x0b\n\x07SP_SELF\x10\x39\x12\x0e\n\nSP_PATTERN\x10:\x12\x10\n\x0cSP_PROTOTYPE\x10;\x12\x0b\n\x07SP_UNDO\x10<\x12\x10\n\x0cSP_NAMESPACE\x10=\x12\x11\n\rSP_SUBPACKAGE\x10>\x12\x0b\n\x07SP_ENUM\x10?\x12\x0f\n\x0bSP_IDENTITY\x10@\x12\x12\n\x0eSP_CONTENTTYPE\x10\x41\x12\x14\n\x10SP_CONTENTLENGTH\x10\x42\x12\r\n\tSP_ACCEPT\x10\x43\x12\x0c\n\x08SP_TOKEN\x10\x44\x12\x0b\n\x06SP_MAX\x10\xff\x01*\xc8\x01\n\x0bSpecClasses\x12\x0e\n\nSC_CLASSES\x10\x00\x12\r\n\tSC_TIMERS\x10\x01\x12\x10\n\x0cSC_LISTENERS\x10\x02\x12\x0e\n\nSC_LOADERS\x10\x03\x12\x0f\n\x0bSC_PACKAGES\x10\x04\x12\x0c\n\x08SC_NAMED\x10\x05\x12\x0c\n\x08SC_ENUMS\x10\x06\x12\r\n\tSC_STORES\x10\x07\x12\x0f\n\x0bSC_SERVICES\x10\x08\x12\r\n\tSC_FSMCTX\x10\t\x12\x0b\n\x07SC_FSMS\x10\n\x12\x0f\n\x0bSC_HANDLERS\x10\x0b*e\n\x07SpecEID\x12\x1b\n\x0e\x45ID_COLLECTION\x10\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01\x12\x1d\n\x10\x45ID_LAST_ELEMENT\x10\xfe\xff\xff\xff\xff\xff\xff\xff\xff\x01\x12\x1e\n\x11\x45ID_FIRST_ELEMENT\x10\xfd\xff\xff\xff\xff\xff\xff\xff\xff\x01*z\n\x06OpMode\x12\x0e\n\x08OM_PURGE\x10\x80\x80\x10\x12\x15\n\x0eOM_CHECK_STAMP\x10\x80\x80\x80\x01\x12\x12\n\x0cOM_PURGE_IDS\x10\x80\x80@\x12\x13\n\x0cOM_ALL_WORDS\x10\x80\x80\x80\x02\x12\x11\n\nOM_DELETED\x10\x80\x80\x80\x04\x12\r\n\x06OM_RAW\x10\x80\x80\x80\x08*\x9c\x01\n\x08PINFlags\x12\x19\n\x11PF_NO_REPLICATION\x10\x80\x80\x80\x80\x04\x12\x11\n\tPF_NOTIFY\x10\x80\x80\x80\x80\x02\x12\x15\n\rPF_REPLICATED\x10\x80\x80\x80\x80\x01\x12\x10\n\tPF_HIDDEN\x10\x80\x80\x80@\x12\x0f\n\x08PF_INMEM\x10\x80\x80\x80 \x12\x13\n\x0cPF_TRANSIENT\x10\x80\x80\x80\x10\x12\x13\n\x0cPF_IMMUTABLE\x10\x80\x80\x80\x08*\xa2\x01\n\tMetaProps\x12\x0e\n\tMETA_PART\x10\x80\x01\x12\x11\n\x0cMETA_FTINDEX\x10\x80\x01\x12\x11\n\rMETA_SSTORAGE\x10@\x12\r\n\tMETA_SYNC\x10\x10\x12\x0e\n\nMETA_ASYNC\x10\x08\x12\x0f\n\x0bMETA_CREATE\x10\x04\x12\x0e\n\nMETA_WRITE\x10\x02\x12\r\n\tMETA_READ\x10\x01\x12\x0c\n\x08META_ALT\x10\x01\x1a\x02\x10\x01*G\n\nClassFlags\x12\x0e\n\nCF_SDELETE\x10\x01\x12\x0b\n\x07\x43\x46_VIEW\x10\x02\x12\x0e\n\nCF_INDEXED\x10\x04\x12\x0c\n\x08\x43\x46_INMEM\x10\x08*S\n\nReturnType\x12\x0b\n\x07RT_PINS\x10\x01\x12\x0c\n\x08RT_COUNT\x10\x02\x12\x0b\n\x07RT_PIDS\x10\x03\x12\x0e\n\nRT_SRCPINS\x10\x04\x12\r\n\tRT_VALUES\x10\x05\x42\x16\n\x0c\x63om.affinityB\x06stream')
 
 _ERRORCODE = _descriptor.EnumDescriptor(
   name='ErrorCode',
@@ -157,8 +157,8 @@ _ERRORCODE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=3756,
-  serialized_end=4290,
+  serialized_start=3466,
+  serialized_end=4000,
 )
 
 ErrorCode = enum_type_wrapper.EnumTypeWrapper(_ERRORCODE)
@@ -221,11 +221,11 @@ _SPECPROP = _descriptor.EnumDescriptor(
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='SP_SUBCLASSES', index=13, number=30,
+      name='SP_SPECIALIZATION', index=13, number=30,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='SP_SUPERCLASSES', index=14, number=31,
+      name='SP_ABSTRACTION', index=14, number=31,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
@@ -383,8 +383,8 @@ _SPECPROP = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=4293,
-  serialized_end=5155,
+  serialized_start=4003,
+  serialized_end=4868,
 )
 
 SpecProp = enum_type_wrapper.EnumTypeWrapper(_SPECPROP)
@@ -445,8 +445,8 @@ _SPECCLASSES = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=5158,
-  serialized_end=5358,
+  serialized_start=4871,
+  serialized_end=5071,
 )
 
 SpecClasses = enum_type_wrapper.EnumTypeWrapper(_SPECCLASSES)
@@ -471,8 +471,8 @@ _SPECEID = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=5360,
-  serialized_end=5461,
+  serialized_start=5073,
+  serialized_end=5174,
 )
 
 SpecEID = enum_type_wrapper.EnumTypeWrapper(_SPECEID)
@@ -509,8 +509,8 @@ _OPMODE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=5463,
-  serialized_end=5585,
+  serialized_start=5176,
+  serialized_end=5298,
 )
 
 OpMode = enum_type_wrapper.EnumTypeWrapper(_OPMODE)
@@ -551,8 +551,8 @@ _PINFLAGS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=5588,
-  serialized_end=5744,
+  serialized_start=5301,
+  serialized_end=5457,
 )
 
 PINFlags = enum_type_wrapper.EnumTypeWrapper(_PINFLAGS)
@@ -601,8 +601,8 @@ _METAPROPS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=_descriptor._ParseOptions(descriptor_pb2.EnumOptions(), '\020\001'),
-  serialized_start=5747,
-  serialized_end=5909,
+  serialized_start=5460,
+  serialized_end=5622,
 )
 
 MetaProps = enum_type_wrapper.EnumTypeWrapper(_METAPROPS)
@@ -631,8 +631,8 @@ _CLASSFLAGS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=5911,
-  serialized_end=5982,
+  serialized_start=5624,
+  serialized_end=5695,
 )
 
 ClassFlags = enum_type_wrapper.EnumTypeWrapper(_CLASSFLAGS)
@@ -665,8 +665,8 @@ _RETURNTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=5984,
-  serialized_end=6067,
+  serialized_start=5697,
+  serialized_end=5780,
 )
 
 ReturnType = enum_type_wrapper.EnumTypeWrapper(_RETURNTYPE)
@@ -716,8 +716,8 @@ SP_STAMP = 26
 SP_OBJID = 27
 SP_PREDICATE = 28
 SP_COUNT = 29
-SP_SUBCLASSES = 30
-SP_SUPERCLASSES = 31
+SP_SPECIALIZATION = 30
+SP_ABSTRACTION = 31
 SP_INDEX_INFO = 32
 SP_PROPERTIES = 33
 SP_ONENTER = 34
@@ -917,8 +917,8 @@ _VALUE_VALUETYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=1303,
-  serialized_end=1694,
+  serialized_start=1026,
+  serialized_end=1417,
 )
 
 _VALUE_MODOP = _descriptor.EnumDescriptor(
@@ -952,150 +952,146 @@ _VALUE_MODOP = _descriptor.EnumDescriptor(
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_EDIT', index=6, number=6,
+      name='OP_RENAME', index=6, number=6,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_RENAME', index=7, number=7,
+      name='OP_PLUS', index=7, number=7,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_PLUS', index=8, number=8,
+      name='OP_MINUS', index=8, number=8,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_MINUS', index=9, number=9,
+      name='OP_MUL', index=9, number=9,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_MUL', index=10, number=10,
+      name='OP_DIV', index=10, number=10,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_DIV', index=11, number=11,
+      name='OP_MOD', index=11, number=11,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_MOD', index=12, number=12,
+      name='OP_NEG', index=12, number=12,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_NEG', index=13, number=13,
+      name='OP_NOT', index=13, number=13,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_NOT', index=14, number=14,
+      name='OP_AND', index=14, number=14,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_AND', index=15, number=15,
+      name='OP_OR', index=15, number=15,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_OR', index=16, number=16,
+      name='OP_XOR', index=16, number=16,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_XOR', index=17, number=17,
+      name='OP_LSHIFT', index=17, number=17,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_LSHIFT', index=18, number=18,
+      name='OP_RSHIFT', index=18, number=18,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_RSHIFT', index=19, number=19,
+      name='OP_MIN', index=19, number=19,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_MIN', index=20, number=20,
+      name='OP_MAX', index=20, number=20,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_MAX', index=21, number=21,
+      name='OP_ABS', index=21, number=21,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_ABS', index=22, number=22,
+      name='OP_LN', index=22, number=22,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_LN', index=23, number=23,
+      name='OP_EXP', index=23, number=23,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_EXP', index=24, number=24,
+      name='OP_POW', index=24, number=24,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_POW', index=25, number=25,
+      name='OP_SQRT', index=25, number=25,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_SQRT', index=26, number=26,
+      name='OP_SIN', index=26, number=26,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_SIN', index=27, number=27,
+      name='OP_COS', index=27, number=27,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_COS', index=28, number=28,
+      name='OP_TAN', index=28, number=28,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_TAN', index=29, number=29,
+      name='OP_ASIN', index=29, number=29,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_ASIN', index=30, number=30,
+      name='OP_ACOS', index=30, number=30,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_ACOS', index=31, number=31,
+      name='OP_ATAN', index=31, number=31,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_ATAN', index=32, number=32,
+      name='OP_FLOOR', index=32, number=32,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_FLOOR', index=33, number=33,
+      name='OP_CEIL', index=33, number=33,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_CEIL', index=34, number=34,
+      name='OP_CONCAT', index=34, number=34,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_CONCAT', index=35, number=35,
+      name='OP_LOWER', index=35, number=35,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_LOWER', index=36, number=36,
+      name='OP_UPPER', index=36, number=36,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_UPPER', index=37, number=37,
+      name='OP_TONUM', index=37, number=37,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_TONUM', index=38, number=38,
+      name='OP_TOINUM', index=38, number=38,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='OP_TOINUM', index=39, number=39,
-      options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='OP_CAST', index=40, number=40,
+      name='OP_CAST', index=39, number=39,
       options=None,
       type=None),
   ],
   containing_type=None,
   options=None,
-  serialized_start=1697,
-  serialized_end=2246,
+  serialized_start=1420,
+  serialized_end=1956,
 )
 
 _AFYSTREAM_MODOP = _descriptor.EnumDescriptor(
@@ -1127,8 +1123,8 @@ _AFYSTREAM_MODOP = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=3527,
-  serialized_end=3609,
+  serialized_start=3237,
+  serialized_end=3319,
 )
 
 _AFYSTREAM_TXOP = _descriptor.EnumDescriptor(
@@ -1168,8 +1164,8 @@ _AFYSTREAM_TXOP = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=3612,
-  serialized_end=3753,
+  serialized_start=3322,
+  serialized_end=3463,
 )
 
 
@@ -1257,122 +1253,6 @@ _REF = _descriptor.Descriptor(
 )
 
 
-_VALUE_STREDIT = _descriptor.Descriptor(
-  name='StrEdit',
-  full_name='AffinityPB.Value.StrEdit',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='str', full_name='AffinityPB.Value.StrEdit.str', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=unicode("", "utf-8"),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='bstr', full_name='AffinityPB.Value.StrEdit.bstr', index=1,
-      number=2, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value="",
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='length', full_name='AffinityPB.Value.StrEdit.length', index=2,
-      number=3, type=13, cpp_type=3, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='offset', full_name='AffinityPB.Value.StrEdit.offset', index=3,
-      number=4, type=4, cpp_type=4, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  extension_ranges=[],
-  serialized_start=816,
-  serialized_end=884,
-)
-
-_VALUE_BITEDIT = _descriptor.Descriptor(
-  name='BitEdit',
-  full_name='AffinityPB.Value.BitEdit',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='bits', full_name='AffinityPB.Value.BitEdit.bits', index=0,
-      number=1, type=13, cpp_type=3, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='mask', full_name='AffinityPB.Value.BitEdit.mask', index=1,
-      number=2, type=13, cpp_type=3, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  extension_ranges=[],
-  serialized_start=886,
-  serialized_end=923,
-)
-
-_VALUE_BITEDIT64 = _descriptor.Descriptor(
-  name='BitEdit64',
-  full_name='AffinityPB.Value.BitEdit64',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='bits', full_name='AffinityPB.Value.BitEdit64.bits', index=0,
-      number=1, type=4, cpp_type=4, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='mask', full_name='AffinityPB.Value.BitEdit64.mask', index=1,
-      number=2, type=4, cpp_type=4, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  extension_ranges=[],
-  serialized_start=925,
-  serialized_end=964,
-)
-
 _VALUE_VARRAY = _descriptor.Descriptor(
   name='VArray',
   full_name='AffinityPB.Value.VArray',
@@ -1403,8 +1283,8 @@ _VALUE_VARRAY = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=966,
-  serialized_end=1015,
+  serialized_start=689,
+  serialized_end=738,
 )
 
 _VALUE_VENUM = _descriptor.Descriptor(
@@ -1437,8 +1317,8 @@ _VALUE_VENUM = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1017,
-  serialized_end=1055,
+  serialized_start=740,
+  serialized_end=778,
 )
 
 _VALUE_VMAPELT = _descriptor.Descriptor(
@@ -1471,8 +1351,8 @@ _VALUE_VMAPELT = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1057,
-  serialized_end=1132,
+  serialized_start=780,
+  serialized_end=855,
 )
 
 _VALUE_VMAP = _descriptor.Descriptor(
@@ -1505,8 +1385,8 @@ _VALUE_VMAP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1134,
-  serialized_end=1189,
+  serialized_start=857,
+  serialized_end=912,
 )
 
 _VALUE_AARRAY = _descriptor.Descriptor(
@@ -1560,8 +1440,8 @@ _VALUE_AARRAY = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1191,
-  serialized_end=1300,
+  serialized_start=914,
+  serialized_end=1023,
 )
 
 _VALUE = _descriptor.Descriptor(
@@ -1705,56 +1585,35 @@ _VALUE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='edit', full_name='AffinityPB.Value.edit', index=19,
-      number=20, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='units', full_name='AffinityPB.Value.units', index=20,
-      number=21, type=13, cpp_type=3, label=1,
+      name='units', full_name='AffinityPB.Value.units', index=19,
+      number=20, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='enu', full_name='AffinityPB.Value.enu', index=21,
+      name='enu', full_name='AffinityPB.Value.enu', index=20,
+      number=21, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='map', full_name='AffinityPB.Value.map', index=21,
       number=22, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='map', full_name='AffinityPB.Value.map', index=22,
+      name='arr', full_name='AffinityPB.Value.arr', index=22,
       number=23, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='bedt', full_name='AffinityPB.Value.bedt', index=23,
-      number=24, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='bedt64', full_name='AffinityPB.Value.bedt64', index=24,
-      number=25, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='arr', full_name='AffinityPB.Value.arr', index=25,
-      number=26, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='cid', full_name='AffinityPB.Value.cid', index=26,
+      name='cid', full_name='AffinityPB.Value.cid', index=23,
       number=128, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -1763,7 +1622,7 @@ _VALUE = _descriptor.Descriptor(
   ],
   extensions=[
   ],
-  nested_types=[_VALUE_STREDIT, _VALUE_BITEDIT, _VALUE_BITEDIT64, _VALUE_VARRAY, _VALUE_VENUM, _VALUE_VMAPELT, _VALUE_VMAP, _VALUE_AARRAY, ],
+  nested_types=[_VALUE_VARRAY, _VALUE_VENUM, _VALUE_VMAPELT, _VALUE_VMAP, _VALUE_AARRAY, ],
   enum_types=[
     _VALUE_VALUETYPE,
     _VALUE_MODOP,
@@ -1772,7 +1631,7 @@ _VALUE = _descriptor.Descriptor(
   is_extendable=False,
   extension_ranges=[],
   serialized_start=145,
-  serialized_end=2246,
+  serialized_end=1956,
 )
 
 
@@ -1806,8 +1665,8 @@ _AFYSTREAM_STRINGMAP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2821,
-  serialized_end=2857,
+  serialized_start=2531,
+  serialized_end=2567,
 )
 
 _AFYSTREAM_RESULT = _descriptor.Descriptor(
@@ -1854,8 +1713,8 @@ _AFYSTREAM_RESULT = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2859,
-  serialized_end=2974,
+  serialized_start=2569,
+  serialized_end=2684,
 )
 
 _AFYSTREAM_PATHSQL = _descriptor.Descriptor(
@@ -1937,8 +1796,8 @@ _AFYSTREAM_PATHSQL = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2977,
-  serialized_end=3164,
+  serialized_start=2687,
+  serialized_end=2874,
 )
 
 _AFYSTREAM_PIN = _descriptor.Descriptor(
@@ -2006,8 +1865,8 @@ _AFYSTREAM_PIN = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3167,
-  serialized_end=3358,
+  serialized_start=2877,
+  serialized_end=3068,
 )
 
 _AFYSTREAM_COMPOUND = _descriptor.Descriptor(
@@ -2047,8 +1906,8 @@ _AFYSTREAM_COMPOUND = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3360,
-  serialized_end=3439,
+  serialized_start=3070,
+  serialized_end=3149,
 )
 
 _AFYSTREAM_STATUS = _descriptor.Descriptor(
@@ -2081,8 +1940,8 @@ _AFYSTREAM_STATUS = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3441,
-  serialized_end=3476,
+  serialized_start=3151,
+  serialized_end=3186,
 )
 
 _AFYSTREAM_RESERVEDPAGES = _descriptor.Descriptor(
@@ -2115,8 +1974,8 @@ _AFYSTREAM_RESERVEDPAGES = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3478,
-  serialized_end=3525,
+  serialized_start=3188,
+  serialized_end=3235,
 )
 
 _AFYSTREAM = _descriptor.Descriptor(
@@ -2235,14 +2094,11 @@ _AFYSTREAM = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2249,
-  serialized_end=3753,
+  serialized_start=1959,
+  serialized_end=3463,
 )
 
 _REF.fields_by_name['id'].message_type = _PID
-_VALUE_STREDIT.containing_type = _VALUE;
-_VALUE_BITEDIT.containing_type = _VALUE;
-_VALUE_BITEDIT64.containing_type = _VALUE;
 _VALUE_VARRAY.fields_by_name['v'].message_type = _VALUE
 _VALUE_VARRAY.containing_type = _VALUE;
 _VALUE_VENUM.containing_type = _VALUE;
@@ -2258,11 +2114,8 @@ _VALUE.fields_by_name['id'].message_type = _PID
 _VALUE.fields_by_name['varray'].message_type = _VALUE_VARRAY
 _VALUE.fields_by_name['ref'].message_type = _REF
 _VALUE.fields_by_name['op'].enum_type = _VALUE_MODOP
-_VALUE.fields_by_name['edit'].message_type = _VALUE_STREDIT
 _VALUE.fields_by_name['enu'].message_type = _VALUE_VENUM
 _VALUE.fields_by_name['map'].message_type = _VALUE_VMAP
-_VALUE.fields_by_name['bedt'].message_type = _VALUE_BITEDIT
-_VALUE.fields_by_name['bedt64'].message_type = _VALUE_BITEDIT64
 _VALUE.fields_by_name['arr'].message_type = _VALUE_AARRAY
 _VALUE_VALUETYPE.containing_type = _VALUE;
 _VALUE_MODOP.containing_type = _VALUE;
@@ -2314,24 +2167,6 @@ class Ref(_message.Message):
 
 class Value(_message.Message):
   __metaclass__ = _reflection.GeneratedProtocolMessageType
-
-  class StrEdit(_message.Message):
-    __metaclass__ = _reflection.GeneratedProtocolMessageType
-    DESCRIPTOR = _VALUE_STREDIT
-
-    # @@protoc_insertion_point(class_scope:AffinityPB.Value.StrEdit)
-
-  class BitEdit(_message.Message):
-    __metaclass__ = _reflection.GeneratedProtocolMessageType
-    DESCRIPTOR = _VALUE_BITEDIT
-
-    # @@protoc_insertion_point(class_scope:AffinityPB.Value.BitEdit)
-
-  class BitEdit64(_message.Message):
-    __metaclass__ = _reflection.GeneratedProtocolMessageType
-    DESCRIPTOR = _VALUE_BITEDIT64
-
-    # @@protoc_insertion_point(class_scope:AffinityPB.Value.BitEdit64)
 
   class VArray(_message.Message):
     __metaclass__ = _reflection.GeneratedProtocolMessageType

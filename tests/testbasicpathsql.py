@@ -961,13 +961,46 @@ def test_case_46():
 
     lAffinity.close()
     return True
+
+def test_case_47():
+    # for repro bug#494
+    lAffinity = AFFINITY()
+    lAffinity.open(pKeepAlive=True)
+
+    lAffinity.clearPrefixes();   
+    lAffinity.setPrefix("alrm","http://example/alarm-system")
+    lAffinity.q("CREATE ENUMERATION alrm:DOOR_STATES AS {'OPEN', 'CLOSED'}")
+    lAffinity.q("CREATE CLASS alrm:components AS SELECT * WHERE alrm:\"component/id\" IN :0")
+    lAffinity.q("CREATE CLASS alrm:homes AS SELECT * WHERE alrm:\"home/id\" IN :0")
+    lAffinity.q("INSERT alrm:\"home/id\"='C147'")
+    lAffinity.q("UPDATE alrm:homes('C147') ADD alrm:doors=(INSERT alrm:\"door/id\"=1, alrm:\"door/state\"=alrm:DOOR_STATES#CLOSED)")
+    lAffinity.q("UPDATE alrm:homes('C147').alrm:doors SET alrm:\"door/state\"=alrm:DOOR_STATES#OPEN")
+    lAffinity.q("UPDATE alrm:homes('C147').alrm:doors SET alrm:\"door/state\"=alrm:DOOR_STATES#OPEN WHERE alrm:\"door/id\"=1")
+
+    lAffinity.close()
+    return True   
+
+def test_case_48():
+    # for repro bug#496
+    lAffinity = AFFINITY()
+    lAffinity.open()
     
+    lAffinity.q("CREATE CLASS houses AS SELECT * WHERE houseid IN :0")
+    lAffinity.q("INSERT houseid=1, doors={(INSERT doorid=1, color='green'),(INSERT doorid=2, color='blue'),(INSERT doorid=3, color='red')};")
+    assert 1 == lAffinity.qCount("SELECT color FROM houses(1).doors WHERE doorid=1")
+    assert 1 == lAffinity.qCount("SELECT color FROM houses(1).doors WHERE doorid=2;")
+    assert 3 == lAffinity.qCount("SELECT color FROM houses(1).doors")
+    assert 3 == lAffinity.qCount("SELECT color FROM houses.doors;") 
+
+    lAffinity.close()
+    return True  
+
 def _entryPoint():
     # test cases are executed here
     start = time.time()
     TEST = 'test_case_'
     cnt = 0
-    for i in range(1, 47):
+    for i in range(1, 49):
         eval(TEST+str(i)+'()')
         cnt+=1
     
